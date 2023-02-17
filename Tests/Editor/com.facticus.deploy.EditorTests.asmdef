@@ -1,7 +1,7 @@
 {
-  "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}.Tests",
+  "name": "com.facticus.deploy.Editor.Tests",
   "references": [
-    "Unity.com.{{COMPANY}}.{{REPOSITORY_NAME}}"
+    "com.facticus.deploy"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"

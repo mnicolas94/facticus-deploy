@@ -1,20 +1,23 @@
 {
-  "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}",
+  "name": "com.facticus.deploy",
   "version": "0.2.1",
-  "displayName": "{{FRIENDLY_NAME}}",
-  "description": "{{DESCRIPTION}}",
-  "unity": "{{UNITY_VERSION}}",
+  "displayName": "Deploy",
+  "description": "A Unity package to help you build and deploy your game remotely with Github Actions",
+  "unity": "2021.3",
   "unityRelease": "",
-  "dependencies": {},
+  "dependencies": {
+    "com.facticus.utils":  "0.12.21",
+    "com.mackysoft.serializereference-extensions": "1.1.7"
+  },
   "keywords": [],
   "author": {
-    "name": "{{COMPANY_FRIENDLY_NAME}}",
-    "email": "{{REPORT_EMAIL}}",
-    "url": "{{COMPANY_WEBSITE}}"
+    "name": "Facticus",
+    "email": "",
+    "url": ""
   },
   "repository": {
     "type": "git",
-    "url": "{{GIT_REPOSITORY}}"
+    "url": "https://github.com/mnicolas94/facticus-deploy.git"
   },
   "license": "MIT"
 }
