@@ -36,12 +36,15 @@ namespace Deploy.Editor.Drawers
             {
                 _buildButton.SetEnabled(false);
                 response = await ((BuildDeploySet)target).Build();
-                _buildButton.SetEnabled(true);
             }
             catch (Exception e)
             {
                 error = true;
                 response = e.Message;
+            }
+            finally
+            {
+                _buildButton.SetEnabled(true);
             }
 
             response = string.IsNullOrEmpty(response) ? "Workflow started succesfully" : response;
