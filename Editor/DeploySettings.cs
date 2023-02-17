@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEditor;
+using UnityEngine;
 using Utils;
 
 namespace Deploy.Editor
@@ -15,5 +17,25 @@ namespace Deploy.Editor
 
         public string DefaultAssetDirectory => 
             string.IsNullOrEmpty(_defaultAssetDirectory) ? "Assets": _defaultAssetDirectory;
+
+
+        public static DeploySettings GetOrCreate()
+        {
+            if (Instance == null)
+            {
+                // create directory
+                var dir = "Assets/Editor/Deploy";
+                Directory.CreateDirectory(dir);
+                AssetDatabase.Refresh();
+
+                // create asset
+                var settings = CreateInstance<DeploySettings>();
+                var path = Path.Join(dir, "DeploySettings.asset");
+                AssetDatabase.CreateAsset(settings, path);
+                AssetDatabase.SaveAssets();
+            }
+
+            return Instance;
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace Deploy.Editor.Data
             var inputsString = $"{{\"build_set\":\"{buildSetInput}\"}}";
             
             var (owner, repo) = GetOwnerAndRepo();
-            var workflowId = DeploySettings.Instance.WorkflowId;
+            var workflowId = DeploySettings.GetOrCreate().WorkflowId;
             var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
             var userAgent = GetGitUser();
             var token = GetToken();

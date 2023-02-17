@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using Deploy.Editor.Data;
 using Deploy.Editor.Utility;
-using Deploy.Editor.VisualElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace Deploy.Editor.EditorWindows
             // Get and populate list view
             _list = root.Q<ListView>("SetsList");
             _list.onSelectionChange += OnListSelectionChange;
-            PopulateList();
+            RefreshList();
             
             // get the Add button
             _addButton = root.Q<Button>("AddButton");
@@ -89,9 +88,13 @@ namespace Deploy.Editor.EditorWindows
 
         private void OnAddNewClicked()
         {
+            // create the directory if it does not exist
+            var dir = DeploySettings.GetOrCreate().DefaultAssetDirectory;
+            Directory.CreateDirectory(dir);
+            AssetDatabase.Refresh();
+
             // create the new asset
             var newSet = CreateInstance<BuildDeploySet>();
-            var dir = DeploySettings.Instance.DefaultAssetDirectory;
             var path = Path.Join(dir, "New Set.asset");
             AssetDatabase.CreateAsset(newSet, path);
             AssetDatabase.SaveAssets();
@@ -123,6 +126,11 @@ namespace Deploy.Editor.EditorWindows
             _listSelectedIndex = _list.selectedIndex;
             string setLabelText;
             
+            if (_inspectorContainer.Contains(_ie))
+            {
+                _inspectorContainer.Remove(_ie);
+            }
+            
             if (_listSelectedIndex < 0)
             {
                 setLabelText = "-";
@@ -130,9 +138,9 @@ namespace Deploy.Editor.EditorWindows
             else
             {
                 var set = _list.selectedItem as BuildDeploySet;
-                if (_inspectorContainer.Contains(_ie))
+                if (set == null)
                 {
-                    _inspectorContainer.Remove(_ie);
+                    return;
                 }
 
                 if (set != null)
