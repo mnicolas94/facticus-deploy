@@ -1,0 +1,11 @@
+{
+  "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}.Editor.Tests",
+  "references": [
+    "com.{{COMPANY}}.{{REPOSITORY_NAME}}"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}

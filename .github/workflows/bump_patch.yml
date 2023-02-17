@@ -1,0 +1,9 @@
+name: Bump version patch on push to main branch
+
+on:
+  push:
+    branches: [ main, dev, develop ]
+    
+jobs:
+  bumpVersion:
+    uses: mnicolas94/UnityCICDWorkflows/.github/workflows/bump_patch_package.yml@v1-pre-8

@@ -1,0 +1,20 @@
+{
+  "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}",
+  "version": "0.2.1",
+  "displayName": "{{FRIENDLY_NAME}}",
+  "description": "{{DESCRIPTION}}",
+  "unity": "{{UNITY_VERSION}}",
+  "unityRelease": "",
+  "dependencies": {},
+  "keywords": [],
+  "author": {
+    "name": "{{COMPANY_FRIENDLY_NAME}}",
+    "email": "{{REPORT_EMAIL}}",
+    "url": "{{COMPANY_WEBSITE}}"
+  },
+  "repository": {
+    "type": "git",
+    "url": "{{GIT_REPOSITORY}}"
+  },
+  "license": "MIT"
+}

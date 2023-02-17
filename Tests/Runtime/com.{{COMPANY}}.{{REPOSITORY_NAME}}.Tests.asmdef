@@ -1,0 +1,11 @@
+{
+  "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}.Tests",
+  "references": [
+    "Unity.com.{{COMPANY}}.{{REPOSITORY_NAME}}"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}
