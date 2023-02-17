@@ -125,7 +125,7 @@ namespace Deploy.Editor.EditorWindows
         private void OnListSelectionChange(IEnumerable<object> obj)
         {
             _listSelectedIndex = _list.selectedIndex;
-            string setLabelText;
+            string setLabelText = "";
             
             if (_inspectorContainer.Contains(_ie))
             {
@@ -139,18 +139,12 @@ namespace Deploy.Editor.EditorWindows
             else
             {
                 var set = _list.selectedItem as BuildDeploySet;
-                if (set == null)
-                {
-                    return;
-                }
-
                 if (set != null)
                 {
                     _ie = new InspectorElement(set);
                     _inspectorContainer.Add(_ie);
+                    setLabelText = set.name;
                 }
-
-                setLabelText = set.name;
             }
 
             _setNameLabel.text = setLabelText;

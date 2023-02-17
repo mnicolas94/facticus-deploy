@@ -11,7 +11,11 @@ namespace Deploy.Editor
         [SerializeField] private string _defaultBranch;
         [SerializeField] private string _defaultAssetDirectory = "Assets/Editor/Deploy";
 
-        public string WorkflowId => _workflowId;
+        public string WorkflowId
+        {
+            get => _workflowId;
+            set => _workflowId = value;
+        }
 
         public string DefaultBranch => _defaultBranch;
 

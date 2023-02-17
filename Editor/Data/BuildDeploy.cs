@@ -160,7 +160,7 @@ namespace Deploy.Editor.Data
                 token = settings.GithubAuthToken;
                 return true;
             }
-            catch (Exception _)
+            catch
             {
                 token = "";
                 return false;

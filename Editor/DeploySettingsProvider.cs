@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using UnityEditor;
+using UnityEditor.Search;
+using UnityEditor.UIElements;
 using UnityEngine;
 using Utils.Editor.EditorGUIUtils;
 
@@ -15,22 +17,28 @@ namespace Deploy.Editor
             var keywords = existsSettings ? SettingsProvider.GetSearchKeywordsFromSerializedObject(so) : new string[0];
             var provider = new SettingsProvider("Project/Facticus/Deploy", SettingsScope.Project)
             {
-                guiHandler = (searchContext) =>
+                activateHandler = (searchContext, root) =>
                 {
-                    EditorGUILayout.Space(12);
-                    
-                    if (existsSettings)
-                        GUIUtils.DrawSerializedObject(so);
-                    else
-                    {
-                        var r = EditorGUILayout.GetControlRect();
-                        if (GUI.Button(r, "Create settings"))
-                        {
-                            var settings = ScriptableObject.CreateInstance<DeploySettings>();
-                            AssetDatabase.CreateAsset(settings, "Assets/DeploySettings.asset");
-                        }
-                    }
+                    var settings = DeploySettings.GetOrCreate();
+                    var inspector = new InspectorElement(settings);
+                    root.Add(inspector);
                 },
+                // guiHandler = (searchContext) =>
+                // {
+                //     EditorGUILayout.Space(12);
+                //     
+                //     if (existsSettings)
+                //         GUIUtils.DrawSerializedObject(so);
+                //     else
+                //     {
+                //         var r = EditorGUILayout.GetControlRect();
+                //         if (GUI.Button(r, "Create settings"))
+                //         {
+                //             var settings = ScriptableObject.CreateInstance<DeploySettings>();
+                //             AssetDatabase.CreateAsset(settings, "Assets/DeploySettings.asset");
+                //         }
+                //     }
+                // },
                 keywords = keywords
             };
             
