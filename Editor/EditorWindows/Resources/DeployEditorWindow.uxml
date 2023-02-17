@@ -3,7 +3,7 @@
     <ui:VisualElement>
         <ui:VisualElement name="ListContainer">
             <ui:Label text="Build and Deploy sets" display-tooltip-when-elided="true" style="font-size: 14px; -unity-text-align: upper-center; margin-left: 0; margin-right: 0; margin-top: 4px; margin-bottom: 8px;" />
-            <ui:ListView focusable="true" name="SetsList" show-alternating-row-backgrounds="ContentOnly" style="flex-grow: 0;" />
+            <ui:ListView focusable="true" name="SetsList" show-alternating-row-backgrounds="ContentOnly" reorderable="true" style="flex-grow: 0;" />
             <ui:VisualElement name="AddButtonContainer" style="flex-direction: row-reverse; flex-shrink: 0;">
                 <ui:Button text="New" display-tooltip-when-elided="true" name="AddButton" />
                 <ui:Button text="Remove" display-tooltip-when-elided="true" name="RemoveButton" />
