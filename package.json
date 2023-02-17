@@ -1,12 +1,12 @@
 {
   "name": "com.facticus.deploy",
-  "version": "0.2.1",
+  "version": "0.1.0",
   "displayName": "Deploy",
   "description": "A Unity package to help you build and deploy your game remotely with Github Actions",
   "unity": "2021.3",
   "unityRelease": "",
   "dependencies": {
-    "com.facticus.utils":  "0.12.21",
+    "com.facticus.utils": "0.12.21",
     "com.mackysoft.serializereference-extensions": "1.1.7"
   },
   "keywords": [],
