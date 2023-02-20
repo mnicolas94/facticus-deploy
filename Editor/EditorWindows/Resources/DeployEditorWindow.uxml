@@ -1,6 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <uie:Toolbar />
-    <ui:VisualElement>
+    <uie:Toolbar>
+        <uie:ToolbarToggle focusable="false" label="Sets" value="false" name="sets-toolbar-toggle" />
+        <uie:ToolbarToggle focusable="false" label="Package settings" name="settings-toolbar-toggle" />
+    </uie:Toolbar>
+    <ui:VisualElement name="sets-container" style="flex-grow: 1;">
         <ui:VisualElement name="ListContainer">
             <ui:Label text="Build and Deploy sets" display-tooltip-when-elided="true" style="font-size: 14px; -unity-text-align: upper-center; margin-left: 0; margin-right: 0; margin-top: 4px; margin-bottom: 8px;" />
             <ui:ListView focusable="true" name="SetsList" show-alternating-row-backgrounds="ContentOnly" reorderable="true" style="flex-grow: 0;" />
@@ -15,5 +18,8 @@
         <ui:VisualElement name="SetEditorContainer" style="flex-grow: 2;">
             <ui:Label text="Set settings" display-tooltip-when-elided="true" name="SetNameLabel" style="font-size: 14px; -unity-text-align: upper-center; flex-direction: row; margin-bottom: 8px; margin-top: 4px;" />
         </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="settings-container">
+        <ui:TextField picking-mode="Ignore" label="Text Field" value="filler text" text="filler text" />
     </ui:VisualElement>
 </ui:UXML>

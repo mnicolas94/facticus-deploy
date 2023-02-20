@@ -13,6 +13,8 @@ namespace Deploy.Editor.EditorWindows
     {
         [SerializeField] private int _listSelectedIndex = -1;
         
+        private VisualElement _setsContainer;
+        private VisualElement _settingsContainer;
         private List<BuildDeploySet> _sets = new List<BuildDeploySet>();
         private ListView _list;
         private Button _addButton;
@@ -36,38 +38,62 @@ namespace Deploy.Editor.EditorWindows
             // Import UXML
             var visualTree = Resources.Load<VisualTreeAsset>("DeployEditorWindow");
             VisualElement uxmlContent = visualTree.Instantiate();
+            uxmlContent.style.flexGrow = 1;
             root.Add(uxmlContent);
             
+            var setsToggle = root.Q<ToolbarToggle>("sets-toolbar-toggle");
+            var settingsToggle = root.Q<ToolbarToggle>("settings-toolbar-toggle");
+            _setsContainer = root.Q("sets-container");
+            _settingsContainer = root.Q("settings-container");
+            TabBarUtility.SetupTabBar(new List<(Toggle, VisualElement)>
+            {
+                (setsToggle, _setsContainer),
+                (settingsToggle, _settingsContainer)
+            });
+            
+            SetupSetsView(root);
+            SetupSettingsView(root);
+        }
+
+        private void SetupSetsView(VisualElement root)
+        {
             // get inspector element
             _inspectorContainer = root.Q("SetEditorContainer");
-            
+
             // set name label
             _setNameLabel = root.Q<Label>("SetNameLabel");
-            
+
             // Get and populate list view
             _list = root.Q<ListView>("SetsList");
             _list.onSelectionChange += OnListSelectionChange;
             RefreshList();
-            
+
             // get the Add button
             _addButton = root.Q<Button>("AddButton");
             _addButton.clicked += OnAddNewClicked;
-            
+
             // get the Remove button
             _removeButton = root.Q<Button>("RemoveButton");
             _removeButton.clicked += OnRemoveClicked;
-            
+
             // get the Remove button
             _refreshButton = root.Q<Button>("RefreshButton");
             _refreshButton.clicked += OnRefreshClicked;
-            
+
             // add a 2 pane split view
             var listContainer = root.Q("ListContainer");
             var splitView = new TwoPaneSplitView(
                 0, 250, TwoPaneSplitViewOrientation.Horizontal);
-            root.Add(splitView);
+            _setsContainer.Add(splitView);
             splitView.Add(listContainer);
             splitView.Add(_inspectorContainer);
+        }
+
+        private void SetupSettingsView(VisualElement root)
+        {
+            var settings = DeploySettings.GetOrCreate();
+            var settingsElement = new InspectorElement(settings);
+            _settingsContainer.Add(settingsElement);
         }
 
         private void PopulateList()
