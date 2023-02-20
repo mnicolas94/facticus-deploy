@@ -20,6 +20,6 @@
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="settings-container">
-        <ui:TextField picking-mode="Ignore" label="Text Field" value="filler text" text="filler text" />
+        <ui:Label text="Package settings" display-tooltip-when-elided="true" name="Label" style="height: 15px; -unity-text-align: upper-center; font-size: 16px; margin-bottom: 8px;" />
     </ui:VisualElement>
 </ui:UXML>
