@@ -98,12 +98,17 @@ namespace Deploy.Editor.Data
             var developmentBuild = element.DevelopmentBuild;
             var deployPlatform = element.DeployPlatform.PlatformName;
             var deployParameters = ToJson(element.DeployPlatform);
+
+            var notifyPlatform = DeploySettings.GetOrCreate().NotifyPlatform;
+            var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.PlatformName;
+            
             var inputsString = "{" +
                                $"\"buildPlatform\":\"{buildPlatform}\"," +
                                $"\"buildParams\":\"{buildParameters}\"," +
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
                                $"\"deployParams\":\"{deployParameters}\"," +
-                               $"\"deployPlatform\":\"{deployPlatform}\"" +
+                               $"\"deployPlatform\":\"{deployPlatform}\"," +
+                               $"\"notifyPlatform\":\"{notifyPlatformName}\"" +
                                "}";
             return inputsString;
         }

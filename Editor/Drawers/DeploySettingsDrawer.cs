@@ -18,8 +18,8 @@ namespace Deploy.Editor.Drawers
             _root = new VisualElement();
             
             var workflowIdField = new PropertyField(serializedObject.FindProperty("_workflowId"));
-            var defaultBranchField = new PropertyField(serializedObject.FindProperty("_defaultBranch"));
             var defaultAssetDirectoryField = new PropertyField(serializedObject.FindProperty("_defaultAssetDirectory"));
+            var notifyPlatformField = new PropertyField(serializedObject.FindProperty("_notifyPlatform"));
 
             workflowIdField.style.flexGrow = 1;
             var workflowContainer = new VisualElement
@@ -37,8 +37,8 @@ namespace Deploy.Editor.Drawers
             workflowContainer.Add(generateWorkflowButton);
             
             _root.Add(workflowContainer);
-            _root.Add(defaultBranchField);
             _root.Add(defaultAssetDirectoryField);
+            _root.Add(notifyPlatformField);
             return _root;
         }
 

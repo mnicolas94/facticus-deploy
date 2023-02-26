@@ -68,3 +68,29 @@ jobs:
           playstore_userFraction: ${{ fromJson(matrix.deployParams).userFraction }}
           PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
+      
+      - name: Construct message info
+        id: messageInfo
+        run: |
+          $replaced=${{ steps.build.outputs.projectName }} | tr ' ' '_'
+          $messageInfo="#$replaced (${{ steps.build.outputs.version }}): ${{ matrix.buildPlatform }} >> ${{ matrix.deployPlatform }}"
+          echo "info=$messageInfo" >> $GITHUB_OUTPUT
+      
+      # Success message
+      - name: Send success message if not failed
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1-pre-13
+        with:
+          notifyPlatform: ${{ matrix.notifyPlatform }}
+          message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        
+      # Error message
+      - name: Send error message if failed
+        if: ${{ failure() }}
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1-pre-13
+        with:
+          notifyPlatform: ${{ matrix.notifyPlatform }}
+          message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
