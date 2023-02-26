@@ -72,8 +72,9 @@ jobs:
       - name: Construct message info
         id: messageInfo
         run: |
-          $replaced=${{ steps.build.outputs.projectName }} | tr ' ' '_'
-          $messageInfo="#$replaced (${{ steps.build.outputs.version }}): ${{ matrix.buildPlatform }} >> ${{ matrix.deployPlatform }}"
+          name="${{ steps.build.outputs.projectName }}"
+          nice_name=${name// /_}
+          messageInfo="#$nice_name (${{ steps.build.outputs.version }}): ${{ matrix.buildPlatform }} >> ${{ matrix.deployPlatform }}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
       
       # Success message
