@@ -28,7 +28,7 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/UnityCICDWorkflows/.github/actions/build@v1-pre-13
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/build@v1
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
@@ -44,7 +44,7 @@ jobs:
 
       # --- Deploy ---
       - name: Deploy
-        uses: mnicolas94/UnityCICDWorkflows/.github/actions/deploy@v1-pre-13
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/deploy@v1
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
           buildPath: ${{ steps.build.outputs.buildPath }}
@@ -68,28 +68,34 @@ jobs:
           playstore_userFraction: ${{ fromJson(matrix.deployParams).userFraction }}
           PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
-      
+
+      # --- Notify ---
+      - name: Get platform display name
+        id: display_name
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/platform-display-name@v1
+        with:
+          platform: ${{ matrix.buildPlatform }}
       - name: Construct message info
         id: messageInfo
         run: |
           name="${{ steps.build.outputs.projectName }}"
           nice_name=${name// /_}
-          messageInfo="#$nice_name (${{ steps.build.outputs.version }}): ${{ matrix.buildPlatform }} >> ${{ matrix.deployPlatform }}"
+          messageInfo="#$nice_name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
       
       # Success message
       - name: Send success message if not failed
-        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1-pre-13
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        
+      
       # Error message
       - name: Send error message if failed
         if: ${{ failure() }}
-        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1-pre-13
+        uses: mnicolas94/UnityCICDWorkflows/.github/actions/notify@v1
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
