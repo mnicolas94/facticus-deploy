@@ -93,14 +93,14 @@ namespace Deploy.Editor.Data
         
         private static string GetInputsString(BuildDeployElement element)
         {
-            var buildPlatform = element.BuildPlatform.GameCiName;
+            var buildPlatform = element.BuildPlatform.GetGameCiName();
             var buildParameters = ToJson(element.BuildPlatform);
             var developmentBuild = element.DevelopmentBuild;
-            var deployPlatform = element.DeployPlatform.PlatformName;
+            var deployPlatform = element.DeployPlatform.GetPlatformName();
             var deployParameters = ToJson(element.DeployPlatform);
 
             var notifyPlatform = DeploySettings.GetOrCreate().NotifyPlatform;
-            var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.PlatformName;
+            var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.GetPlatformName();
             
             var inputsString = "{" +
                                $"\"buildPlatform\":\"{buildPlatform}\"," +

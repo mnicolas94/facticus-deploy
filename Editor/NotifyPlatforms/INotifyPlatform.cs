@@ -4,13 +4,13 @@ namespace Deploy.Editor.NotifyPlatforms
 {
     public interface INotifyPlatform
     {
-        string PlatformName => default;
+        string GetPlatformName();
     }
 
     [Serializable]
     [AddTypeMenu("Telegram")]
     public class TelegramNotifyPlatform : INotifyPlatform
     {
-        public string PlatformName => "Telegram";
+        public string GetPlatformName() => "Telegram";
     }
 }

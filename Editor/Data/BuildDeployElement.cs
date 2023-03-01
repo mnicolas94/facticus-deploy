@@ -21,7 +21,7 @@ namespace Deploy.Editor.Data
 
         public override string ToString()
         {
-            return $"{_buildPlatform.GameCiName} -> {_deployPlatform.PlatformName}";
+            return $"{_buildPlatform.GetGameCiName()} -> {_deployPlatform.GetPlatformName()}";
         }
     }
 }
