@@ -34,7 +34,7 @@ namespace Deploy.Editor
 
                 // create asset
                 var settings = CreateInstance<DeploySettings>();
-                var path = Path.Join(dir, "DeploySettings.asset");
+                var path = Path.Combine(dir, "DeploySettings.asset");
                 AssetDatabase.CreateAsset(settings, path);
                 AssetDatabase.SaveAssets();
             }

@@ -106,10 +106,12 @@ namespace Deploy.Editor.EditorWindows
         private void RefreshList()
         {
             _list.Clear();
-            // await Task.Delay(100);
             PopulateList();
-            // await Task.Delay(100);
+#if UNITY_2021_2_OR_NEWER
             _list.RefreshItems();
+#else
+            _list.Refresh();
+#endif
         }
 
         private void OnAddNewClicked()
@@ -121,7 +123,7 @@ namespace Deploy.Editor.EditorWindows
 
             // create the new asset
             var newSet = CreateInstance<BuildDeploySet>();
-            var path = Path.Join(dir, "New Set.asset");
+            var path = Path.Combine(dir, "New Set.asset");
             path = AssetDatabase.GenerateUniqueAssetPath(path);
             AssetDatabase.CreateAsset(newSet, path);
             AssetDatabase.SaveAssets();

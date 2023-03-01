@@ -58,7 +58,7 @@ namespace Deploy.Editor.Drawers
             Directory.CreateDirectory(destinyDir);
             
             // copy the workflow file
-            var destinyPath = Path.Join(destinyDir, fileNameWithExt);
+            var destinyPath = Path.Combine(destinyDir, fileNameWithExt);
             File.Copy(templatePath, destinyPath);
 
             DeploySettings.GetOrCreate().WorkflowId = workflowName;
@@ -69,13 +69,13 @@ namespace Deploy.Editor.Drawers
             var templateFileName = "workflow_template.yml";
             var packageDir = "Packages/com.facticus.deploy/Editor/Resources";
 
-            var filePath = Path.Join(packageDir, templateFileName);
+            var filePath = Path.Combine(packageDir, templateFileName);
 
             if (!File.Exists(filePath))
             {
                 // this means this project is my development project, should not happen for package's users
                 packageDir = "Assets/Deploy/Editor/Resources";
-                filePath = Path.Join(packageDir, templateFileName);
+                filePath = Path.Combine(packageDir, templateFileName);
             }
 
             return filePath;

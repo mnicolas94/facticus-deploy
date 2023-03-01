@@ -186,7 +186,7 @@ namespace Deploy.Editor.Data
 
         private static string GetTokenPath()
         {
-            var tokenPath = Path.Join(Application.persistentDataPath, "deploy_settings.data");
+            var tokenPath = Path.Combine(Application.persistentDataPath, "deploy_settings.data");
             return tokenPath;
         }
 
