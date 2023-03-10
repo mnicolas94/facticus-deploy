@@ -179,7 +179,7 @@ namespace Deploy.Editor.Data
             var input = EditorInputDialog.ShowModal<TokenDialogueInput>(
                 "Enter token", message);
             
-            bool entered = input == null;
+            bool entered = input != null;
             token = "";
 
             if (entered)
