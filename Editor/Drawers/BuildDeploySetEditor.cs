@@ -30,32 +30,18 @@ namespace Deploy.Editor.Drawers
 
         private async void OnBuildClicked()
         {
-            bool error = false;
-            string response = "";
             try
             {
                 _buildButton.SetEnabled(false);
-                response = await ((BuildDeploySet)target).Build();
-            }
-            catch (Exception e)
-            {
-                error = true;
-                response = e.Message;
+                var success = await BuildDeploy.BuildAndDeploySet((BuildDeploySet) target);
+                if (success)
+                {
+                    EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started succesfully"));
+                }
             }
             finally
             {
                 _buildButton.SetEnabled(true);
-            }
-
-            response = string.IsNullOrEmpty(response) ? "Workflow started succesfully" : response;
-            if (error)
-            {
-                EditorInputDialog.ShowMessage("Error", response);
-                
-            }
-            else
-            {
-                EditorWindow.focusedWindow.ShowNotification(new GUIContent(response));
             }
         }
     }

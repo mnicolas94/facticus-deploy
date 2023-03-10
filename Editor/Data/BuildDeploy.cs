@@ -16,46 +16,70 @@ namespace Deploy.Editor.Data
 {
     public static class BuildDeploy
     {
-        public static async Task<string> BuildAndDeploySet(BuildDeploySet set)
+        public static async Task<bool> BuildAndDeploySet(BuildDeploySet set)
         {
-            var elements = set.Elements;
-            var branch = set.RepositoryBranch;
-            var buildSetInput = GetBuildSetInput(elements);
-            var inputsString = $"{{\"build_set\":\"{buildSetInput}\"}}";
-            
-            var (owner, repo) = GetOwnerAndRepo();
-            var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
-            var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
-            var userAgent = GetGitUser();
-            var token = GetToken();
-            
-            var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
-            var requestContent = new StringContent(stringContent);
-            using (var httpClient = new HttpClient())
+            bool tokenIsNotValid = false;
+            bool success;
+
+            do
             {
-                using (var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri))
+                tokenIsNotValid = false;
+                var elements = set.Elements;
+                var branch = set.RepositoryBranch;
+                var buildSetInput = GetBuildSetInput(elements);
+                var inputsString = $"{{\"build_set\":\"{buildSetInput}\"}}";
+
+                var (owner, repo) = GetOwnerAndRepo();
+                var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
+                var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
+                var userAgent = GetGitUser();
+                var entered = TryGetToken(out var token);
+                success = entered;
+                
+                if (entered)
                 {
-                    request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
-                    request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
-                    request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
-                    request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
-
-                    request.Content = requestContent;
-                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded"); 
-
-                    var response = await httpClient.SendAsync(request);
-                    var content = await response.Content.ReadAsStringAsync();
-                    var responseCode = (int) response.StatusCode;
-                    if (responseCode >= 300)
+                    var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
+                    var requestContent = new StringContent(stringContent);
+                    using (var httpClient = new HttpClient())
                     {
-                        throw new HttpRequestException(content);
-                    }
+                        using (var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri))
+                        {
+                            request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
+                            request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
+                            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                            request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
 
-                    return content;
+                            request.Content = requestContent;
+                            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+
+                            var response = await httpClient.SendAsync(request);
+                            var content = await response.Content.ReadAsStringAsync();
+                            var responseCode = (int)response.StatusCode;
+
+                            // Bad credentials
+                            if (responseCode == 401)  // request token and try again
+                            {
+                                var message = "Your Github authentication token is no longer valid, please enter a new valid one.";
+                                entered = TryAskForTokenDialog(message, out var _);
+                                success = false;
+                                if (entered)
+                                {
+                                    tokenIsNotValid = true;  // try again
+                                }
+                            }
+                            else if (responseCode >= 300)
+                            {
+                                EditorInputDialog.ShowMessage("Error", content);
+                                success = false;
+                            }
+                        }
+                    }
                 }
-            }
+            } while (tokenIsNotValid);
+            
+            return success;
         }
-        
+
         public static void BuildAndDeploySetLocally(BuildDeploySet set)
         {
             var elements = set.Elements;
@@ -137,19 +161,40 @@ namespace Deploy.Editor.Data
             return buildParameters;
         }
 
-        private static string GetToken()
+        private static bool TryGetToken(out string token)
         {
-            if (TryLoadToken(out var token))
+            if (TryLoadToken(out token))
             {
-                return token;
+                return true;
             }
             else
             {
-                var input = EditorInputDialog.ShowModal<TokenDialogueInput>(
-                    "Enter token", "Enter your github authentication token");
-                SaveToken(input.AuthToken);
-                return input.AuthToken;
+                var entered = TryAskForTokenDialog(out token);
+                return entered;
             }
+        }
+
+        private static bool TryAskForTokenDialog(string message, out string token)
+        {
+            var input = EditorInputDialog.ShowModal<TokenDialogueInput>(
+                "Enter token", message);
+            
+            bool entered = input == null;
+            token = "";
+
+            if (entered)
+            {
+                SaveToken(input.AuthToken);
+                token = input.AuthToken;
+            }
+            
+            return entered;
+        }
+        
+        private static bool TryAskForTokenDialog(out string token)
+        {
+            var message = "Enter your github authentication token";
+            return TryAskForTokenDialog(message, out token);
         }
 
         private static bool TryLoadToken(out string token)

@@ -14,12 +14,6 @@ namespace Deploy.Editor.Data
         public ReadOnlyCollection<BuildDeployElement> Elements => _elements.AsReadOnly();
 
         public string RepositoryBranch => _repositoryBranch;
-
-        public async Task<string> Build()
-        {
-            var response = await BuildDeploy.BuildAndDeploySet(this);
-            return response;
-        }
         
         [ContextMenu("Debug build locally")]
         public void BuildLocally()
