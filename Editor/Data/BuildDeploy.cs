@@ -176,7 +176,7 @@ namespace Deploy.Editor.Data
 
         private static bool TryAskForTokenDialog(string message, out string token)
         {
-            var input = EditorInputDialog.ShowModal<TokenDialogueInput>(
+            var input = EditorInputDialog.ShowModal<TokenDialogInput>(
                 "Enter token", message);
             
             bool entered = input != null;

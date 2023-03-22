@@ -50,7 +50,7 @@ namespace Deploy.Editor.DeployPlatforms
                 {"userFraction", userFraction.ToString()},
             };
             
-            if (status == "draft")
+            if (status is "draft" or "completed")
             {
                 dict.Remove("userFraction");
             }

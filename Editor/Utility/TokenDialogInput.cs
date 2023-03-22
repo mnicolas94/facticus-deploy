@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Deploy.Editor.Utility
 {
-    internal class TokenDialogueInput : ScriptableObject
+    internal class TokenDialogInput : ScriptableObject
     {
         [SerializeField] private string _authToken;
 
