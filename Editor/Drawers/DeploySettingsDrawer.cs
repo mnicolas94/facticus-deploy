@@ -59,9 +59,25 @@ namespace Deploy.Editor.Drawers
             
             // copy the workflow file
             var destinyPath = Path.Combine(destinyDir, fileNameWithExt);
-            File.Copy(templatePath, destinyPath);
+            bool copy = true;
+            if (File.Exists(destinyPath))
+            {
+                var yes = EditorInputDialog.ShowYesNoDialog(
+                    "Workflow file exists",
+                    "A workflow file with that name already exists. Do you want to overwrite it?"
+                );
+                copy = yes;
+                if (yes)
+                {
+                    File.Delete(destinyPath);
+                }
+            }
 
-            DeploySettings.GetOrCreate().WorkflowId = workflowName;
+            if (copy)
+            {
+                File.Copy(templatePath, destinyPath);
+                DeploySettings.GetOrCreate().WorkflowId = workflowName;
+            }
         }
 
         private string GetTemplatePath()
