@@ -45,10 +45,17 @@ namespace Deploy.Editor.Drawers
         private void OnGenerateWorkflow()
         {
             // get workflow name
-            var workflowName = EditorInputDialog.ShowModal<StringContainer>(
+            var dialogOutput = EditorInputDialog.ShowModal<StringContainer>(
                 "Generate workflow",
                 "Enter the workflow name"
-            ).Value;
+            );
+            var entered = dialogOutput != null;
+            if (!entered)
+            {
+                return;
+            }
+            
+            var workflowName = dialogOutput.Value;
             var fileNameWithExt = $"{workflowName}.yml";
             
             var templatePath = GetTemplatePath();

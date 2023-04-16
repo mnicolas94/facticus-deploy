@@ -7,12 +7,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Deploy.Editor.Data;
 using Deploy.Editor.Utility;
 using UnityEngine;
 using Utils.Editor;
 using Debug = UnityEngine.Debug;
 
-namespace Deploy.Editor.Data
+namespace Deploy.Editor
 {
     public static class BuildDeploy
     {
@@ -27,7 +28,7 @@ namespace Deploy.Editor.Data
                 var elements = set.Elements;
                 var branch = set.RepositoryBranch;
                 var buildSetInput = GetBuildSetInput(elements);
-                var inputsString = $"{{\"build_set\":\"{buildSetInput}\"}}";
+                var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
 
                 var (owner, repo) = GetOwnerAndRepo();
                 var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
