@@ -60,15 +60,21 @@ namespace Deploy.Editor.Drawers
             }
         }
 
-        private void OnVariableAdded(IEnumerable<int> obj)
+        private void OnVariableAdded(IEnumerable<int> newIndices)
         {
-            Debug.Log("Item added");
+            var set = (BuildDeploySet) target;
+            foreach (var i in newIndices)
+            {
+                set.Variables[i].Value = null;
+                set.Variables[i].Variable = null;
+                EditorUtility.SetDirty(set);
+            }
         }
 
-        private void OnVariableRemoved(IEnumerable<int> obj)
+        private void OnVariableRemoved(IEnumerable<int> indices)
         {
-            var set = ((BuildDeploySet)target);
-            var values = set.Variables.Select(variable => variable.Value);
+            var set = (BuildDeploySet) target;
+            var values = set.Variables.Select(variable => variable.Value).ToList();
 
             var path = AssetDatabase.GetAssetPath(set);
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);
@@ -78,6 +84,8 @@ namespace Deploy.Editor.Drawers
             {
                 AssetDatabase.RemoveObjectFromAsset(asset);
             }
+            EditorUtility.SetDirty(set);
+            AssetDatabase.SaveAssets();
         }
 
         private async void OnBuildClicked()

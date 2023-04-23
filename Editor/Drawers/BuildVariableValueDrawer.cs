@@ -11,23 +11,25 @@ namespace Deploy.Editor.Drawers
     [CustomPropertyDrawer(typeof(BuildVariableValue))]
     public class BuildVariableValueDrawer : PropertyDrawer
     {
-        private VisualElement _root;
-        private InspectorElement _valueField;
-        
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            _root = new VisualElement();
-            
+            return new BuildVariableValueElement(property);
+        }
+    }
+    public class BuildVariableValueElement : VisualElement
+    {
+        private InspectorElement _valueField;
+
+        public BuildVariableValueElement(SerializedProperty property)
+        {
             // variable
             var variableField = new PropertyField(property.FindPropertyRelative("_variable"));
             variableField.RegisterValueChangeCallback(OnVariableChange);
-            _root.Add(variableField);
+            Add(variableField);
 
             // value
             var valueObject = GetOrCreateValueObject(property);
             DrawValue(valueObject);
-
-            return _root;
         }
 
         private void DrawValue(ScriptableObject valueObject)
@@ -37,7 +39,7 @@ namespace Deploy.Editor.Drawers
                 if (_valueField == null)
                 {
                     _valueField = new InspectorElement(valueObject);
-                    _root.Add(_valueField);
+                    Add(_valueField);
                 }
                 else
                 {
@@ -48,9 +50,9 @@ namespace Deploy.Editor.Drawers
             {
                 if (_valueField != null)
                 {
-                    if (_root.Contains(_valueField))
+                    if (Contains(_valueField))
                     {
-                        _root.Remove(_valueField);
+                        Remove(_valueField);
                     }
                     _valueField = null;
                 }
@@ -95,7 +97,7 @@ namespace Deploy.Editor.Drawers
                 return false;
             }
 
-            valueObject = ScriptableObject.Instantiate(variable);
+            valueObject = Object.Instantiate(variable);
             var valueProperty = property.FindPropertyRelative("_value");
             AddAsSubAsset(property, valueObject);
             valueProperty.objectReferenceValue = valueObject;
@@ -123,7 +125,6 @@ namespace Deploy.Editor.Drawers
 
         private void OnVariableChange(SerializedPropertyChangeEvent evt)
         {
-            Debug.Log("OnVariableChange");
             var parentProperty = evt.changedProperty.FindParentProperty();
             var variable = GetVariableObject(parentProperty);
             var value = GetValueObject(parentProperty);

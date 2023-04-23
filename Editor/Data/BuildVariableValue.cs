@@ -10,8 +10,16 @@ namespace Deploy.Editor.Data
         [SerializeReference] private ScriptableObject _variable;
         [SerializeReference] private ScriptableObject _value;
 
-        public ScriptableObject Variable => _variable;
+        public ScriptableObject Variable
+        {
+            get => _variable;
+            set => _variable = value;
+        }
 
-        public ScriptableObject Value => _value;
+        public ScriptableObject Value
+        {
+            get => _value;
+            set => _value = value;
+        }
     }
 }
