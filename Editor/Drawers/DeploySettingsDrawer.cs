@@ -16,6 +16,7 @@ namespace Deploy.Editor.Drawers
             _root = new VisualElement();
             
             var workflowIdField = new PropertyField(serializedObject.FindProperty("_workflowId"));
+            var gitDirectoryField = new PropertyField(serializedObject.FindProperty("_gitDirectory"));
             var defaultAssetDirectoryField = new PropertyField(serializedObject.FindProperty("_defaultAssetDirectory"));
             var notifyPlatformField = new PropertyField(serializedObject.FindProperty("_notifyPlatform"));
 
@@ -35,6 +36,7 @@ namespace Deploy.Editor.Drawers
             workflowContainer.Add(generateWorkflowButton);
             
             _root.Add(workflowContainer);
+            _root.Add(gitDirectoryField);
             _root.Add(defaultAssetDirectoryField);
             _root.Add(notifyPlatformField);
             return _root;

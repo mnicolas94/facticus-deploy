@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deploy.Editor.Data;
 using Deploy.Editor.Utility;
+using UnityEditor;
 using UnityEngine;
 using Utils.Editor;
 using Debug = UnityEngine.Debug;
@@ -27,7 +29,7 @@ namespace Deploy.Editor
                 tokenIsNotValid = false;
                 var elements = set.Elements;
                 var branch = set.RepositoryBranch;
-                var buildSetInput = GetBuildSetInput(elements);
+                var buildSetInput = GetBuildSetInput(elements, set.Variables);
                 var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
 
                 var (owner, repo) = GetOwnerAndRepo();
@@ -85,21 +87,22 @@ namespace Deploy.Editor
         {
             var elements = set.Elements;
 
-            var buildSetInput = GetBuildSetInput(elements);
+            var buildSetInput = GetBuildSetInput(elements, set.Variables);
 
             var command =
                 $"act workflow_dispatch -W .\\.github\\workflows\\build_and_deploy_test.yml" +
                 $" --input \"build_set={buildSetInput}\"";
 
-            var output = RunCommandMergeOutputs("gh", command);
+            var output = RunCommandMergeOutputs("gh", command, DeploySettings.GetOrCreate().GitDirectory);
             Debug.Log(output);
         }
 
-        private static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements)
+        private static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
+            IList<BuildVariableValue> variables)
         {
             var inputStrings = elements.Select(element =>
             {
-                var inputString = GetInputsString(element);
+                var inputString = GetInputsString(element, variables);
                 
                 // prevent escaped double quotes to be affected by the next line
                 inputString = inputString.Replace(@"\""", @"@@@");
@@ -116,10 +119,11 @@ namespace Deploy.Editor
             return buildSetInput;
         }
         
-        private static string GetInputsString(BuildDeployElement element)
+        private static string GetInputsString(BuildDeployElement element, IList<BuildVariableValue> variables)
         {
             var buildPlatform = element.BuildPlatform.GetGameCiName();
             var buildParameters = ToJson(element.BuildPlatform);
+            var buildVariables = VariablesToJson(variables);
             var developmentBuild = element.DevelopmentBuild;
             var deployPlatform = element.DeployPlatform.GetPlatformName();
             var deployParameters = ToJson(element.DeployPlatform);
@@ -130,12 +134,31 @@ namespace Deploy.Editor
             var inputsString = "{" +
                                $"\"buildPlatform\":\"{buildPlatform}\"," +
                                $"\"buildParams\":\"{buildParameters}\"," +
+                               $"\"buildVariables\":\"{buildVariables}\"," +
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
                                $"\"deployParams\":\"{deployParameters}\"," +
                                $"\"deployPlatform\":\"{deployPlatform}\"," +
                                $"\"notifyPlatform\":\"{notifyPlatformName}\"" +
                                "}";
             return inputsString;
+        }
+
+        private static string VariablesToJson(IList<BuildVariableValue> variables)
+        {
+            var variablesJson = variables.Select(variableValue =>
+            {
+                var variable = variableValue.Variable;
+                var value = variableValue.Value;
+                var path = AssetDatabase.GetAssetPath(variable);
+                var guid = AssetDatabase.AssetPathToGUID(path);
+                var json = "{" +
+                           $"\"guid\":\"{guid}\"," +
+                           $"\"value\":\"{ToJson(value)}\"" +
+                           "}";
+                return json;
+            });
+            var buildVariablesJoined = string.Join(",", variablesJson);
+            return $"[{buildVariablesJoined}]";
         }
 
         private static string ToJson(object obj)
@@ -239,7 +262,7 @@ namespace Deploy.Editor
         private static (string, string) GetOwnerAndRepo()
         {
             // limitations: only works on remotes named "origin"
-            var (output, _) = RunCommand("git", "remote get-url origin");
+            var (output, _) = RunCommand("git", "remote get-url origin", DeploySettings.GetOrCreate().GitDirectory);
             var rx = new Regex("https://github.com/(.*)/(.*).git");
             var matches = rx.Matches(output);
             var owner = matches[0].Groups[1].Value;
@@ -250,16 +273,16 @@ namespace Deploy.Editor
         private static string GetGitUser()
         {
             string gitCommand = "config --get user.name";
-            var (stdout, _) = RunCommand("git",gitCommand);
+            var (stdout, _) = RunCommand("git",gitCommand, DeploySettings.GetOrCreate().GitDirectory);
             stdout = stdout.Trim();
             return stdout;
         }
         
-        private static (string, string) RunCommand(string command, string options)
+        private static (string, string) RunCommand(string command, string options, string workingDir)
         {
             // Set up our processInfo to run the command and log to output and errorOutput.
             ProcessStartInfo processInfo = new ProcessStartInfo(command, options) {
-                WorkingDirectory = "",
+                WorkingDirectory = workingDir,
                 CreateNoWindow = true,          // We want no visible pop-ups
                 UseShellExecute = false,        // Allows us to redirect input, output and error streams
                 RedirectStandardOutput = true,  // Allows us to read the output stream
@@ -290,9 +313,9 @@ namespace Deploy.Editor
             return (output, errorOutput);
         }
         
-        private static string RunCommandMergeOutputs(string command, string options)
+        private static string RunCommandMergeOutputs(string command, string options, string workingDir)
         {
-            var (output, errorOutput) = RunCommand(command, options);
+            var (output, errorOutput) = RunCommand(command, options, workingDir);
 
             return $"Output:\n{output}\n\nErrorOutput:\n{errorOutput}";  // Return the output
         }
