@@ -152,13 +152,16 @@ namespace Deploy.Editor
                 var path = AssetDatabase.GetAssetPath(variable);
                 var guid = AssetDatabase.AssetPathToGUID(path);
                 var json = "{" +
-                           $"\"guid\":\"{guid}\"," +
-                           $"\"value\":\"{ToJson(value)}\"" +
-                           "}";
-                return PreProcessJsonString(json);
+                                $"\"guid\":\"{guid}\"," +
+                                $"\"value\":\"{JsonUtility.ToJson(value)}\"" +
+                                "}";
+                return json;
             });
             var buildVariablesJoined = string.Join(",", variablesJson);
-            return $"[{buildVariablesJoined}]";
+            var json = $"[{buildVariablesJoined}]";
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var base64 = Convert.ToBase64String(plainTextBytes);
+            return base64;
         }
 
         private static string ToJson(object obj)

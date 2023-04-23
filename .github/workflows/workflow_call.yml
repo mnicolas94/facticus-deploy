@@ -73,6 +73,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.buildPlatform }}
           developmentBuild: ${{ matrix.developmentBuild }}
+          buildVariables: ${{ matrix.buildVariables }}
           # Android specific
           androidAppBundle: ${{ fromJson(matrix.buildParams).appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}

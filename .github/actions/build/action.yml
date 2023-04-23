@@ -8,6 +8,9 @@ inputs:
   developmentBuild:
     description: 'Whether is a development build or not'
     required: true
+  buildVariables:
+    description: 'Base64 encoded build variables'
+    required: true
   androidAppBundle:
     required: false
     default: 'false'
@@ -84,7 +87,7 @@ runs:
         androidKeystorePass: ${{ inputs.androidKeystorePass }}
         androidKeyaliasName: ${{ inputs.androidKeyaliasName }}
         androidKeyaliasPass: ${{ inputs.androidKeyaliasPass }}
-        customParameters: ${{ env.dev_build_parameter }}
+        customParameters: ${{ env.dev_build_parameter }} -buildVariables ${{ inputs.buildVariables }}
     
     # --- Get build path ---    
     - name: Get platform display name

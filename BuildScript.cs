@@ -60,6 +60,7 @@ namespace UnityBuilderAction
             BuildAddressables();
 
             bool devBuild = options.ContainsKey("developmentBuild");
+            var buildVariablesEncoded = options["buildVariables"];
             
             // Custom build
             Build(buildTarget, options["customBuildPath"], devBuild);
@@ -266,6 +267,13 @@ namespace UnityBuilderAction
         private static void SetGithubSafeDirectory()
         {
             RunGitCommand("config --global --add safe.directory /github/workspace");
+        }
+
+        private static void ProcessBuildVariables(string encodedVariables)
+        {
+            var base64EncodedBytes = Convert.FromBase64String(encodedVariables);
+            var buildVariables = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            // todo
         }
     }
 }
