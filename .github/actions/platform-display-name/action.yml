@@ -1,0 +1,31 @@
+﻿name: 'Get platform display name'
+description: 'Get a nice/display name for a GameCI platform'
+inputs:
+  platform:
+    required: true
+outputs:
+  display_name:
+    value: ${{ steps.get_name.outputs.display_name }}
+  display_name_lower:
+    value: ${{ steps.get_name.outputs.display_name_lower }}
+      
+runs:
+  using: "composite"
+  steps:
+    - name: Get GameCI platforms display name
+      id: get_name
+      env:
+        StandaloneWindows64: "Windows"
+        StandaloneLinux64: "Linux"
+        StandaloneOSX: "Mac"
+        Android: "Android"
+        WebGL: "WebGL"
+        StandaloneWindows64_lower: "windows"
+        StandaloneLinux64_lower: "linux"
+        StandaloneOSX_lower: "mac"
+        Android_lower: "android"
+        WebGL_lower: "webgl"
+      shell: bash
+      run: |
+        echo "display_name=${{ env[format('{0}', inputs.platform)] }}" >> $GITHUB_OUTPUT
+        echo "display_name_lower=${{ env[format('{0}_lower', inputs.platform)] }}" >> $GITHUB_OUTPUT

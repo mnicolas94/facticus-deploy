@@ -1,0 +1,16 @@
+﻿name: 'Get Unity project name'
+description: 'Get Unity project name'
+outputs:
+  project-name:
+    description: "Project name"
+    value: ${{ steps.project_name.outputs.projectname }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get project name variable
+      id: project_name
+      shell: bash
+      run: |
+        chmod +x ${{ github.action_path }}/getname.sh
+        projectname=$(${{ github.action_path }}/getname.sh)
+        echo "projectname=$projectname" >> $GITHUB_OUTPUT

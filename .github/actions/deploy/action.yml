@@ -1,0 +1,124 @@
+﻿name: 'Deploy'
+description: 'Sends a file to deploy'
+inputs:
+  deployPlatform:
+    required: true
+    description: 'Platform to deploy'
+  buildPath:
+    required: true
+    description: 'File to deploy'
+  version:
+    required: true
+    description: 'build version'
+# Telegram
+  telegram_message:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_SESSION:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_API_ID:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_API_HASH:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_TOKEN:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_CHAT_ID:
+    required: false
+    default: ''
+    description: 'TODO'
+# Itch.io
+  itch_channel:
+    required: false
+    default: ''
+    description: 'TODO'
+  ITCH_BUTLER_CREDENTIALS:
+    required: false
+    default: ''
+    description: 'TODO'
+  ITCH_GAME:
+    required: false
+    default: ''
+    description: 'TODO'
+  ITCH_USER:
+    required: false
+    default: ''
+    description: 'TODO'
+  # Play Store
+  playstore_track:
+    required: false
+    default: ''
+    description: 'TODO'
+  playstore_status:
+    required: false
+    default: ''
+    description: 'TODO'
+  playstore_inAppUpdatePriority:
+    required: false
+    default: ''
+    description: 'TODO'
+  playstore_userFraction:
+    required: false
+    default: ''
+    description: 'TODO'
+  PLAY_STORE_SERVICE_ACCOUNT_JSON:
+    required: false
+    default: ''
+    description: 'TODO'
+  PLAY_STORE_PACKAGE_NAME:
+    required: false
+    default: ''
+    description: 'TODO'
+
+runs:
+  using: "composite"
+  steps:
+    # Telegram
+    - name: Deploy to Telegram
+      if: ${{ inputs.deployPlatform == 'Telegram'}}
+      uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@main
+      with:
+        buildPath: ${{ inputs.buildPath }}
+        message: ${{ inputs.telegram_message }}
+        TELEGRAM_SESSION: ${{ inputs.TELEGRAM_SESSION }}
+        TELEGRAM_API_ID: ${{ inputs.TELEGRAM_API_ID }}
+        TELEGRAM_API_HASH: ${{ inputs.TELEGRAM_API_HASH }}
+        TELEGRAM_TOKEN: ${{ inputs.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ inputs.TELEGRAM_CHAT_ID }}
+        
+    # Itchio
+    - name: Deploy to Itch.io
+      if: ${{ inputs.deployPlatform == 'Itch'}}
+      uses: josephbmanley/butler-publish-itchio-action@master
+      env:
+        BUTLER_CREDENTIALS: ${{ inputs.ITCH_BUTLER_CREDENTIALS }}
+        CHANNEL: ${{ inputs.itch_channel }}
+        ITCH_GAME: ${{ inputs.ITCH_GAME }}
+        ITCH_USER: ${{ inputs.ITCH_USER }}
+        PACKAGE: ${{ inputs.buildPath }}
+        VERSION: ${{ inputs.version }}
+        
+    # Play Store
+    - name: Deploy to Play Store
+      if: ${{ inputs.deployPlatform == 'PlayStore'}}
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ inputs.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        packageName: ${{ inputs.PLAY_STORE_PACKAGE_NAME }}
+        releaseFiles: ${{ inputs.buildPath }}
+#        releaseName: ${{ inputs.version }}
+        track: ${{ inputs.playstore_track }}
+        status: ${{ inputs.playstore_status }}
+        inAppUpdatePriority: ${{ inputs.playstore_inAppUpdatePriority }}
+        userFraction: ${{ inputs.playstore_userFraction }}
+#        whatsNewDirectory: ${{ inputs. }}
+#        mappingFile: ${{ inputs. }}
+#        debugSymbols: ${{ inputs. }}

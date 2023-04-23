@@ -1,0 +1,57 @@
+﻿name: 'Deploy to Telegram'
+description: 'Sends a file to Telegram'
+inputs:
+  buildPath:
+    required: true
+    default: ''
+    description: 'File path'
+  message:
+    required: false
+    default: ""
+    description: "Caption message to send along the file"
+  TELEGRAM_SESSION:
+    required: true
+  TELEGRAM_API_ID:
+    required: true
+  TELEGRAM_API_HASH:
+    required: true
+  TELEGRAM_TOKEN:
+    required: true
+  TELEGRAM_CHAT_ID:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check if file size is greater than 50 MB
+      id: sizecheck
+      shell: bash
+      run: |
+        maxsize=50000000
+        filesize=$(stat -c%s "${{ inputs.buildPath }}")
+        echo "The build size is $filesize bytes."
+        if (( filesize > maxsize )); then
+          echo "::set-output name=bigger::true"
+        else
+          echo "::set-output name=bigger::false"
+        fi
+    - name: Send file to telegram
+      if: ${{ steps.sizecheck.outputs.bigger == 'false' }}
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ inputs.TELEGRAM_CHAT_ID }}
+        token: ${{ inputs.TELEGRAM_TOKEN }}
+        message: ${{ inputs.message }}
+        document: ${{ inputs.buildPath }}
+    - name: Send file to telegram with MTProto API
+      if: ${{ steps.sizecheck.outputs.bigger == 'true' }}
+      uses: mnicolas94/telegram-file-uploader@main
+      with:
+        session-name: ${{ inputs.TELEGRAM_SESSION }}
+        api-id: ${{ inputs.TELEGRAM_API_ID }}
+        api-hash: ${{ inputs.TELEGRAM_API_HASH }}
+        bot-token: ${{ inputs.TELEGRAM_TOKEN }}
+        chat-id: ${{ inputs.TELEGRAM_CHAT_ID }}
+        file-path: ${{ inputs.buildPath }}
+        message: ${{ inputs.message }}
+        reply-request: 'The file size is bigger than 50 MB. Please, reply to this message to give me permission to send you the file'

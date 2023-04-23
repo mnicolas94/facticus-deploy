@@ -1,0 +1,148 @@
+﻿name: 'Build'
+description: 'Build Unity project'
+inputs:
+  targetPlatform:
+    required: true
+    default: ''
+    description: 'Platform that the build should target.'
+  developmentBuild:
+    description: 'Whether is a development build or not'
+    required: true
+  androidAppBundle:
+    required: false
+    default: 'false'
+    description: 'Whether to build .aab instead of .apk'
+  androidKeystoreBase64:
+    required: false
+    default: ''
+    description: 'The base64 contents of the android keystore file'
+  androidKeystoreName:
+    required: false
+    default: ''
+    description: 'The android keystoreName'
+  androidKeystorePass:
+    required: false
+    default: ''
+    description: 'The android keystorePass'
+  androidKeyaliasName:
+    required: false
+    default: ''
+    description: 'The android keyaliasName'
+  androidKeyaliasPass:
+    required: false
+    default: ''
+    description: 'The android keyaliasPass'
+outputs:
+  buildPath:
+    description: "The built file path"
+    value: ${{ steps.output_path.outputs.path }}
+  version:
+    value: ${{ steps.build.outputs.buildVersion }}
+    description: ''
+  projectName:
+    value: ${{ steps.project_name.outputs.project-name }}
+    description: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        lfs: true
+    - name: Get project name variable
+      id: project_name
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: Library
+        key: Library-${{ steps.project_name.outputs.project-name }}-${{ inputs.targetPlatform }}
+        restore-keys: |
+          Library-${{ steps.project_name.outputs.project-name }}-
+          Library-
+    - name: Download build script
+      shell: bash
+      run: |
+        mkdir -p Assets/Editor
+        curl 'https://raw.githubusercontent.com/mnicolas94/facticus-deploy/main/BuildScript.cs' > Assets/Editor/BuildScript.cs
+    - name: Build step
+      uses: game-ci/unity-builder@v2
+      id: build
+      env:
+        UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
+        dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
+      with:
+        buildName: ${{ steps.project_name.outputs.project-name }}
+        buildMethod: UnityBuilderAction.BuildScript.Build
+        targetPlatform: ${{ inputs.targetPlatform }}
+        versioning: Tag
+        androidAppBundle: ${{ inputs.androidAppBundle }}
+        androidKeystoreName: ${{ inputs.androidKeystoreName }}
+        androidKeystoreBase64: ${{ inputs.androidKeystoreBase64 }}
+        androidKeystorePass: ${{ inputs.androidKeystorePass }}
+        androidKeyaliasName: ${{ inputs.androidKeyaliasName }}
+        androidKeyaliasPass: ${{ inputs.androidKeyaliasPass }}
+        customParameters: ${{ env.dev_build_parameter }}
+    
+    # --- Get build path ---    
+    - name: Get platform display name
+      id: display_name
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@main
+      with:
+        platform: ${{ inputs.targetPlatform }}
+    - name: Construct zip name (Standalone and WebGL)
+      id: zipName
+      shell: bash
+      run: |
+        echo "zipName=${{ steps.project_name.outputs.project-name }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.zip" >> $GITHUB_OUTPUT
+
+    # Standalone
+    - name: Rename build folder
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
+      id: renaming
+      shell: bash
+      run: |
+        mkdir renamed
+        cp -r "build/${{ inputs.targetPlatform }}" renamed
+        mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.project-name }}"
+    - uses: vimtor/action-zip@v1
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
+      with:
+        files: renamed
+        dest: ${{ steps.zipName.outputs.zipName }}
+    # WebGL
+    - uses: vimtor/action-zip@v1
+      if: ${{ inputs.targetPlatform == 'WebGL' }}
+      with:
+        files: build/${{ inputs.targetPlatform }}
+        dest: ${{ steps.zipName.outputs.zipName }}
+    # Android
+    - name: Set Android output path
+      if: ${{ inputs.targetPlatform == 'Android' }}
+      id: android_path
+      env:
+        ext: ${{ fromJSON('[".apk", ".aab"]')[inputs.androidAppBundle == 'true'] }}
+      shell: bash
+      run: |
+        oldfilename="build/Android/${{ steps.project_name.outputs.project-name }}${{ env.ext }}"
+        newfilename="build/Android/${{ steps.project_name.outputs.project-name }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
+        sudo mv "$oldfilename" "$newfilename"
+        echo "path=$newfilename" >> $GITHUB_OUTPUT
+    
+    # Output
+    - name: Set the action's output
+      id: output_path
+      shell: bash
+      run: |
+        if [ ${{ inputs.targetPlatform == 'Android' }} == 'true' ]; then
+          echo 'path=${{ steps.android_path.outputs.path }}' >> $GITHUB_OUTPUT
+        elif [ ${{ inputs.targetPlatform == 'WebGL' }} == 'true' ]; then
+          echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
+        elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') == 'true' }} ]; then
+          echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
+        else
+          echo 'path=ERROR' >> $GITHUB_OUTPUT
+        fi
+        

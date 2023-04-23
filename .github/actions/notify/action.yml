@@ -1,0 +1,30 @@
+﻿name: 'Notify'
+description: 'Send a message'
+inputs:
+  notifyPlatform:
+    required: true
+    description: 'Platform to send the message.'
+  message:
+    required: true
+    description: 'Message to send'
+  # Telegram
+  TELEGRAM_TOKEN:
+    required: false
+    default: ''
+    description: 'TODO'
+  TELEGRAM_CHAT_ID:
+    required: false
+    default: ''
+    description: 'TODO'
+
+runs:
+  using: "composite"
+  steps:
+    # Telegram
+    - name: Send notification to Telegram
+      if: ${{ inputs.notifyPlatform == 'Telegram'}}
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ inputs.TELEGRAM_CHAT_ID }}
+        token: ${{ inputs.TELEGRAM_TOKEN }}
+        message: ${{ inputs.message }}

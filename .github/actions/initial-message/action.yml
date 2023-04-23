@@ -1,0 +1,33 @@
+﻿name: 'Send first notification message'
+description: 'Send message to telegram notifying some build process has started'
+inputs:
+  development_build:
+    description: 'The build is a development one'
+    required: true
+  platform:
+    description: "From which platform is the build"
+    required: true
+  bot-token:
+    description: 'Token of the bot that will send the file'
+    required: true
+  chat-id:
+    description: 'Id of the chat to send the file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Get version variable
+      id: version
+      shell: bash
+      run: |
+        echo "lasttag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+    - name: Get project name variable
+      id: project_name
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
+    - uses: appleboy/telegram-action@master
+      env:
+        message_verb: ${{ fromJSON('["release", "devbuild"]')[inputs.development_build == 'true'] }}
+      with:
+        to: ${{ inputs.chat-id }}
+        token: ${{ inputs.bot-token }}
+        message: "#${{ inputs.platform }} #${{ env.message_verb }} #${{ steps.project_name.outputs.project-name }} ${{ steps.version.outputs.lasttag }}."
