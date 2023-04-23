@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Utils.Editor;
 
 namespace Deploy.Editor.Drawers
 {
@@ -13,6 +16,9 @@ namespace Deploy.Editor.Drawers
     public class BuildDeploySetEditor : UnityEditor.Editor
     {
         private Button _buildButton;
+        private PropertyField _variablesList;
+        private ListView _list;
+        
         public override VisualElement CreateInspectorGUI()
         {
             var root = new VisualElement();
@@ -24,8 +30,54 @@ namespace Deploy.Editor.Drawers
 
             _buildButton = root.Q<Button>("BuildButton");
             _buildButton.clickable.clicked += OnBuildClicked;
+
+            _variablesList = root.Q<PropertyField>("PropertyField:_variables");
             
+            GetList();
+
             return root;
+        }
+
+        private async void GetList()
+        {
+            var cts = new CancellationTokenSource(1000);
+            var ct = cts.Token;
+            bool found = false;
+            
+            while (!found && !ct.IsCancellationRequested)
+            {
+                var list = _variablesList.Q<ListView>();
+                if (list != null)
+                {
+                    found = true;
+                    _list = list;
+
+                    _list.itemsAdded += OnVariableAdded;
+                    _list.itemsRemoved += OnVariableRemoved;
+                }
+
+                await Task.Yield();
+            }
+        }
+
+        private void OnVariableAdded(IEnumerable<int> obj)
+        {
+            Debug.Log("Item added");
+        }
+
+        private void OnVariableRemoved(IEnumerable<int> obj)
+        {
+            var set = ((BuildDeploySet)target);
+            var values = set.Variables.Select(variable => variable.Value);
+
+            var path = AssetDatabase.GetAssetPath(set);
+            var assets = AssetDatabase.LoadAllAssetsAtPath(path);
+            var assetsToRemove = assets.Where(
+                asset => AssetDatabase.IsSubAsset(asset) && !values.Contains(asset));
+            foreach (var asset in assetsToRemove)
+            {
+                AssetDatabase.RemoveObjectFromAsset(asset);
+            }
         }
 
         private async void OnBuildClicked()
@@ -36,7 +88,7 @@ namespace Deploy.Editor.Drawers
                 var success = await BuildDeploy.BuildAndDeploySet((BuildDeploySet) target);
                 if (success)
                 {
-                    EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started succesfully"));
+                    EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
                 }
             }
             finally

@@ -9,7 +9,10 @@ namespace Deploy.Editor.Data
     public class BuildDeploySet : ScriptableObject
     {
         [SerializeField] private string _repositoryBranch;
+        [SerializeField] private List<BuildVariableValue> _variables;
         [SerializeField] private List<BuildDeployElement> _elements;
+
+        public ReadOnlyCollection<BuildVariableValue> Variables => _variables.AsReadOnly();
 
         public ReadOnlyCollection<BuildDeployElement> Elements => _elements.AsReadOnly();
 
@@ -19,6 +22,15 @@ namespace Deploy.Editor.Data
         public void BuildLocally()
         {
             BuildDeploy.BuildAndDeploySetLocally(this);
+        }
+
+        [ContextMenu("Debug")]
+        public void DebugVariables()
+        {
+            foreach (var variableValue in _variables)
+            {
+                Debug.Log($"VariableValue: {JsonUtility.ToJson(variableValue)}");
+            }
         }
     }
 }
