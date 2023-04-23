@@ -155,7 +155,7 @@ namespace Deploy.Editor
                            $"\"guid\":\"{guid}\"," +
                            $"\"value\":\"{ToJson(value)}\"" +
                            "}";
-                return json;
+                return PreProcessJsonString(json);
             });
             var buildVariablesJoined = string.Join(",", variablesJson);
             return $"[{buildVariablesJoined}]";
