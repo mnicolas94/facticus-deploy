@@ -1,0 +1,20 @@
+{
+    "name": "com.facticus.deploy.buildscript",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d4550b8028c94adf9a90ce699ae4ad99",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:69448af7b92c7f342b298e06a37122aa"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
