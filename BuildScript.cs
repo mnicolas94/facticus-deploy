@@ -1,16 +1,15 @@
-﻿﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-   using Deploy.Editor.Data;
-   using UnityEditor;
+using Deploy.Editor;
+using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Build.Reporting;
-   using UnityEngine;
 
-   namespace UnityBuilderAction
+
+namespace UnityBuilderAction
 {
     public static class BuildScript
     {
@@ -59,7 +58,7 @@ using UnityEditor.Build.Reporting;
             }
 
             var buildVariablesEncoded = options["buildVariables"];
-            ProcessBuildVariables(buildVariablesEncoded);
+            BuildDeploy.ProcessBuildVariables(buildVariablesEncoded);
             
             // Build addressables
             BuildAddressables();
@@ -271,26 +270,6 @@ using UnityEditor.Build.Reporting;
         private static void SetGithubSafeDirectory()
         {
             RunGitCommand("config --global --add safe.directory /github/workspace");
-        }
-
-        private static void ProcessBuildVariables(string encodedVariables)
-        {
-            var base64EncodedBytes = Convert.FromBase64String(encodedVariables);
-            var buildVariables = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            var serializableVariables = JsonUtility.FromJson<BuildVariableValueJsonSerializableList>(buildVariables);
-
-            foreach (var serializableVariable in serializableVariables.SerializedVariables)
-            {
-                var guid = serializableVariable.VariableGuid;
-                var valueJson = serializableVariable.ValueJson;
-
-                var variablePath = AssetDatabase.GUIDToAssetPath(guid);
-                var variable = AssetDatabase.LoadMainAssetAtPath(variablePath);
-                JsonUtility.FromJsonOverwrite(valueJson, variable);
-                EditorUtility.SetDirty(variable);
-            }
-            
-            AssetDatabase.SaveAssets();
         }
     }
 }

@@ -97,6 +97,24 @@ namespace Deploy.Editor
             Debug.Log(output);
         }
 
+        public static void ProcessBuildVariables(string encodedVariables)
+        {
+            var variables = VariablesFromBase64(encodedVariables);
+            
+            foreach (var serializableVariable in variables)
+            {
+                var guid = serializableVariable.VariableGuid;
+                var valueJson = serializableVariable.ValueJson;
+
+                var variablePath = AssetDatabase.GUIDToAssetPath(guid);
+                var variable = AssetDatabase.LoadMainAssetAtPath(variablePath);
+                JsonUtility.FromJsonOverwrite(valueJson, variable);
+                EditorUtility.SetDirty(variable);
+            }
+            
+            AssetDatabase.SaveAssets();
+        }
+        
         private static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
@@ -123,7 +141,7 @@ namespace Deploy.Editor
         {
             var buildPlatform = element.BuildPlatform.GetGameCiName();
             var buildParameters = ToJson(element.BuildPlatform);
-            var buildVariables = VariablesToJson(variables);
+            var buildVariables = VariablesToBase64(variables);
             var developmentBuild = element.DevelopmentBuild;
             var deployPlatform = element.DeployPlatform.GetPlatformName();
             var deployParameters = ToJson(element.DeployPlatform);
@@ -143,7 +161,7 @@ namespace Deploy.Editor
             return inputsString;
         }
 
-        private static string VariablesToJson(List<BuildVariableValue> variables)
+        private static string VariablesToBase64(List<BuildVariableValue> variables)
         {
             var serializableVariables = variables.ConvertAll(variableValue =>
             {
@@ -166,6 +184,15 @@ namespace Deploy.Editor
             return base64;
         }
 
+        private static List<BuildVariableValueJsonSerializable> VariablesFromBase64(string base64Encoded)
+        {
+            var base64EncodedBytes = Convert.FromBase64String(base64Encoded);
+            var buildVariables = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            var serializableVariables = JsonUtility.FromJson<BuildVariableValueJsonSerializableList>(buildVariables);
+
+            return serializableVariables.SerializedVariables;
+        }
+        
         private static string ToJson(object obj)
         {
             string json = "";
