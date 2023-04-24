@@ -29,7 +29,7 @@ namespace Deploy.Editor
                 tokenIsNotValid = false;
                 var elements = set.Elements;
                 var branch = set.RepositoryBranch;
-                var buildSetInput = GetBuildSetInput(elements, set.Variables);
+                var buildSetInput = GetBuildSetInput(elements, set.Variables.ToList());
                 var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
 
                 var (owner, repo) = GetOwnerAndRepo();
@@ -87,7 +87,7 @@ namespace Deploy.Editor
         {
             var elements = set.Elements;
 
-            var buildSetInput = GetBuildSetInput(elements, set.Variables);
+            var buildSetInput = GetBuildSetInput(elements, set.Variables.ToList());
 
             var command =
                 $"act workflow_dispatch -W .\\.github\\workflows\\build_and_deploy_test.yml" +
@@ -98,7 +98,7 @@ namespace Deploy.Editor
         }
 
         private static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
-            IList<BuildVariableValue> variables)
+            List<BuildVariableValue> variables)
         {
             var inputStrings = elements.Select(element =>
             {
@@ -119,7 +119,7 @@ namespace Deploy.Editor
             return buildSetInput;
         }
         
-        private static string GetInputsString(BuildDeployElement element, IList<BuildVariableValue> variables)
+        private static string GetInputsString(BuildDeployElement element, List<BuildVariableValue> variables)
         {
             var buildPlatform = element.BuildPlatform.GetGameCiName();
             var buildParameters = ToJson(element.BuildPlatform);
@@ -143,24 +143,26 @@ namespace Deploy.Editor
             return inputsString;
         }
 
-        private static string VariablesToJson(IList<BuildVariableValue> variables)
+        private static string VariablesToJson(List<BuildVariableValue> variables)
         {
-            var variablesJson = variables.Select(variableValue =>
+            var serializableVariables = variables.ConvertAll(variableValue =>
             {
                 var variable = variableValue.Variable;
                 var value = variableValue.Value;
                 var path = AssetDatabase.GetAssetPath(variable);
                 var guid = AssetDatabase.AssetPathToGUID(path);
-                var json = "{" +
-                                $"\"guid\":\"{guid}\"," +
-                                $"\"value\":\"{JsonUtility.ToJson(value)}\"" +
-                                "}";
-                return json;
+                var valueJson = JsonUtility.ToJson(value);
+                var serializable = new BuildVariableValueJsonSerializable(guid, valueJson);
+                return serializable;
             });
-            var buildVariablesJoined = string.Join(",", variablesJson);
-            var json = $"[{buildVariablesJoined}]";
+            var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
+            
+            var json = JsonUtility.ToJson(serializableList);
+            
+            // encode with base64
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
             var base64 = Convert.ToBase64String(plainTextBytes);
+            
             return base64;
         }
 

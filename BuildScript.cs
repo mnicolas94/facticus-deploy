@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using UnityEditor;
+   using Deploy.Editor.Data;
+   using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Build.Reporting;
+   using UnityEngine;
 
-namespace UnityBuilderAction
+   namespace UnityBuilderAction
 {
     public static class BuildScript
     {
@@ -56,11 +58,13 @@ namespace UnityBuilderAction
                     break;
             }
 
+            var buildVariablesEncoded = options["buildVariables"];
+            ProcessBuildVariables(buildVariablesEncoded);
+            
             // Build addressables
             BuildAddressables();
 
             bool devBuild = options.ContainsKey("developmentBuild");
-            var buildVariablesEncoded = options["buildVariables"];
             
             // Custom build
             Build(buildTarget, options["customBuildPath"], devBuild);
@@ -273,7 +277,17 @@ namespace UnityBuilderAction
         {
             var base64EncodedBytes = Convert.FromBase64String(encodedVariables);
             var buildVariables = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            // todo
+            var serializableVariables = JsonUtility.FromJson<BuildVariableValueJsonSerializableList>(buildVariables);
+
+            foreach (var serializableVariable in serializableVariables.SerializedVariables)
+            {
+                var guid = serializableVariable.VariableGuid;
+                var valueJson = serializableVariable.ValueJson;
+
+                var variablePath = AssetDatabase.GUIDToAssetPath(guid);
+                var variable = AssetDatabase.LoadMainAssetAtPath(variablePath);
+                JsonUtility.FromJsonOverwrite(valueJson, variable);
+            }
         }
     }
 }
