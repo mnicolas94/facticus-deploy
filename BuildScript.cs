@@ -287,7 +287,10 @@ using UnityEditor.Build.Reporting;
                 var variablePath = AssetDatabase.GUIDToAssetPath(guid);
                 var variable = AssetDatabase.LoadMainAssetAtPath(variablePath);
                 JsonUtility.FromJsonOverwrite(valueJson, variable);
+                EditorUtility.SetDirty(variable);
             }
+            
+            AssetDatabase.SaveAssets();
         }
     }
 }
