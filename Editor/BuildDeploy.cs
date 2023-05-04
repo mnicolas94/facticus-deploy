@@ -72,7 +72,7 @@ namespace Deploy.Editor
                             }
                             else if (responseCode >= 300)
                             {
-                                EditorInputDialog.ShowMessage("Error", content);
+                                EditorInputDialog.ShowMessage($"Error {responseCode}", content);
                                 success = false;
                             }
                         }

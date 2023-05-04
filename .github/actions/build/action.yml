@@ -65,12 +65,6 @@ runs:
         restore-keys: |
           Library-${{ steps.project_name.outputs.project-name }}-
           Library-
-    #- name: Download build script
-    #  shell: bash
-    #  run: |
-    #    mkdir -p Assets/Editor
-    #    curl 'https://raw.githubusercontent.com/mnicolas94/facticus-deploy/main/BuildScript.cs' > Assets/Editor/BuildScript.cs
-    #    curl 'https://raw.githubusercontent.com/mnicolas94/facticus-deploy/main/com.facticus.deploy.buildscript.asmdef' > Assets/Editor/com.facticus.deploy.buildscript.asmdef
     - name: Build step
       uses: game-ci/unity-builder@v2
       id: build
