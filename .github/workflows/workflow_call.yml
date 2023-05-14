@@ -111,16 +111,23 @@ jobs:
 
       # --- Notify ---
       - name: Get platform display name
+        if: success() || failure()
         id: display_name
         uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@main
         with:
           platform: ${{ matrix.buildPlatform }}
+          
+      - name: Get project name variable
+        if: success() || failure()
+        id: project_name
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
+        
       - name: Construct message info
+        if: success() || failure()
         id: messageInfo
         run: |
-          name="${{ steps.build.outputs.projectName }}"
-          nice_name=${name// /_}
-          messageInfo="#$nice_name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
+          name="${{ steps.project_name.outputs.project-name-no-spaces }}"
+          messageInfo="#$name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 
       # Success message
@@ -134,7 +141,7 @@ jobs:
 
       # Error message
       - name: Send error message if failed
-        if: ${{ failure() }}
+        if: failure()
         uses: mnicolas94/facticus-deploy/.github/actions/notify@main
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
