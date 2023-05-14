@@ -27,9 +27,9 @@ namespace Deploy.Editor
             do
             {
                 tokenIsNotValid = false;
-                var elements = set.Elements;
+                var elements = set.Platforms;
                 var branch = set.RepositoryBranch;
-                var buildSetInput = GetBuildSetInput(elements, set.Variables.ToList());
+                var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
                 var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
 
                 var (owner, repo) = GetOwnerAndRepo();
@@ -85,9 +85,9 @@ namespace Deploy.Editor
 
         public static void BuildAndDeploySetLocally(BuildDeploySet set)
         {
-            var elements = set.Elements;
+            var elements = set.Platforms;
 
-            var buildSetInput = GetBuildSetInput(elements, set.Variables.ToList());
+            var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
 
             var command =
                 $"act workflow_dispatch -W .\\.github\\workflows\\build_and_deploy_test.yml" +

@@ -65,8 +65,8 @@ namespace Deploy.Editor.Drawers
             var set = (BuildDeploySet) target;
             foreach (var i in newIndices)
             {
-                set.Variables[i].Value = null;
-                set.Variables[i].Variable = null;
+                set.OverrideVariables[i].Value = null;
+                set.OverrideVariables[i].Variable = null;
                 EditorUtility.SetDirty(set);
             }
         }
@@ -74,7 +74,7 @@ namespace Deploy.Editor.Drawers
         private void OnVariableRemoved(IEnumerable<int> indices)
         {
             var set = (BuildDeploySet) target;
-            var values = set.Variables.Select(variable => variable.Value).ToList();
+            var values = set.OverrideVariables.Select(variable => variable.Value).ToList();
 
             var path = AssetDatabase.GetAssetPath(set);
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);

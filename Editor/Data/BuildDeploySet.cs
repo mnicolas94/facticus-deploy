@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Deploy.Editor.Data
 {
@@ -9,12 +10,16 @@ namespace Deploy.Editor.Data
     public class BuildDeploySet : ScriptableObject
     {
         [SerializeField] private string _repositoryBranch;
-        [SerializeField] private List<BuildVariableValue> _variables;
-        [SerializeField] private List<BuildDeployElement> _elements;
+        
+        [FormerlySerializedAs("_variables")] [SerializeField]
+        private List<BuildVariableValue> _overrideVariables;
+        
+        [FormerlySerializedAs("_elements")] [SerializeField]
+        private List<BuildDeployElement> _platforms;
 
-        public ReadOnlyCollection<BuildVariableValue> Variables => _variables.AsReadOnly();
+        public ReadOnlyCollection<BuildVariableValue> OverrideVariables => _overrideVariables.AsReadOnly();
 
-        public ReadOnlyCollection<BuildDeployElement> Elements => _elements.AsReadOnly();
+        public ReadOnlyCollection<BuildDeployElement> Platforms => _platforms.AsReadOnly();
 
         public string RepositoryBranch => _repositoryBranch;
         
@@ -27,7 +32,7 @@ namespace Deploy.Editor.Data
         [ContextMenu("Debug")]
         public void DebugVariables()
         {
-            foreach (var variableValue in _variables)
+            foreach (var variableValue in _overrideVariables)
             {
                 Debug.Log($"VariableValue: {JsonUtility.ToJson(variableValue)}");
             }
