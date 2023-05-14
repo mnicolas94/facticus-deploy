@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Deploy.Editor.Data;
 using Deploy.Editor.Utility;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utils.Editor.Extensions;
 
 namespace Deploy.Editor.EditorWindows
 {
@@ -99,8 +101,30 @@ namespace Deploy.Editor.EditorWindows
         private void PopulateList()
         {
             BuildDeploySetsListPopulator.LoadSets(_sets);
-            BuildDeploySetsListPopulator.FillListView(_list, _sets);
+            BuildDeploySetsListPopulator.FillListView(_list, _sets, OnSetViewCreated);
             _list.selectedIndex = _listSelectedIndex;
+        }
+
+        private void OnSetViewCreated(VisualElement item)
+        {
+            ContextualMenuManipulator contextManipulator = new ContextualMenuManipulator(SetupBuildSetContextMenu);
+            contextManipulator.target = item;
+        }
+        
+        private void SetupBuildSetContextMenu(ContextualMenuPopulateEvent ctx)
+        {
+            var label = ctx.target;
+            ctx.menu.AppendAction(
+                "Duplicate",
+                action => DuplicateSet(action, (VisualElement) label),
+                DropdownMenuAction.Status.Normal);
+        }
+
+        private void DuplicateSet(DropdownMenuAction action, VisualElement label)
+        {
+            var set = label.userData as BuildDeploySet;
+            var copy = set.DuplicateScriptableObjectWithSubAssets();
+            RefreshList();
         }
 
         private void RefreshList()
@@ -116,18 +140,9 @@ namespace Deploy.Editor.EditorWindows
 
         private void OnAddNewClicked()
         {
-            // create the directory if it does not exist
-            var dir = DeploySettings.GetOrCreate().DefaultAssetDirectory;
-            Directory.CreateDirectory(dir);
-            AssetDatabase.Refresh();
-
-            // create the new asset
             var newSet = CreateInstance<BuildDeploySet>();
-            var path = Path.Combine(dir, "New Set.asset");
-            path = AssetDatabase.GenerateUniqueAssetPath(path);
-            AssetDatabase.CreateAsset(newSet, path);
-            AssetDatabase.SaveAssets();
-            
+            var assetName = "New Set";
+            CreateSetAsset(assetName, newSet);
             RefreshList();
         }
 
@@ -176,6 +191,66 @@ namespace Deploy.Editor.EditorWindows
             }
 
             _setNameLabel.text = setLabelText;
+        }
+
+        private static void CreateSetAsset(string assetName, BuildDeploySet newSet)
+        {
+            // create the directory if it does not exist
+            var dir = DeploySettings.GetOrCreate().DefaultAssetDirectory;
+            Directory.CreateDirectory(dir);
+            AssetDatabase.Refresh();
+
+            // create the new asset
+            var path = Path.Combine(dir, $"{assetName}.asset");
+            path = AssetDatabase.GenerateUniqueAssetPath(path);
+            AssetDatabase.CreateAsset(newSet, path);
+            AssetDatabase.SaveAssets();
+        }
+        
+        public static ScriptableObject DuplicateScriptableObjectWithSubAssets(ScriptableObject original)
+        {
+            // create the new path
+            var originalPath = AssetDatabase.GetAssetPath(original);
+            var path = AssetDatabase.GenerateUniqueAssetPath(originalPath);
+
+            // Duplicate the original scriptable object
+            ScriptableObject newScriptableObject = Object.Instantiate(original);
+            AssetDatabase.CreateAsset(newScriptableObject, path);
+
+            // Get all sub assets of the original scriptable object
+            var subAssets = AssetDatabase.LoadAllAssetsAtPath(originalPath)
+                .Where(subAsset => subAsset != original)
+                .ToList();
+            
+            // Duplicate all sub assets and add them as sub assets of the new scriptable object
+            Dictionary<Object, Object> originalToNewSubAssets = new Dictionary<Object, Object>();
+            foreach (Object subAsset in subAssets)
+            {
+                Object newSubAsset = Object.Instantiate(subAsset);
+                newSubAsset.name = subAsset.name;
+                AssetDatabase.AddObjectToAsset(newSubAsset, newScriptableObject);
+                originalToNewSubAssets.Add(subAsset, newSubAsset);
+            }
+
+            // Update all references to sub assets in the new scriptable object
+            SerializedObject newSerializedObject = new SerializedObject(newScriptableObject);
+            var property = newSerializedObject.GetIterator();
+            while (property.NextVisible(true))
+            {
+                if (property.propertyType == SerializedPropertyType.ObjectReference)
+                {
+                    Object originalObject = property.objectReferenceValue;
+                    if (originalToNewSubAssets.ContainsKey(originalObject))
+                    {
+                        property.objectReferenceValue = originalToNewSubAssets[originalObject];
+                    }
+                }
+            }
+            newSerializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(newScriptableObject);
+            AssetDatabase.SaveAssets();
+
+            return newScriptableObject;
         }
     }
 }

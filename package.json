@@ -6,7 +6,7 @@
   "unity": "2021.3",
   "unityRelease": "",
   "dependencies": {
-    "com.facticus.utils": "0.12.36",
+    "com.facticus.utils": "0.12.46",
     "com.mackysoft.serializereference-extensions": "1.1.7"
   },
   "keywords": [],

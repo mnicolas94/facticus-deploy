@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Deploy.Editor.Data;
 using Deploy.Editor.VisualElements;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Deploy.Editor.Utility
 {
@@ -20,7 +24,7 @@ namespace Deploy.Editor.Utility
             sets.AddRange(loadedSets); 
         }
         
-        public static void FillListView(ListView listView, List<BuildDeploySet> sets)
+        public static void FillListView(ListView listView, List<BuildDeploySet> sets, Action<VisualElement> onBind)
         {
             listView.makeItem = () => new RenamableLabel("");
             listView.bindItem = (item, index) =>
@@ -32,6 +36,8 @@ namespace Deploy.Editor.Utility
                     renamableLabel.Text = set.name;
                     renamableLabel.OnRename += (newText) => RenameItemData(newText, renamableLabel);
                 }
+                
+                onBind.Invoke(item);
             };
             listView.itemsSource = sets;
         }
