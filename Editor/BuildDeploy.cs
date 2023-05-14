@@ -28,7 +28,7 @@ namespace Deploy.Editor
             {
                 tokenIsNotValid = false;
                 var elements = set.Platforms;
-                var branch = set.RepositoryBranch;
+                var branch = set.RepositoryBranchOrTag;
                 var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
                 var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
 

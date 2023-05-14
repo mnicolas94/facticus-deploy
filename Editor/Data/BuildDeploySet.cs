@@ -9,7 +9,8 @@ namespace Deploy.Editor.Data
     [CreateAssetMenu(fileName = "BuildDeploySet", menuName = "Facticus/Deploy/BuildDeploySet", order = 0)]
     public class BuildDeploySet : ScriptableObject
     {
-        [SerializeField] private string _repositoryBranch;
+        [FormerlySerializedAs("_repositoryBranch")] [SerializeField]
+        private string _repositoryBranchOrTag;
         
         [FormerlySerializedAs("_variables")] [SerializeField]
         private List<BuildVariableValue> _overrideVariables;
@@ -21,7 +22,7 @@ namespace Deploy.Editor.Data
 
         public ReadOnlyCollection<BuildDeployElement> Platforms => _platforms.AsReadOnly();
 
-        public string RepositoryBranch => _repositoryBranch;
+        public string RepositoryBranchOrTag => _repositoryBranchOrTag;
         
         [ContextMenu("Debug build locally")]
         public void BuildLocally()
