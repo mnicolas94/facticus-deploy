@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
+using Deploy.Editor.DeployPlatforms;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -15,49 +17,93 @@ namespace Deploy.Editor.Drawers
     [CanEditMultipleObjects]
     public class BuildDeploySetEditor : UnityEditor.Editor
     {
+        private VisualElement _root;
         private Button _buildButton;
-        private PropertyField _variablesList;
-        private ListView _list;
         
         public override VisualElement CreateInspectorGUI()
         {
-            var root = new VisualElement();
+            _root = new VisualElement();
             
             var tree = Resources.Load<VisualTreeAsset>("BuildDeploySetEditor");
-            tree.CloneTree(root);
-            var defaultInspectorContainer = root.Q("Default");
+            tree.CloneTree(_root);
+            var defaultInspectorContainer = _root.Q("Default");
             InspectorElement.FillDefaultInspector(defaultInspectorContainer, serializedObject, this);
 
-            _buildButton = root.Q<Button>("BuildButton");
+            _buildButton = _root.Q<Button>("BuildButton");
             _buildButton.clickable.clicked += OnBuildClicked;
 
-            _variablesList = root.Q<PropertyField>("PropertyField:_variables");
-            
-            GetList();
+            RegisterPlatformsEvents();
+            RegisterOverrideVariablesEvents();
 
-            return root;
+            return _root;
         }
 
-        private async void GetList()
+        private async Task<ListView> GetListView(string propertyFieldName)
         {
             var cts = new CancellationTokenSource(1000);
             var ct = cts.Token;
-            bool found = false;
-            
-            while (!found && !ct.IsCancellationRequested)
+            var variablesList = _root.Q<PropertyField>(propertyFieldName);
+
+            if (variablesList == null)
             {
-                var list = _variablesList.Q<ListView>();
+                return null;
+            }
+
+            while (!ct.IsCancellationRequested)
+            {
+                var list = variablesList.Q<ListView>();
                 if (list != null)
                 {
-                    found = true;
-                    _list = list;
-
-                    _list.itemsAdded += OnVariableAdded;
-                    _list.itemsRemoved += OnVariableRemoved;
+                    return list;
                 }
 
                 await Task.Yield();
             }
+
+            return null;
+        }
+        
+        private async void RegisterOverrideVariablesEvents()
+        {
+            var list = await GetListView("PropertyField:_variables");
+            if (list == null)
+            {
+                return;
+            }
+            list.itemsAdded += OnVariableAdded;
+            list.itemsRemoved += OnVariableRemoved;
+        }
+        
+        private async void RegisterPlatformsEvents()
+        {
+            var list = await GetListView("PropertyField:_platforms");
+            if (list == null)
+            {
+                return;
+            }
+            list.itemsAdded += OnPlatformsAdded;
+        }
+
+        private void OnPlatformsAdded(IEnumerable<int> newIndices)
+        {
+            var set = (BuildDeploySet) target;
+            foreach (var i in newIndices)
+            {
+                var buildPlatform = set.Platforms[i].BuildPlatform;
+                var deployPlatform = set.Platforms[i].DeployPlatform;
+                set.Platforms[i].BuildPlatform = (IBuildPlatform) Clone(buildPlatform);
+                set.Platforms[i].DeployPlatform = (IDeployPlatform) Clone(deployPlatform);
+                
+                EditorUtility.SetDirty(set);
+            }
+        }
+
+        private object Clone(object original)
+        {
+            var type = original.GetType();
+            var json = JsonUtility.ToJson(original);
+            var copy = JsonUtility.FromJson(json, type);
+            return copy;
         }
 
         private void OnVariableAdded(IEnumerable<int> newIndices)

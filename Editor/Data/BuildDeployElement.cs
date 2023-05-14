@@ -15,9 +15,17 @@ namespace Deploy.Editor.Data
 
         public bool DevelopmentBuild => _developmentBuild;
 
-        public IBuildPlatform BuildPlatform => _buildPlatform;
+        public IBuildPlatform BuildPlatform
+        {
+            get => _buildPlatform;
+            set => _buildPlatform = value;
+        }
 
-        public IDeployPlatform DeployPlatform => _deployPlatform;
+        public IDeployPlatform DeployPlatform
+        {
+            get => _deployPlatform;
+            set => _deployPlatform = value;
+        }
 
         public override string ToString()
         {
