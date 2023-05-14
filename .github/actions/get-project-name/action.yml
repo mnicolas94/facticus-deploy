@@ -17,5 +17,5 @@ runs:
         chmod +x ${{ github.action_path }}/getname.sh
         projectname=$(${{ github.action_path }}/getname.sh)
         echo "projectname=$projectname" >> $GITHUB_OUTPUT
-        project-name-no-spaces=${projectname// /_}
-        echo "project-name-no-spaces=$project-name-no-spaces" >> $GITHUB_OUTPUT
+        projectnamenospaces=${projectname// /_}
+        echo "project-name-no-spaces=$projectnamenospaces" >> $GITHUB_OUTPUT
