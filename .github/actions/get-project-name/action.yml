@@ -4,6 +4,9 @@ outputs:
   project-name:
     description: "Project name"
     value: ${{ steps.project_name.outputs.projectname }}
+  project-name-no-spaces:
+    description: "Project name with underscores instead of spaces"
+    value: ${{ steps.project_name.outputs.projectname }}
 runs:
   using: "composite"
   steps:
@@ -14,3 +17,5 @@ runs:
         chmod +x ${{ github.action_path }}/getname.sh
         projectname=$(${{ github.action_path }}/getname.sh)
         echo "projectname=$projectname" >> $GITHUB_OUTPUT
+        project-name-no-spaces=${projectname// /_}
+        echo "project-name-no-spaces=$project-name-no-spaces" >> $GITHUB_OUTPUT

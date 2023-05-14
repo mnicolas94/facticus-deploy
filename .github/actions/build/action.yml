@@ -61,9 +61,9 @@ runs:
       uses: actions/cache@v2
       with:
         path: Library
-        key: Library-${{ steps.project_name.outputs.project-name }}-${{ inputs.targetPlatform }}
+        key: Library-${{ steps.project_name.outputs.project-name-no-spaces }}-${{ inputs.targetPlatform }}
         restore-keys: |
-          Library-${{ steps.project_name.outputs.project-name }}-
+          Library-${{ steps.project_name.outputs.project-name-no-spaces }}-
           Library-
     - name: Build step
       uses: game-ci/unity-builder@v2
