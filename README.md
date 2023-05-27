@@ -77,8 +77,8 @@ You need to configure some [Secrets](https://docs.github.com/en/actions/security
     - PLAY_STORE_PACKAGE_NAME: The package name, or Application Id, of the app you are uploading, e.g. `com.example.myapp`.
 
 #### Notification platforms' secrets
-A notification platform is a channel to notify the success or failure of your workflows. Currently Deploy only supports Telegram as notification platform. To enable it you have to select Telegram in the Package settings' `Notify platform` dropdown field.
-![UnityEditor IMGUI Controls AdvancedDropdownWindow](https://github.com/mnicolas94/facticus-deploy/assets/35781652/f09eb62e-b5f8-4d46-b718-8b6c7ac2ac55)
+A notification platform is a channel to notify the success or failure of your workflows. Currently Deploy only supports Telegram as notification platform. To enable it you have to select Telegram in the Package settings' `Notify platform` dropdown field.![UnityEditor IMGUI Controls AdvancedDropdownWindow](https://github.com/mnicolas94/facticus-deploy/assets/35781652/f09eb62e-b5f8-4d46-b718-8b6c7ac2ac55)
+- Telegram
     - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
     - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
 
