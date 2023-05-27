@@ -1,6 +1,6 @@
 {
   "name": "com.facticus.deploy",
-  "version": "0.1.34",
+  "version": "0.1.35",
   "displayName": "Deploy",
   "description": "A Unity package to help you build and deploy your game remotely with Github Actions",
   "unity": "2021.3",
