@@ -82,6 +82,9 @@ A notification platform is a channel to notify the success or failure of your wo
     - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
     - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
 
+## Secrets security
+> TODO
+
 ## How to use
 > TODO
 
