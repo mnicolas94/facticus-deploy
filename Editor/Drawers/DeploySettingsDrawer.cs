@@ -61,7 +61,8 @@ namespace Deploy.Editor.Drawers
             var templatePath = GetTemplatePath();
             
             // create workflows directory if it does not exist
-            var destinyDir = ".github/workflows";
+            var gitDirectory = DeploySettings.Instance.GitDirectory;
+            var destinyDir = Path.Combine(gitDirectory, ".github", "workflows");
             Directory.CreateDirectory(destinyDir);
             
             // copy the workflow file
