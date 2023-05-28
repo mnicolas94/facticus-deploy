@@ -31,10 +31,7 @@ Install dependencies first
 - paste `https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions`
 - click <kbd>Add</kbd>
 
-Then `https://github.com/mnicolas94/UnityUtils.git` with the same method. If you get errors installing this dependency make sure you have Unity's Localization `com.unity.localization` and new Input System `com.unity.inputsystem` packages installed. This is a current limitation of this dependency that will be addressed as soon as possible.
-
-![Package Manager_3](https://github.com/mnicolas94/facticus-deploy/assets/35781652/6bd20465-1ed4-4390-b5c0-f2907b49b154)
-
+Then `https://github.com/mnicolas94/UnityUtils.git` with the same method.
 And finally, install the Deploy package itself `https://github.com/mnicolas94/facticus-deploy.git`.
 
 ## How to setup
