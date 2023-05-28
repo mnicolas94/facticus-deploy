@@ -22,7 +22,9 @@ Deploy is a Unity package that allows you to build your game for multiple platfo
 
 ## How to install
 ### Via OpenUPM
-> TODO
+To install it with [OpenUPM](https://openupm.com/) run:
+`openupm add com.facticus.deploy`
+
 ### Via Git URL
 Install dependencies first
 - open Package Manager
