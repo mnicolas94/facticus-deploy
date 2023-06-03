@@ -30,4 +30,4 @@ runs:
       with:
         to: ${{ inputs.chat-id }}
         token: ${{ inputs.bot-token }}
-        message: "#${{ inputs.platform }} #${{ env.message_verb }} #${{ steps.project_name.outputs.project-name }} ${{ steps.version.outputs.lasttag }}."
+        message: "#${{ inputs.platform }} #${{ env.message_verb }} #${{ steps.project_name.outputs.projectName }} ${{ steps.version.outputs.lasttag }}."

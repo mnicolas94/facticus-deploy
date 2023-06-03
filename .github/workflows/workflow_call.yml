@@ -134,7 +134,7 @@ jobs:
         if: success() || failure()
         id: messageInfo
         run: |
-          name="${{ steps.project_name.outputs.project-name-no-spaces }}"
+          name="${{ steps.project_name.outputs.projectNameNoSpaces }}"
           messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 

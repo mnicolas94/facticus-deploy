@@ -1,12 +1,12 @@
 ﻿name: 'Get Unity project name'
 description: 'Get Unity project name'
 outputs:
-  project-name:
+  projectName:
     description: "Project name"
-    value: ${{ steps.project_name.outputs.projectname }}
-  project-name-no-spaces:
+    value: ${{ steps.project_name.outputs.projectName }}
+  projectNameNoSpaces:
     description: "Project name with underscores instead of spaces"
-    value: ${{ steps.project_name.outputs.projectname }}
+    value: ${{ steps.project_name.outputs.projectNameNoSpaces }}
 runs:
   using: "composite"
   steps:
@@ -16,6 +16,6 @@ runs:
       run: |
         chmod +x ${{ github.action_path }}/getname.sh
         projectname=$(${{ github.action_path }}/getname.sh)
-        echo "projectname=$projectname" >> $GITHUB_OUTPUT
         projectnamenospaces=${projectname// /_}
-        echo "project-name-no-spaces=$projectnamenospaces" >> $GITHUB_OUTPUT
+        echo "projectName=$projectname" >> $GITHUB_OUTPUT
+        echo "projectNameNoSpaces=$projectnamenospaces" >> $GITHUB_OUTPUT

@@ -43,7 +43,7 @@ outputs:
     value: ${{ steps.build.outputs.buildVersion }}
     description: ''
   projectName:
-    value: ${{ steps.project_name.outputs.project-name }}
+    value: ${{ steps.project_name.outputs.projectName }}
     description: ''
 
 runs:
@@ -61,9 +61,9 @@ runs:
       uses: actions/cache@v2
       with:
         path: Library
-        key: Library-${{ steps.project_name.outputs.project-name-no-spaces }}-${{ inputs.targetPlatform }}
+        key: Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-${{ inputs.targetPlatform }}
         restore-keys: |
-          Library-${{ steps.project_name.outputs.project-name-no-spaces }}-
+          Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-
           Library-
     - name: Build step
       uses: game-ci/unity-builder@v2
@@ -72,7 +72,7 @@ runs:
         UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
         dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
       with:
-        buildName: ${{ steps.project_name.outputs.project-name }}
+        buildName: ${{ steps.project_name.outputs.projectName }}
         buildMethod: UnityBuilderAction.BuildScript.Build
         targetPlatform: ${{ inputs.targetPlatform }}
         versioning: Tag
@@ -94,7 +94,7 @@ runs:
       id: zipName
       shell: bash
       run: |
-        echo "zipName=${{ steps.project_name.outputs.project-name }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.zip" >> $GITHUB_OUTPUT
+        echo "zipName=${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.zip" >> $GITHUB_OUTPUT
 
     # Standalone
     - name: Rename build folder
@@ -104,7 +104,7 @@ runs:
       run: |
         mkdir renamed
         cp -r "build/${{ inputs.targetPlatform }}" renamed
-        mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.project-name }}"
+        mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - uses: vimtor/action-zip@v1
       if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
       with:
@@ -124,8 +124,8 @@ runs:
         ext: ${{ fromJSON('[".apk", ".aab"]')[inputs.androidAppBundle == 'true'] }}
       shell: bash
       run: |
-        oldfilename="build/Android/${{ steps.project_name.outputs.project-name }}${{ env.ext }}"
-        newfilename="build/Android/${{ steps.project_name.outputs.project-name }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
+        oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
+        newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
         sudo mv "$oldfilename" "$newfilename"
         echo "path=$newfilename" >> $GITHUB_OUTPUT
     
