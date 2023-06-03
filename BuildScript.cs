@@ -71,6 +71,7 @@ namespace UnityBuilderAction
 
         private static void BuildAddressables()
         {
+#if ENABLED_ADDRESSABLES
             var settings = AddressableAssetSettingsDefaultObject.Settings;
 #if UNITY_2021_2_OR_NEWER
             var buildWithPlayer = settings.BuildAddressablesWithPlayerBuild;
@@ -84,6 +85,7 @@ namespace UnityBuilderAction
                 AddressableAssetSettings.CleanPlayerContent(activePlayerDataBuilder);
                 AddressableAssetSettings.BuildPlayerContent();
             }
+#endif
         }
 
         private static Dictionary<string, string> GetValidatedOptions()
