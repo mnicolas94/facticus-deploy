@@ -122,12 +122,20 @@ jobs:
         id: project_name
         uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
         
+      - name: Get version variable
+        if: success() || failure()
+        id: version
+        run: |
+          version=$(git describe --tags --abbrev=0 --match v[0-9]*)
+          version=${version:1}
+          echo "version=$version" >> $GITHUB_OUTPUT
+          
       - name: Construct message info
         if: success() || failure()
         id: messageInfo
         run: |
           name="${{ steps.project_name.outputs.project-name-no-spaces }}"
-          messageInfo="#$name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
+          messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 
       # Success message
