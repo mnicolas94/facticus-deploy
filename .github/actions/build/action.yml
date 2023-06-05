@@ -65,6 +65,9 @@ runs:
         restore-keys: |
           Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-
           Library-
+    - name: Free CI system disk space
+      uses: mnicolas94/facticus-deploy/.github/actions/free-disk-space@main
+          
     - name: Build step
       uses: game-ci/unity-builder@v2
       id: build
