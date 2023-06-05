@@ -18,7 +18,7 @@ runs:
         sudo swapoff -a
         sudo rm -f /swapfile
         sudo apt clean
-        docker rmi $(docker image ls -aq)
+        docker rmi $(docker images -q)
         echo "After swap off"
         df -h
 
