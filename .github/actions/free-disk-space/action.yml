@@ -15,12 +15,12 @@ runs:
         echo "Disk space before:"
         df -h
 
-        sudo swapoff -a
-        sudo rm -f /swapfile
-        sudo apt clean
-        docker rmi $(docker images -q)
-        echo "After swap off"
-        df -h
+        #sudo swapoff -a
+        #sudo rm -f /swapfile
+        #sudo apt clean
+        #docker rmi $(docker images -q)
+        #echo "After swap off"
+        #df -h
 
         #echo "Listing 100 largest packages"
         #dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
