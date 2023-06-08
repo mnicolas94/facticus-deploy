@@ -1,3 +1,5 @@
+Notice: This project is a work in progress as is its documentation. Use at your own risk.
+
 # Deploy
 
 Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your workstation) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) under the hood to run the builds on GitHub servers.
