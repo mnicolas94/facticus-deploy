@@ -97,6 +97,8 @@ Each set has the followig fields:
 2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the sections [below](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#override-variables-feature).
 3. Platforms: a list of Build-Deploy platforms pairs. Each element of the list describes a platform to build for, a platform to deploy to and whether the build should be flagged with [Development build](https://docs.unity3d.com/Manual/BuildSettings.html).
 
+After configuring yout Set press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
+
 ## Override variables feature
 > TODO
 
