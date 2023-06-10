@@ -40,7 +40,7 @@ runs:
 
         # https://github.com/actions/virtual-environments/issues/709#issuecomment-612569242
         rm -rf "/usr/local/share/boost"
-        rm -rf "$AGENT_TOOLSDIRECTORY"
+        #rm -rf "$AGENT_TOOLSDIRECTORY"
 
         # After
         echo "Disk space after:"
