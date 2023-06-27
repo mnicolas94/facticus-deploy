@@ -89,11 +89,14 @@ namespace Deploy.Editor
 
             var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
 
+            var workflowName = "build_and_deploy";
+            // var workflowName = "test";
             var command =
-                $"act workflow_dispatch -W .\\.github\\workflows\\build_and_deploy_test.yml" +
-                $" --input \"build_set={buildSetInput}\"";
+                $"workflow_dispatch -W ..\\..\\.github\\workflows\\{workflowName}.yml" +
+                $" --input \"json_parameters={buildSetInput}\"" +
+                $" --secret-file ..\\..\\_extras\\my.secrets";
 
-            var output = RunCommandMergeOutputs("gh", command, DeploySettings.GetOrCreate().GitDirectory);
+            var output = RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
             Debug.Log(output);
         }
 
@@ -309,24 +312,38 @@ namespace Deploy.Editor
             stdout = stdout.Trim();
             return stdout;
         }
-        
-        private static (string, string) RunCommand(string command, string options, string workingDir)
+
+        private static (string, string) RunCommand(string command, string options, string workingDir,
+            bool createAsCmdPopup = false)
         {
+            if (createAsCmdPopup)
+            {
+                options = $"/k {command} {options}";
+                command = "cmd.exe";
+            }
+            
             // Set up our processInfo to run the command and log to output and errorOutput.
-            ProcessStartInfo processInfo = new ProcessStartInfo(command, options) {
+            ProcessStartInfo processInfo = new ProcessStartInfo(command, options)
+            {
                 WorkingDirectory = workingDir,
-                CreateNoWindow = true,          // We want no visible pop-ups
-                UseShellExecute = false,        // Allows us to redirect input, output and error streams
-                RedirectStandardOutput = true,  // Allows us to read the output stream
-                RedirectStandardError = true    // Allows us to read the error stream
+                CreateNoWindow = !createAsCmdPopup, // We want no visible pop-ups
+                UseShellExecute = createAsCmdPopup, // Allows us to redirect input, output and error streams
+                RedirectStandardOutput = !createAsCmdPopup, // Allows us to read the output stream
+                RedirectStandardError = !createAsCmdPopup // Allows us to read the error stream
             };
 
             // Set up the Process
-            Process process = new Process {
+            Process process = new Process
+            {
                 StartInfo = processInfo
             };
             process.Start();
 
+            if (createAsCmdPopup)
+            {
+                return ("", "");
+            }
+            
             // Read the results back from the process so we can get the output and check for errors
             var output = process.StandardOutput.ReadToEnd();
             var errorOutput = process.StandardError.ReadToEnd();
@@ -345,9 +362,9 @@ namespace Deploy.Editor
             return (output, errorOutput);
         }
         
-        private static string RunCommandMergeOutputs(string command, string options, string workingDir)
+        private static string RunCommandMergeOutputs(string command, string options, string workingDir, bool createNoWindow=false)
         {
-            var (output, errorOutput) = RunCommand(command, options, workingDir);
+            var (output, errorOutput) = RunCommand(command, options, workingDir, createNoWindow);
 
             return $"Output:\n{output}\n\nErrorOutput:\n{errorOutput}";  // Return the output
         }
