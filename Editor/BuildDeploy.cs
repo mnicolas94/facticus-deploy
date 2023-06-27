@@ -92,9 +92,9 @@ namespace Deploy.Editor
             var workflowName = "build_and_deploy";
             // var workflowName = "test";
             var command =
-                $"workflow_dispatch -W ..\\..\\.github\\workflows\\{workflowName}.yml" +
+                $"workflow_dispatch -W .\\.github\\workflows\\{workflowName}.yml" +
                 $" --input \"json_parameters={buildSetInput}\"" +
-                $" --secret-file ..\\..\\_extras\\my.secrets";
+                $" --secret-file .\\_extras\\my.secrets";
 
             var output = RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
             Debug.Log(output);
