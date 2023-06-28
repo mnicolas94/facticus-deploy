@@ -1,0 +1,111 @@
+# This workflow is intended to be run locally with nektos/act 
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildPath:
+        type: string
+        required: true
+        description: ""
+      version:
+        type: string
+        required: true
+        description: ""
+      deployPlatform:
+        type: string
+        required: true
+        description: ""
+      deployParams:
+        type: string
+        required: true
+        description: ""
+      buildPlatform:
+        type: string
+        required: true
+        description: ""
+      notifyPlatform:
+        type: string
+        required: true
+        description: ""
+      
+jobs:
+  build_and_deploy:
+    name: Deploy to ${{ inputs.deployPlatform }}
+    runs-on: ubuntu-latest
+    steps:
+      # --- Deploy ---
+      - name: Deploy
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@main
+        with:
+          deployPlatform: ${{ inputs.deployPlatform }}
+          buildPath: ${{ inputs.buildPath }}
+          version: ${{ inputs.version }}
+          # Telegram
+          telegram_message: ${{ fromJson(inputs.deployParams).message }}
+          TELEGRAM_SESSION: ${{ secrets.TELEGRAM_SESSION }}
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Itch
+          itch_channel: ${{ fromJson(inputs.deployParams).channel }}
+          ITCH_BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_CREDENTIALS }}
+          ITCH_GAME: ${{ secrets.ITCH_GAME }}
+          ITCH_USER: ${{ secrets.ITCH_USER }}
+          # PlayStore
+          playstore_track: ${{ fromJson(inputs.deployParams).track }}
+          playstore_status: ${{ fromJson(inputs.deployParams).status }}
+          playstore_inAppUpdatePriority: ${{ fromJson(inputs.deployParams).inAppUpdatePriority }}
+          playstore_userFraction: ${{ fromJson(inputs.deployParams).userFraction }}
+          PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
+
+      # --- Notify ---
+      - name: Get platform display name
+        if: success() || failure()
+        id: display_name
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@main
+        with:
+          platform: ${{ inputs.buildPlatform }}
+          
+      - name: Get project name variable
+        if: success() || failure()
+        id: project_name
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
+        
+      - name: Get version variable
+        if: success() || failure()
+        id: version
+        run: |
+          version=$(git describe --tags --abbrev=0 --match v[0-9]*)
+          version=${version:1}
+          echo "version=$version" >> $GITHUB_OUTPUT
+          
+      - name: Construct message info
+        if: success() || failure()
+        id: messageInfo
+        run: |
+          name="${{ steps.project_name.outputs.projectNameNoSpaces }}"
+          messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ inputs.deployPlatform }}"
+          echo "info=$messageInfo" >> $GITHUB_OUTPUT
+
+      # Success message
+      - name: Send success message if not failed
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@main
+        with:
+          notifyPlatform: ${{ inputs.notifyPlatform }}
+          message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+
+      # Error message
+      - name: Send error message if failed
+        if: failure()
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@main
+        with:
+          notifyPlatform: ${{ inputs.notifyPlatform }}
+          message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}

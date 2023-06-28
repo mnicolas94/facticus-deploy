@@ -18,6 +18,7 @@ namespace Deploy.Editor.Drawers
             var workflowIdField = new PropertyField(serializedObject.FindProperty("_workflowId"));
             var gitDirectoryField = new PropertyField(serializedObject.FindProperty("_gitDirectory"));
             var defaultAssetDirectoryField = new PropertyField(serializedObject.FindProperty("_defaultAssetDirectory"));
+            var backendField = new PropertyField(serializedObject.FindProperty("_backend"));
             var notifyPlatformField = new PropertyField(serializedObject.FindProperty("_notifyPlatform"));
 
             workflowIdField.style.flexGrow = 1;
@@ -38,6 +39,7 @@ namespace Deploy.Editor.Drawers
             _root.Add(workflowContainer);
             _root.Add(gitDirectoryField);
             _root.Add(defaultAssetDirectoryField);
+            _root.Add(backendField);
             _root.Add(notifyPlatformField);
             return _root;
         }

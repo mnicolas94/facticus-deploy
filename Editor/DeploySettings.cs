@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Deploy.Editor.BackEnds;
 using Deploy.Editor.NotifyPlatforms;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Deploy.Editor
         [SerializeField] private string _workflowId;
         [SerializeField] private string _gitDirectory;
         [SerializeField] private string _defaultAssetDirectory = "Assets/Editor/Deploy";
+        [SerializeReference, SubclassSelector] private ICicdBackend _backend;
         [SerializeReference, SubclassSelector] private INotifyPlatform _notifyPlatform;
 
         public string WorkflowId
@@ -23,6 +25,8 @@ namespace Deploy.Editor
 
         public string DefaultAssetDirectory => 
             string.IsNullOrEmpty(_defaultAssetDirectory) ? "Assets": _defaultAssetDirectory;
+
+        public ICicdBackend Backend => _backend;
 
         public INotifyPlatform NotifyPlatform => _notifyPlatform;
 

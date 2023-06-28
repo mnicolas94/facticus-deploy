@@ -23,12 +23,6 @@ namespace Deploy.Editor.Data
         public ReadOnlyCollection<BuildDeployElement> Platforms => _platforms.AsReadOnly();
 
         public string RepositoryBranchOrTag => _repositoryBranchOrTag;
-        
-        [ContextMenu("Debug build locally")]
-        public void BuildLocally()
-        {
-            BuildDeploy.BuildAndDeploySetLocally(this);
-        }
 
         [ContextMenu("Debug")]
         public void DebugVariables()

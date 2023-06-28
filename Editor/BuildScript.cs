@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Deploy.Editor;
+using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -20,11 +21,14 @@ namespace UnityBuilderAction
 
         public static void Build()
         {
+            Dictionary<string, string> options = GetValidatedOptions();
+            Build(options);
+        }
+        
+        public static void Build(Dictionary<string, string> options, bool exit = true)
+        {
             // Run git command to avoid security issue
             SetGithubSafeDirectory();
-
-            // Gather values from args
-            Dictionary<string, string> options = GetValidatedOptions();
 
             // Set version for this build
             PlayerSettings.bundleVersion = options["buildVersion"];
@@ -58,7 +62,7 @@ namespace UnityBuilderAction
             }
 
             var buildVariablesEncoded = options["buildVariables"];
-            BuildDeploy.ProcessBuildVariables(buildVariablesEncoded);
+            OverrideVariablesListExtensions.ApplyOverrideVariablesValues(buildVariablesEncoded);
             
             // Build addressables
             BuildAddressables();
@@ -66,7 +70,7 @@ namespace UnityBuilderAction
             bool devBuild = options.ContainsKey("developmentBuild");
             
             // Custom build
-            Build(buildTarget, options["customBuildPath"], devBuild);
+            Build(buildTarget, options["customBuildPath"], devBuild, exit);
         }
 
         private static void BuildAddressables()
@@ -163,7 +167,7 @@ namespace UnityBuilderAction
             }
         }
 
-        private static void Build(BuildTarget buildTarget, string filePath, bool developmentBuild)
+        private static void Build(BuildTarget buildTarget, string filePath, bool developmentBuild, bool exit = true)
         {
             string[] scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(s => s.path).ToArray();
             var buildPlayerOptions = new BuildPlayerOptions
@@ -181,7 +185,10 @@ namespace UnityBuilderAction
 
             BuildSummary buildSummary = BuildPipeline.BuildPlayer(buildPlayerOptions).summary;
             ReportSummary(buildSummary);
-            ExitWithResult(buildSummary.result);
+            if (exit)
+            {
+                ExitWithResult(buildSummary.result);
+            }
         }
 
         private static void ReportSummary(BuildSummary summary)

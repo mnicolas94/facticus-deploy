@@ -139,11 +139,16 @@ namespace Deploy.Editor.Drawers
             try
             {
                 _buildButton.SetEnabled(false);
-                var success = await BuildDeploy.BuildAndDeploySet((BuildDeploySet) target);
+                var backend = DeploySettings.GetOrCreate().Backend;
+                var success = await backend.BuildAndDeploy((BuildDeploySet)target);
                 if (success)
                 {
                     EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
                 }
+            }
+            catch (Exception e)
+            {
+                
             }
             finally
             {
