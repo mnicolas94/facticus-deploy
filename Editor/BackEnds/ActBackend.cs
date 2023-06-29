@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
+using Deploy.Editor.DeployPlatforms;
 using Deploy.Editor.Utility;
 using Newtonsoft.Json;
 using UnityBuilderAction;
@@ -88,7 +89,7 @@ namespace Deploy.Editor.BackEnds
                             { "buildPath", buildPath },
                             { "version", Application.version },
                             { "deployPlatform", buildDeployElement.DeployPlatform.GetPlatformName() },
-                            { "deployParams", buildDeployElement.DeployPlatform },
+                            { "deployParams", ToDict(buildDeployElement.DeployPlatform) },
                             { "buildPlatform", buildDeployElement.BuildPlatform.GetGameCiName() },
                             { "notifyPlatform", DeploySettings.GetOrCreate().NotifyPlatform.GetPlatformName() },
                         }
@@ -198,6 +199,13 @@ namespace Deploy.Editor.BackEnds
             }
 
             return filePath;
+        }
+
+        private Dictionary<string, object> ToDict(object obj)
+        {
+            var json = JsonUtility.ToJson(obj);
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return dict;
         }
     }
 }
