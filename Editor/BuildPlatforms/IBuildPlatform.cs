@@ -33,6 +33,8 @@ namespace Deploy.Editor.BuildPlatforms
 
         [SerializeField, Tooltip("Set this flag to true to build '.aab' instead of '.apk'")]
         private bool appBundle;
+
+        public bool AppBundle => appBundle;
     }
     
     [Serializable]
