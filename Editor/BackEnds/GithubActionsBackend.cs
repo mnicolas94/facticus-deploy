@@ -71,8 +71,7 @@ namespace Deploy.Editor.BackEnds
                             }
                             else if (responseCode >= 300)
                             {
-                                EditorInputDialog.ShowMessage($"Error {responseCode}", content);
-                                success = false;
+                                throw new HttpRequestException($"Error {responseCode}\n{content}");
                             }
                         }
                     }

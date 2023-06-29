@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utils.Editor;
 
 namespace Deploy.Editor.Drawers
 {
@@ -140,7 +141,7 @@ namespace Deploy.Editor.Drawers
             {
                 _buildButton.SetEnabled(false);
                 var backend = DeploySettings.GetOrCreate().Backend;
-                var success = await backend.BuildAndDeploy((BuildDeploySet)target);
+                var success = await backend.BuildAndDeploy((BuildDeploySet) target);
                 if (success)
                 {
                     EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
@@ -148,7 +149,7 @@ namespace Deploy.Editor.Drawers
             }
             catch (Exception e)
             {
-                
+                EditorInputDialog.ShowMessage("Error", e.Message);
             }
             finally
             {
