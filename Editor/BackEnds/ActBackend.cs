@@ -45,13 +45,19 @@ namespace Deploy.Editor.BackEnds
             var overrideVariables = set.OverrideVariables.ToList();
             
             var buildSetInput = GithubActionsBackend.GetBuildSetInput(elements, overrideVariables);
-            var workflowName = "build_and_deploy";
+            
+            var secretsPath = _secretsDir;
+            secretsPath = Path.GetFullPath(secretsPath);
+            var deploySettings = DeploySettings.GetOrCreate();
+            var workflowName = $"{deploySettings.WorkflowId}.yml";
+            var workflowPath = Path.Combine(".github", "workflows", workflowName);
+            
             var command =
-                $"workflow_dispatch -W ./.github/workflows/{workflowName}.yml" +
+                $"workflow_dispatch -W {workflowPath}" +
                 $" --input \"json_parameters={buildSetInput}\"" +
-                $" --secret-file ./_extras/my.secrets";
+                $" --secret-file {secretsPath}";
 
-            TerminalUtils.RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
+            TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
             Debug.Log("Act started building. See outputs in terminal");
         }
 
