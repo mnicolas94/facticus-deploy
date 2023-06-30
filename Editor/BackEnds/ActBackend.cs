@@ -197,6 +197,15 @@ namespace Deploy.Editor.BackEnds
                 // this means this project is my development project, should not happen for package's users
                 filePath = "Assets/Deploy/.github/workflows/only_deploy.yml";
             }
+            else
+            {
+                // copy the workflow to a temporary path
+                var tempDir = "Temp/Deploy";
+                Directory.CreateDirectory(tempDir);
+                var tempPath = Path.Combine(tempDir, "only_deploy.yml");
+                File.Copy(filePath, tempPath);
+                filePath = tempPath;
+            }
 
             return filePath;
         }
