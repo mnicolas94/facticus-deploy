@@ -203,7 +203,11 @@ namespace Deploy.Editor.BackEnds
                 var tempDir = "Temp/Deploy";
                 Directory.CreateDirectory(tempDir);
                 var tempPath = Path.Combine(tempDir, "only_deploy.yml");
-                File.Copy(filePath, tempPath);
+
+                if (!File.Exists(tempPath))
+                {
+                    File.Copy(filePath, tempPath);
+                }
                 filePath = tempPath;
             }
 
