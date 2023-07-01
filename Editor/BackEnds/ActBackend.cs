@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
-using Deploy.Editor.DeployPlatforms;
 using Deploy.Editor.Utility;
 using Newtonsoft.Json;
 using UnityBuilderAction;
-using UnityEditor;
 using UnityEngine;
 using Utils.Attributes;
 
