@@ -21,6 +21,8 @@ namespace Deploy.Editor.BackEnds
     public class ActBackend : ICicdBackend
     {
         [SerializeField] private bool _buildWithAct;
+        [SerializeField, Tooltip("The console output will give more details")]
+        private bool _verboseOutput;
         [SerializeField, PathSelector(isDirectory: true)] private string _buildsDirectory;
         [SerializeField, PathSelector] private string _secretsDir;
         
@@ -56,6 +58,11 @@ namespace Deploy.Editor.BackEnds
                 $"workflow_dispatch -W {workflowPath}" +
                 $" --input \"json_parameters={buildSetInput}\"" +
                 $" --secret-file {secretsPath}";
+
+            if (_verboseOutput)
+            {
+                command += " -v";
+            }
 
             TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
             Debug.Log("Act started building. See outputs in terminal");
@@ -114,6 +121,11 @@ namespace Deploy.Editor.BackEnds
                     $" -b" +
                     $" -C {workingDir}" +
                     $" --secret-file {secretsPath}";
+                
+                if (_verboseOutput)
+                {
+                    command += " -v";
+                }
 
                 // execute Act to deploy
                 TerminalUtils.RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
