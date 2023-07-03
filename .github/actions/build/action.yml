@@ -8,6 +8,9 @@ inputs:
   developmentBuild:
     description: 'Whether is a development build or not'
     required: true
+  freeDiskSpace:
+    description: 'Whether to free disk space before build'
+    required: true
   buildVariables:
     description: 'Base64 encoded build variables'
     required: true
@@ -66,6 +69,7 @@ runs:
           Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-
           Library-
     - name: Free CI system disk space
+      if: ${{ inputs.freeDiskSpace == 'true' }}
       uses: mnicolas94/facticus-deploy/.github/actions/free-disk-space@main
           
     - name: Build step

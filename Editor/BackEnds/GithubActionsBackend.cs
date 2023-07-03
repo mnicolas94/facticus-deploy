@@ -109,6 +109,7 @@ namespace Deploy.Editor.BackEnds
             var buildParameters = ToJson(element.BuildPlatform);
             var buildVariables = variables.OverrideVariablesToBase64();
             var developmentBuild = element.DevelopmentBuild;
+            var freeDiskSpace = element.FreeDiskSpaceBeforeBuild;
             var deployPlatform = element.DeployPlatform.GetPlatformName();
             var deployParameters = ToJson(element.DeployPlatform);
 
@@ -120,6 +121,7 @@ namespace Deploy.Editor.BackEnds
                                $"\"buildParams\":\"{buildParameters}\"," +
                                $"\"buildVariables\":\"{buildVariables}\"," +
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
+                               $"\"freeDiskSpace\":\"{freeDiskSpace.ToString().ToLower()}\"," +
                                $"\"deployParams\":\"{deployParameters}\"," +
                                $"\"deployPlatform\":\"{deployPlatform}\"," +
                                $"\"notifyPlatform\":\"{notifyPlatformName}\"" +

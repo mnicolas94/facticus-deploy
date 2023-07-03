@@ -18,7 +18,7 @@ runs:
         #sudo swapoff -a
         #sudo rm -f /swapfile
         #sudo apt clean
-        #docker rmi $(docker images -q)
+        #docker rmi $(docker images -q)  # removing docker images breaks appleboy/telegram-action action.
         #echo "After swap off"
         #df -h
 

@@ -9,11 +9,19 @@ namespace Deploy.Editor.Data
     public class BuildDeployElement
     {
         [SerializeField] private bool _developmentBuild;
+        [SerializeField]
+        [Tooltip("Whether to free disk space in the runner that builds your project before the build starts. " +
+                 "Not applicable to local builds with Act backend. Only set it to true if you are getting a " +
+                 "\"...no space left on device.\" error. See the risks of setting this option to true on the " +
+                 "documentation.")]
+        private bool _freeDiskSpaceBeforeBuild;
         [SerializeReference, SubclassSelector] private IBuildPlatform _buildPlatform;
         [SerializeReference, SubclassSelector] private IDeployPlatform _deployPlatform;
         // [SerializeField] private SubclassSelector<IDeployPlatform> _deployPlatformCustom;
 
         public bool DevelopmentBuild => _developmentBuild;
+
+        public bool FreeDiskSpaceBeforeBuild => _freeDiskSpaceBeforeBuild;
 
         public IBuildPlatform BuildPlatform
         {
