@@ -8,6 +8,9 @@ inputs:
   developmentBuild:
     description: 'Whether is a development build or not'
     required: true
+  versioningStrategy:
+    description: 'The versioning scheme to use when building the project'
+    required: true
   freeDiskSpace:
     description: 'Whether to free disk space before build'
     required: true
@@ -82,7 +85,7 @@ runs:
         buildName: ${{ steps.project_name.outputs.projectName }}
         buildMethod: UnityBuilderAction.BuildScript.Build
         targetPlatform: ${{ inputs.targetPlatform }}
-        versioning: Tag
+        versioning: ${{ inputs.versioningStrategy }}
         androidAppBundle: ${{ inputs.androidAppBundle }}
         androidKeystoreName: ${{ inputs.androidKeystoreName }}
         androidKeystoreBase64: ${{ inputs.androidKeystoreBase64 }}

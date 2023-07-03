@@ -107,24 +107,28 @@ namespace Deploy.Editor.BackEnds
         {
             var buildPlatform = element.BuildPlatform.GetGameCiName();
             var buildParameters = ToJson(element.BuildPlatform);
-            var buildVariables = variables.OverrideVariablesToBase64();
+            var overrideVariablesBase64 = variables.OverrideVariablesToBase64();
             var developmentBuild = element.DevelopmentBuild;
             var freeDiskSpace = element.FreeDiskSpaceBeforeBuild;
             var deployPlatform = element.DeployPlatform.GetPlatformName();
             var deployParameters = ToJson(element.DeployPlatform);
 
-            var notifyPlatform = DeploySettings.GetOrCreate().NotifyPlatform;
+            var deploySettings = DeploySettings.GetOrCreate();
+            
+            var notifyPlatform = deploySettings.NotifyPlatform;
             var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.GetPlatformName();
+            var versioningStrategy = deploySettings.VersioningStrategy;
             
             var inputsString = "{" +
                                $"\"buildPlatform\":\"{buildPlatform}\"," +
                                $"\"buildParams\":\"{buildParameters}\"," +
-                               $"\"buildVariables\":\"{buildVariables}\"," +
+                               $"\"buildVariables\":\"{overrideVariablesBase64}\"," +
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
                                $"\"freeDiskSpace\":\"{freeDiskSpace.ToString().ToLower()}\"," +
                                $"\"deployParams\":\"{deployParameters}\"," +
                                $"\"deployPlatform\":\"{deployPlatform}\"," +
-                               $"\"notifyPlatform\":\"{notifyPlatformName}\"" +
+                               $"\"notifyPlatform\":\"{notifyPlatformName}\"," +
+                               $"\"versioningStrategy\":\"{versioningStrategy}\"" +
                                "}";
             return inputsString;
         }

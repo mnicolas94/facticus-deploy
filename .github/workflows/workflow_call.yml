@@ -73,6 +73,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.buildPlatform }}
           developmentBuild: ${{ matrix.developmentBuild }}
+          versioningStrategy: ${{ matrix.versioningStrategy }}
           freeDiskSpace: ${{ matrix.freeDiskSpace }}
           buildVariables: ${{ matrix.buildVariables }}
           # Android specific

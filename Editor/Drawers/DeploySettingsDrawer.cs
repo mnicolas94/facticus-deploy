@@ -20,6 +20,7 @@ namespace Deploy.Editor.Drawers
             var defaultAssetDirectoryField = new PropertyField(serializedObject.FindProperty("_defaultAssetDirectory"));
             var backendField = new PropertyField(serializedObject.FindProperty("_backend"));
             var notifyPlatformField = new PropertyField(serializedObject.FindProperty("_notifyPlatform"));
+            var versioningStrategyField = new PropertyField(serializedObject.FindProperty("_versioningStrategy"));
 
             workflowIdField.style.flexGrow = 1;
             var workflowContainer = new VisualElement
@@ -41,6 +42,7 @@ namespace Deploy.Editor.Drawers
             _root.Add(defaultAssetDirectoryField);
             _root.Add(backendField);
             _root.Add(notifyPlatformField);
+            _root.Add(versioningStrategyField);
             return _root;
         }
 
