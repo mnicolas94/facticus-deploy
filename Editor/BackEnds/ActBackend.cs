@@ -6,9 +6,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
+using Deploy.Editor.DeployPlatforms;
 using Deploy.Editor.Utility;
 using Newtonsoft.Json;
 using UnityBuilderAction;
+using UnityEditor;
 using UnityEngine;
 using Utils.Attributes;
 
@@ -86,7 +88,7 @@ namespace Deploy.Editor.BackEnds
                             { "buildPath", buildPath },
                             { "version", Application.version },
                             { "deployPlatform", buildDeployElement.DeployPlatform.GetPlatformName() },
-                            { "deployParams", ToDict(buildDeployElement.DeployPlatform) },
+                            { "deployParams", JsonUtility.ToJson(buildDeployElement.DeployPlatform) },
                             { "buildPlatform", buildDeployElement.BuildPlatform.GetGameCiName() },
                             { "notifyPlatform", DeploySettings.GetOrCreate().NotifyPlatform.GetPlatformName() },
                         }
@@ -118,7 +120,54 @@ namespace Deploy.Editor.BackEnds
                 Debug.Log("Act started deploying. See outputs in terminal");
             }
         }
-
+        
+        // [MenuItem("Test/Deploy telegram message")]
+        // public static void TestDeployTelegram()
+        // {
+        //     var workflowPath = GetDeployOnlyWorkflowFilePath();
+        //
+        //     // construct payload inputs
+        //     var inputs = new Dictionary<string, object>
+        //     {
+        //         {
+        //             "inputs", new Dictionary<string, object>
+        //             {
+        //                 { "buildPath", "./facticus-deploy.sln" },
+        //                 { "version", Application.version },
+        //                 { "deployPlatform", "Telegram" },
+        //                 { "deployParams", JsonUtility.ToJson(new Telegram{Message="Test telegram message"}) },
+        //                 { "buildPlatform", "StandaloneWindows64" },
+        //                 { "notifyPlatform", "Telegram" },
+        //             }
+        //         }
+        //     };
+        //     
+        //     // write json
+        //     var json = JsonConvert.SerializeObject(inputs, Formatting.Indented);
+        //     var jsonDirectory = "Temp/Deploy/";
+        //     Directory.CreateDirectory(jsonDirectory);
+        //     var jsonPath = Path.Combine(jsonDirectory, "actPayload.json");
+        //     jsonPath = Path.GetFullPath(jsonPath);
+        //     File.WriteAllText(jsonPath, json);
+        //
+        //     var secretsPath = "./_extras/my.secrets";
+        //     secretsPath = Path.GetFullPath(secretsPath);
+        //
+        //     // construct command
+        //     var workingDir = Path.GetFullPath("./");
+        //     var command =
+        //         $"workflow_dispatch -W {workflowPath}" +
+        //         $" -e {jsonPath}" +
+        //         $" -b" +
+        //         $" -C {workingDir}" +
+        //         $" -v" +
+        //         $" --secret-file {secretsPath}";
+        //
+        //     // execute Act to deploy
+        //     TerminalUtils.RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
+        //     Debug.Log("Act started deploying. See outputs in terminal");
+        // }
+        
         private string BuildLocally(BuildDeployElement element, string buildFolderName, List<BuildVariableValue> overrideVariables)
         {
             var projectPath = "./";
@@ -186,7 +235,7 @@ namespace Deploy.Editor.BackEnds
             return $"{major}{minor}{patch}";
         }
 
-        private string GetDeployOnlyWorkflowFilePath()
+        private static string GetDeployOnlyWorkflowFilePath()
         {
             var filePath = "Packages/com.facticus.deploy/.github/workflows/only_deploy.yml";
             if (!File.Exists(filePath))

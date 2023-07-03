@@ -18,6 +18,12 @@ namespace Deploy.Editor.DeployPlatforms
         public string GetPlatformName() => "Telegram";
 
         [SerializeField] private string message;
+
+        public string Message
+        {
+            get => message;
+            set => message = value;
+        }
     }
     
     [Serializable]
