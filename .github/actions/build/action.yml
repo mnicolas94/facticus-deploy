@@ -3,20 +3,22 @@ description: 'Build Unity project'
 inputs:
   targetPlatform:
     required: true
-    default: ''
     description: 'Platform that the build should target.'
   developmentBuild:
+    required: false
+    default: 'false'
     description: 'Whether is a development build or not'
-    required: true
   versioningStrategy:
+    required: false
+    default: 'Semantic'
     description: 'The versioning scheme to use when building the project'
-    required: true
   freeDiskSpace:
+    required: false
+    default: 'false'
     description: 'Whether to free disk space before build'
-    required: true
   buildVariables:
-    description: 'Base64 encoded build variables'
     required: true
+    description: 'Base64 encoded build variables'
   androidAppBundle:
     required: false
     default: 'false'
@@ -43,8 +45,8 @@ inputs:
     description: 'The android keyaliasPass'
 outputs:
   buildPath:
-    description: "The built file path"
     value: ${{ steps.output_path.outputs.path }}
+    description: "The built file path"
   version:
     value: ${{ steps.build.outputs.buildVersion }}
     description: ''
