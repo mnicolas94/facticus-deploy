@@ -121,53 +121,6 @@ namespace Deploy.Editor.BackEnds
             }
         }
         
-        // [MenuItem("Test/Deploy telegram message")]
-        // public static void TestDeployTelegram()
-        // {
-        //     var workflowPath = GetDeployOnlyWorkflowFilePath();
-        //
-        //     // construct payload inputs
-        //     var inputs = new Dictionary<string, object>
-        //     {
-        //         {
-        //             "inputs", new Dictionary<string, object>
-        //             {
-        //                 { "buildPath", "./facticus-deploy.sln" },
-        //                 { "version", Application.version },
-        //                 { "deployPlatform", "Telegram" },
-        //                 { "deployParams", JsonUtility.ToJson(new Telegram{Message="Test telegram message"}) },
-        //                 { "buildPlatform", "StandaloneWindows64" },
-        //                 { "notifyPlatform", "Telegram" },
-        //             }
-        //         }
-        //     };
-        //     
-        //     // write json
-        //     var json = JsonConvert.SerializeObject(inputs, Formatting.Indented);
-        //     var jsonDirectory = "Temp/Deploy/";
-        //     Directory.CreateDirectory(jsonDirectory);
-        //     var jsonPath = Path.Combine(jsonDirectory, "actPayload.json");
-        //     jsonPath = Path.GetFullPath(jsonPath);
-        //     File.WriteAllText(jsonPath, json);
-        //
-        //     var secretsPath = "./_extras/my.secrets";
-        //     secretsPath = Path.GetFullPath(secretsPath);
-        //
-        //     // construct command
-        //     var workingDir = Path.GetFullPath("./");
-        //     var command =
-        //         $"workflow_dispatch -W {workflowPath}" +
-        //         $" -e {jsonPath}" +
-        //         $" -b" +
-        //         $" -C {workingDir}" +
-        //         $" -v" +
-        //         $" --secret-file {secretsPath}";
-        //
-        //     // execute Act to deploy
-        //     TerminalUtils.RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
-        //     Debug.Log("Act started deploying. See outputs in terminal");
-        // }
-        
         private string BuildLocally(BuildDeployElement element, string buildFolderName, List<BuildVariableValue> overrideVariables)
         {
             var projectPath = "./";
