@@ -11,8 +11,13 @@ namespace Deploy.Editor.Utility
         {
             if (createAsCmdPopup)
             {
+#if UNITY_EDITOR_WIN
                 options = $"/k {command} {options}";
                 command = "cmd.exe";
+#else
+                options = $"-c '{command} {options'";
+                command = "bash";
+#endif
             }
             
             // Set up our processInfo to run the command and log to output and errorOutput.
