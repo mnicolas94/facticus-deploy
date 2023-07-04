@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Deploy.Editor.Data;
+using Deploy.Editor.Settings;
 using Deploy.Editor.Utility;
 using UnityEditor;
 using UnityEditor.UIElements;

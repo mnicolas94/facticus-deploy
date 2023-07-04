@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
 using Deploy.Editor.DeployPlatforms;
+using Deploy.Editor.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;

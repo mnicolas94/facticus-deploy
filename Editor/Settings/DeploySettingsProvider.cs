@@ -1,11 +1,7 @@
-﻿using System.IO;
-using UnityEditor;
-using UnityEditor.Search;
+﻿using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
-using Utils.Editor.EditorGUIUtils;
 
-namespace Deploy.Editor
+namespace Deploy.Editor.Settings
 {
     public static class DeploySettingsProvider
     {

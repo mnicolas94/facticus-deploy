@@ -2,12 +2,12 @@
 using System.IO;
 using Deploy.Editor.BackEnds;
 using Deploy.Editor.NotifyPlatforms;
+using Deploy.Editor.Versioning;
 using UnityEditor;
 using UnityEngine;
 using Utils;
-using Utils.Attributes;
 
-namespace Deploy.Editor
+namespace Deploy.Editor.Settings
 {
     public class DeploySettings : ScriptableObjectSingleton<DeploySettings>
     {
@@ -16,8 +16,7 @@ namespace Deploy.Editor
         [SerializeField] private string _defaultAssetDirectory = "Assets/Editor/Deploy";
         [SerializeReference, SubclassSelector] private ICicdBackend _backend;
         [SerializeReference, SubclassSelector] private INotifyPlatform _notifyPlatform;
-        [SerializeField, Dropdown(nameof(GetVersioningStrategies))]
-        private string _versioningStrategy;
+        [SerializeField] private VersioningStrategy _versioningStrategy;
 
         public string WorkflowId
         {
@@ -34,7 +33,7 @@ namespace Deploy.Editor
 
         public INotifyPlatform NotifyPlatform => _notifyPlatform;
 
-        public string VersioningStrategy => _versioningStrategy;
+        public VersioningStrategy VersioningStrategy => _versioningStrategy;
 
         public static DeploySettings GetOrCreate()
         {
