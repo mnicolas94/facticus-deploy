@@ -24,6 +24,9 @@ namespace Deploy.Editor.BackEnds
         [SerializeField] private bool _buildWithAct;
         [SerializeField, Tooltip("The console output will give more details")]
         private bool _verboseOutput;
+
+        [SerializeField] private List<string> _extraCommands;
+        
         [SerializeField, PathSelector(isDirectory: true)] private string _buildsDirectory;
         [SerializeField, PathSelector] private string _secretsDir;
         
@@ -60,10 +63,7 @@ namespace Deploy.Editor.BackEnds
                 $" --input \"json_parameters={buildSetInput}\"" +
                 $" --secret-file {secretsPath}";
 
-            if (_verboseOutput)
-            {
-                command += " -v";
-            }
+            command = AddExtraArgumentsToActCommand(command);
 
             TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
             Debug.Log("Act started building. See outputs in terminal");
@@ -122,12 +122,9 @@ namespace Deploy.Editor.BackEnds
                     $" -b" +
                     $" -C {workingDir}" +
                     $" --secret-file {secretsPath}";
-                
-                if (_verboseOutput)
-                {
-                    command += " -v";
-                }
 
+                command = AddExtraArgumentsToActCommand(command);
+                
                 // execute Act to deploy
                 TerminalUtils.RunCommandMergeOutputs("act", command, DeploySettings.GetOrCreate().GitDirectory, true);
                 Debug.Log("Act started deploying. See outputs in terminal");
@@ -226,6 +223,21 @@ namespace Deploy.Editor.BackEnds
             return filePath;
         }
 
+        private string AddExtraArgumentsToActCommand(string command)
+        {
+            if (_verboseOutput)
+            {
+                command += " -v";
+            }
+
+            foreach (var extraCommand in _extraCommands)
+            {
+                command += $" {extraCommand}";
+            }
+            
+            return command;
+        }
+        
         private Dictionary<string, object> ToDict(object obj)
         {
             var json = JsonUtility.ToJson(obj);
