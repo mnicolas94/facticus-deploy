@@ -62,6 +62,14 @@ runs:
       with:
         fetch-depth: 0
         lfs: true
+    - name: Test echo branch
+      shell: bash
+      run: |
+        echo "**************************************************"
+        echo "--------------------------------------------------"
+        git rev-parse --abbrev-ref HEAD
+        echo "--------------------------------------------------"
+        echo "**************************************************"
     - name: Get project name variable
       id: project_name
       uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@main
