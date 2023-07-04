@@ -57,7 +57,8 @@ jobs:
         run: echo "matrix={\"include\":${{ github.event.inputs.json_parameters }}}" >> $GITHUB_OUTPUT
 
   build_and_deploy:
-    name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
+    #name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
+    name: Build and Deploy
     needs: parse_input
     runs-on: ubuntu-latest
     strategy:
