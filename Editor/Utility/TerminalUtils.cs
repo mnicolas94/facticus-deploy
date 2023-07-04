@@ -53,7 +53,6 @@ namespace Deploy.Editor.Utility
 
             if (hadErrors)
             {
-                Debug.Log($"Exit code: {exitCode}");    
                 throw new Exception($"{output}\n{errorOutput}");
             }
 
