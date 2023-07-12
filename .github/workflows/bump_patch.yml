@@ -1,5 +1,6 @@
 name: Bump version patch on push to main branch
 
+
 on:
   push:
     branches: [ main, dev, develop ]
