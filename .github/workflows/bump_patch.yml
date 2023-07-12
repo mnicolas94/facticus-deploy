@@ -1,6 +1,5 @@
 name: Bump version patch on push to main branch
 
-
 on:
   push:
     branches: [ main, dev, develop ]
@@ -10,10 +9,12 @@ jobs:
     name: Bump the project's version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
+          repository: mnicolas94/facticus-deploy
           fetch-depth: 0
           token: secrets.WORKFLOW_TOKEN
+          persist-credentials: false
 
       - name: Bump patch
         id: version
