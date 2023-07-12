@@ -111,7 +111,7 @@ jobs:
             if __name__ == '__main__':
                 dirs = [
                     ".github/actions/",
-                    ".github/workflows/",
+                    ".github/reusable_workflows/",
                     "Editor/Resources/",
                 ]
             
