@@ -124,8 +124,13 @@ jobs:
 
       - name: commit, tag and push version file
         run: |
-          git add *
+          git status
+          git add .
+          echo "---"
+          git status
           git commit -m "bump version patch and update package.json"
+          echo "---"
+          git status
           version=v${{ steps.version.outputs.version }}
           if [[ ${{ steps.version.outputs.is_new }} == 'false' ]]; then
             git tag -d $version
