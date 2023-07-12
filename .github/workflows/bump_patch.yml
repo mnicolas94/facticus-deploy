@@ -6,4 +6,130 @@ on:
     
 jobs:
   bumpVersion:
-    uses: mnicolas94/UnityCICDWorkflows/.github/workflows/bump_patch_package.yml@v1-pre-8
+    name: Bump the project's version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Bump patch
+        id: version
+        run: |
+          strindex() {
+            x="${1%%$2*}"
+            [[ "$x" = "$1" ]] && echo -1 || echo "${#x}"
+          }
+          if [ $(git describe --tags --long --match v[0-9]*) ]; then
+            describe=$(git describe --tags --long --match v[0-9]*)
+            majorindex=$(strindex $describe .)
+            major=${describe:1:majorindex-1}
+            minorsub=${describe:majorindex+1}
+            minorindex=$(strindex $minorsub .)
+            minor=${minorsub:0:minorindex}
+            patchsub=${minorsub:minorindex+1}
+            patchindex=$(strindex $patchsub -)
+            patch=${patchsub:0:patchindex}
+            newpatch=$((patch+1))
+            oldversion=$major.$minor.$patch
+            version=$major.$minor.$newpatch
+          else
+            oldversion="there was no version before"
+            version=0.1.0
+          fi
+          echo old version: $oldversion
+          echo version: $version
+          if [ $(git describe --tags --exact-match HEAD) ]; then
+            echo "Current commit already has tag. Can't bump version"
+            echo "is_new=false" >> $GITHUB_OUTPUT
+            echo "version=$oldversion" >> $GITHUB_OUTPUT
+          else
+            echo "is_new=true" >> $GITHUB_OUTPUT
+            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-python@v2
+
+      - name: Update package.json file
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            import json
+
+            if __name__ == '__main__':
+                json_path = "package.json"
+                with open(json_path) as f:
+                  js = json.load(f)
+
+                version = "${{ steps.version.outputs.version }}"
+                is_same_version = js['version'] == version
+                js['version'] = version
+
+                with open(json_path, "w") as f:
+                  json.dump(js, f, indent=2)
+
+                print(is_same_version)
+
+      - name: Update tags on Deploy's actions calls
+        uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            import os
+            import re
+            
+            def list_files(base_path, valid_extensions=None, recursive=True):
+                for element in os.scandir(base_path):
+                    element: os.DirEntry = element
+                    path = element.path
+                    if element.is_dir() and recursive:
+                        yield from list_files(path, valid_extensions, recursive)
+                    else:
+                        valid_extensions = valid_extensions or []
+                        _, ext = os.path.splitext(path)
+                        no_extension_restriction = len(valid_extensions) == 0
+                        if no_extension_restriction or ext in valid_extensions:
+                            yield path
+            
+            def replace_deploy_versions_in_file(file_path, version):
+                lines = []
+                # read file's lines
+                with open(file_path, encoding="utf8") as f:
+                    for line in f:
+                        s = re.search(pattern, line)  # search for pattern
+                        if s:
+                            start = s.start(group_name)
+                            end = s.end(group_name)
+                            line = f"{line[:start]}{version}{line[end:]}"  # replace tag with the new version
+                        lines.append(line)
+                # write new lines
+                with open(file_path, "w", encoding="utf8") as f:
+                    f.writelines(lines)
+            
+            if __name__ == '__main__':
+                dirs = [
+                    ".github/actions/",
+                    ".github/workflows/",
+                    "Editor/Resources/",
+                ]
+            
+                version = "v${{ steps.version.outputs.version }}"
+                group_name = "ver"
+                pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@(?P<{group_name}>.*)"
+            
+                for folder in dirs:
+                    for p in list_files(folder, ".yml", True):
+                        replace_deploy_versions_in_file(p, version)
+
+      - uses: fregante/setup-git-user@v1
+
+      - name: commit, tag and push version file
+        run: |
+          git commit -m "bump version patch and update package.json" ./package.json
+          version=v${{ steps.version.outputs.version }}
+          if [[ ${{ steps.version.outputs.is_new }} == 'false' ]]; then
+            git tag -d $version
+            git push --delete origin $version
+          fi
+          git tag $version
+          git push origin
+          git push origin $version
