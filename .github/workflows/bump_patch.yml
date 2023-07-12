@@ -11,10 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          repository: mnicolas94/facticus-deploy
           fetch-depth: 0
-          token: secrets.WORKFLOW_TOKEN
-          persist-credentials: false
 
       - name: Bump patch
         id: version
