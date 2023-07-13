@@ -94,6 +94,7 @@ jobs:
             
             def replace_deploy_versions_in_file(file_path, version):
                 lines = []
+                changed = False
                 # read file's lines
                 with open(file_path, encoding="utf8") as f:
                     for line in f:
@@ -102,10 +103,12 @@ jobs:
                             start = s.start(group_name)
                             end = s.end(group_name)
                             line = f"{line[:start]}{version}{line[end:]}"  # replace tag with the new version
+                            changed = True
                         lines.append(line)
                 # write new lines
-                with open(file_path, "w", encoding="utf8") as f:
-                    f.writelines(lines)
+                if changed:
+                    with open(file_path, "w", encoding="utf8") as f:
+                        f.writelines(lines)
             
             if __name__ == '__main__':
                 dirs = [
