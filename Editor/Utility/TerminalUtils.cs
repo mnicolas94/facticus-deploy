@@ -14,7 +14,7 @@ namespace Deploy.Editor.Utility
                 options = $"/k {command} {options}";
                 command = "cmd.exe";
 #else
-                options = $"-c '{command} {options'";
+                options = $"-c '{command} {options}'";
                 command = "bash";
 #endif
             }
