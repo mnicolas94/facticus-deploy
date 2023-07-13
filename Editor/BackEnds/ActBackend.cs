@@ -200,11 +200,11 @@ namespace Deploy.Editor.BackEnds
 
         private static string GetDeployOnlyWorkflowFilePath()
         {
-            var filePath = "Packages/com.facticus.deploy/.github/reusable_workflows/only_deploy.yml";
+            var filePath = "Packages/com.facticus.deploy/.github/workflows/only_deploy.yml";
             if (!File.Exists(filePath))
             {
                 // this means this project is my development project, should not happen for package's users
-                filePath = "Assets/Deploy/.github/reusable_workflows/only_deploy.yml";
+                filePath = "Assets/Deploy/.github/workflows/only_deploy.yml";
             }
             else
             {
