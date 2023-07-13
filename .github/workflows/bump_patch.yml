@@ -115,7 +115,7 @@ jobs:
             
                 version = "v${{ steps.version.outputs.version }}"
                 group_name = "ver"
-                pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@(?P<{group_name}>.*)"
+                pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@v0.1.73
             
                 for folder in dirs:
                     for p in list_files(folder, ".yml", True):
