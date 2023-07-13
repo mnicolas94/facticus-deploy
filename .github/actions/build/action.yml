@@ -72,7 +72,7 @@ runs:
         echo "**************************************************"
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.75
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.76
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -83,7 +83,7 @@ runs:
           Library-
     - name: Free CI system disk space
       if: ${{ inputs.freeDiskSpace == 'true' }}
-      uses: mnicolas94/facticus-deploy/.github/actions/free-disk-space@v0.1.75
+      uses: mnicolas94/facticus-deploy/.github/actions/free-disk-space@v0.1.76
           
     - name: Build step
       uses: game-ci/unity-builder@v2
@@ -107,7 +107,7 @@ runs:
     # --- Get build path ---    
     - name: Get platform display name
       id: display_name
-      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.75
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.76
       with:
         platform: ${{ inputs.targetPlatform }}
     - name: Construct zip name (Standalone and WebGL)
