@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          token: secrets.WORKFLOW_TOKEN
 
       - name: Bump patch
         id: version
@@ -108,7 +109,7 @@ jobs:
             if __name__ == '__main__':
                 dirs = [
                     ".github/actions/",
-                    ".github/reusable_workflows/",
+                    ".github/workflows/",
                     "Editor/Resources/",
                 ]
             
