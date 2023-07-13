@@ -112,13 +112,20 @@ jobs:
                     ".github/workflows/",
                     "Editor/Resources/",
                 ]
+                ignore_files = [
+                    ".github/workflows/bump_patch.yml"
+                ]
+                # normalize paths to properly compare later
+                ignore_files = [os.path.normpath(p) for p in ignore_files]
             
                 version = "v${{ steps.version.outputs.version }}"
                 group_name = "ver"
-                pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@v0.1.73
+                pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@(?P<{group_name}>.*)"
             
                 for folder in dirs:
                     for p in list_files(folder, ".yml", True):
+                        if os.path.normpath(p) in ignore_files:
+                            continue  # ignore it
                         replace_deploy_versions_in_file(p, version)
 
       - uses: fregante/setup-git-user@v1
