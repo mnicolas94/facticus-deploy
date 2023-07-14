@@ -12,8 +12,10 @@ runs:
         echo "=============================================================================="
 
         # Before
+        echo "------------------"
         echo "Disk space before:"
         df -h
+        echo "------------------"
 
         #sudo swapoff -a
         #sudo rm -f /swapfile
@@ -43,6 +45,8 @@ runs:
         #rm -rf "$AGENT_TOOLSDIRECTORY"  This can break Python
 
         # After
+        echo "------------------"
         echo "Disk space after:"
         df -h
+        echo "------------------"
           
