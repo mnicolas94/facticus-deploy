@@ -5,19 +5,19 @@
 Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your workstation) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) under the hood to run the builds on GitHub servers.
 
 ## Table of contents
-- [Features](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#features)  
-- [Requirements](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#requirements)  
-- [How to install](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#how-to-install)  
-- [How to setup](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#how-to-setup)  
-    - [Create the workflow](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#create-the-workflow)  
-    - [Configuring Secrets](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#configuring-secrets)  
-    - [Secrets security](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#secrets-security)  
-- [How to use](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#how-to-use)  
-- [Override variables feature](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#override-variables-feature)  
-- [Limitations](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#limitations)  
-- [Known issues](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#known-issues)  
-- [FAQ](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#faq)  
-- [Acknowledgements](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#aknowledgements)  
+- [Features](https://github.com/mnicolas94/facticus-deploy#features)  
+- [Requirements](https://github.com/mnicolas94/facticus-deploy#requirements)  
+- [How to install](https://github.com/mnicolas94/facticus-deploy#how-to-install)  
+- [How to setup](https://github.com/mnicolas94/facticus-deploy#how-to-setup)  
+    - [Create the workflow](https://github.com/mnicolas94/facticus-deploy#create-the-workflow)  
+    - [Configuring Secrets](https://github.com/mnicolas94/facticus-deploy#configuring-secrets)  
+    - [Secrets security](https://github.com/mnicolas94/facticus-deploy#secrets-security)  
+- [How to use](https://github.com/mnicolas94/facticus-deploy#how-to-use)  
+- [Override variables feature](https://github.com/mnicolas94/facticus-deploy#override-variables-feature)  
+- [Limitations](https://github.com/mnicolas94/facticus-deploy#limitations)  
+- [Known issues](https://github.com/mnicolas94/facticus-deploy#known-issues)  
+- [FAQ](https://github.com/mnicolas94/facticus-deploy#faq)  
+- [Acknowledgements](https://github.com/mnicolas94/facticus-deploy#aknowledgements)  
 
 ## Features
 1. Platforms supported to build:
