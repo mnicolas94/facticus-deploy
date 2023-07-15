@@ -68,7 +68,7 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.1.81
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
@@ -87,7 +87,7 @@ jobs:
 
       # --- Deploy ---
       - name: Deploy
-        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.1.81
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
           buildPath: ${{ steps.build.outputs.buildPath }}
@@ -116,14 +116,14 @@ jobs:
       - name: Get platform display name
         if: success() || failure()
         id: display_name
-        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.81
         with:
           platform: ${{ matrix.buildPlatform }}
           
       - name: Get project name variable
         if: success() || failure()
         id: project_name
-        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.81
         
       - name: Get version variable
         if: success() || failure()
@@ -143,7 +143,7 @@ jobs:
 
       # Success message
       - name: Send success message if not failed
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.1.81
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
@@ -153,7 +153,7 @@ jobs:
       # Error message
       - name: Send error message if failed
         if: failure()
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.1.80
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.1.81
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
