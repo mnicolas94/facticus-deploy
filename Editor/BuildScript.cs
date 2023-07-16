@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using Deploy.Editor.Data;
 using UnityEditor;
+#if ENABLED_ADDRESSABLES
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+#endif
 using UnityEditor.Build.Reporting;
 
 
