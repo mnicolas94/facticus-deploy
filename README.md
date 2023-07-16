@@ -1,8 +1,23 @@
-## Notice: This project is a work in progress as is its documentation. Use at your own risk.
+## Notice: This project and its documentation are a work in progress. Use at your own risk.
 
 # Deploy
 
-Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your workstation) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) under the hood to run the builds on GitHub servers.
+Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your workstation) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) and [GameCI](https://game.ci/) under the hood to run the builds on GitHub servers.
+
+## Table of contents
+- [Features](https://github.com/mnicolas94/facticus-deploy#features)  
+- [Requirements](https://github.com/mnicolas94/facticus-deploy#requirements)  
+- [How to install](https://github.com/mnicolas94/facticus-deploy#how-to-install)  
+- [How to setup](https://github.com/mnicolas94/facticus-deploy#how-to-setup)  
+    - [Create the workflow](https://github.com/mnicolas94/facticus-deploy#create-the-workflow)  
+    - [Configuring Secrets](https://github.com/mnicolas94/facticus-deploy#configuring-secrets)  
+    - [Secrets security](https://github.com/mnicolas94/facticus-deploy#secrets-security)  
+- [How to use](https://github.com/mnicolas94/facticus-deploy#how-to-use)  
+- [Override variables feature](https://github.com/mnicolas94/facticus-deploy#override-variables-feature)  
+- [Limitations](https://github.com/mnicolas94/facticus-deploy#limitations)  
+- [Known issues](https://github.com/mnicolas94/facticus-deploy#known-issues)  
+- [FAQ](https://github.com/mnicolas94/facticus-deploy#faq)  
+- [Acknowledgements](https://github.com/mnicolas94/facticus-deploy#acknowledgements)  
 
 ## Features
 1. Platforms supported to build:
@@ -42,7 +57,7 @@ And finally, install the Deploy package itself `https://github.com/mnicolas94/fa
 ### Create the workflow
 1. Inside Unity open the Deploy's editor window with `Tools/Facticus/Deploy/Edit sets`.
 ![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/01eadaa7-b4b7-40aa-a8f0-d60dbd5914da)
-2. [optional] Dock the window somewhere within your editor. This is recommended due to a known issue where the window wont open anymore if you lose its focus while is floating.
+2. [optional] Dock the window somewhere within your editor. This is recommended due to a known issue where the window wont open anymore if you lose its focus while it is floating.
 3. Click on the `Package settings` tab.![facticus-deploy-setup-guide - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/b0b8dd6c-c31b-4fea-b626-ad98a6d8e555)
 4. First configure the `Git Directory` field if needed. It should point to your git repository's root directory relative to your Unity project's root. Commonly, both directories match, in which case you should leave the field empty.
 5. Then, click the `Generate workflow` button and choose whatever name you want. This will be the name of the GitHub Actions workflow yml file created to build and deploy the project. Just keep this in mind to select a name different from other existent workflows you already have in your project.
@@ -84,8 +99,8 @@ A notification platform is a channel to notify the success or failure of your wo
     - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
     - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
 
-## Secrets security
-> TODO
+### Secrets security
+Since secrets generally hold sensitive credentials and information, it is important to know how these variables are used by third-party actions and workflows, like the ones Deploy uses. This [article](https://blog.gitguardian.com/github-actions-security-cheat-sheet/) describes good practices and security measures to take when using Github Actions. I recommend reading it before using this package.
 
 ## How to use
 After setting up the initial configurations you can start configuring your builds. Just go to the Sets tab in the Deploy's editor window (`Tools/Facticus/Deploy/Edit sets`) and create a new Build-Deploy set (name subject to change).
