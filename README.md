@@ -96,8 +96,8 @@ You need to configure some [Secrets](https://docs.github.com/en/actions/security
 #### Notification platforms' secrets
 A notification platform is a channel to notify the success or failure of your workflows. Currently Deploy only supports Telegram as notification platform. To enable it you have to select Telegram in the Package settings' `Notify platform` dropdown field.![UnityEditor IMGUI Controls AdvancedDropdownWindow](https://github.com/mnicolas94/facticus-deploy/assets/35781652/f09eb62e-b5f8-4d46-b718-8b6c7ac2ac55)
 - Telegram
-    - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
-    - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#deploy-platforms-secrets).
+    - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy#deploy-platforms-secrets).
+    - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy#deploy-platforms-secrets).
 
 ### Secrets security
 Since secrets generally hold sensitive credentials and information, it is important to know how these variables are used by third-party actions and workflows, like the ones Deploy uses. This [article](https://blog.gitguardian.com/github-actions-security-cheat-sheet/) describes good practices and security measures to take when using Github Actions. I recommend reading it before using this package.
@@ -108,8 +108,8 @@ After setting up the initial configurations you can start configuring your build
 https://github.com/mnicolas94/facticus-deploy/assets/35781652/c9c1969b-4526-4e9a-84fc-48773790ab5d
 
 Each set has the followig fields:
-1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#create-the-workflow).
-2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the sections [below](https://github.com/mnicolas94/facticus-deploy/edit/main/README.md#override-variables-feature).
+1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy#create-the-workflow).
+2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the sections [below](https://github.com/mnicolas94/facticus-deploy#override-variables-feature).
 3. Platforms: a list of Build-Deploy platforms pairs. Each element of the list describes a platform to build for, a platform to deploy to and whether the build should be flagged with [Development build](https://docs.unity3d.com/Manual/BuildSettings.html).
 
 After configuring yout Set press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
