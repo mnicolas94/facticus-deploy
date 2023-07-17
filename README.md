@@ -1,4 +1,4 @@
-## Notice: This project and its documentation are a work in progress. Use at your own risk.
+## Notice: This project and its documentation are a work in progress. Breaking changes are expected. Use carefully.
 
 # Deploy
 
