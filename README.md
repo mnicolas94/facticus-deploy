@@ -130,7 +130,7 @@ After configuring yout Set press the `Build and Deploy` button to start building
 > TODO. Acknowledge GameCI and actions used in this
 
 ## Support me
-> TODO. add ko-fi
+<a href='https://ko-fi.com/Q5Q7G6N97' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ## License
 
