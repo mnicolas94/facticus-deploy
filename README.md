@@ -127,7 +127,7 @@ After configuring yout Set press the `Build and Deploy` button to start building
 > TODO
 
 ## Acknowledgements
-> TODO. Acknowledge GameCI and actions used in this
+- [GameCI](https://game.ci/) for creating and making accessible to everyone the tools used by Deploy to build Unity projects.
 
 ## Support me
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q7G6N97)
