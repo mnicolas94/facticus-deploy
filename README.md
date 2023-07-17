@@ -117,13 +117,7 @@ After configuring yout Set press the `Build and Deploy` button to start building
 ## Override variables feature
 > TODO
 
-## Limitations
-> TODO
-
 ## Known issues
-> TODO
-
-## FAQ??
 > TODO
 
 ## Acknowledgements
