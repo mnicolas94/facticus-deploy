@@ -11,18 +11,49 @@ runs:
         echo "Freeing up disk space on CI system"
         echo "=============================================================================="
 
-        # Before
-        echo "------------------"
-        echo "Disk space before:"
+        echo "=================="
+        echo "Disk space before sudo apt-get remove -y 'php.*':"
+        df -h
+        
+        sudo apt-get remove -y 'php.*'
+        
+        echo "Disk space after:"
         df -h
         echo "------------------"
-
-        #sudo swapoff -a
-        #sudo rm -f /swapfile
-        #sudo apt clean
-        #docker rmi $(docker images -q)  # removing docker images breaks appleboy/telegram-action action.
-        #echo "After swap off"
-        #df -h
+        echo ""
+        
+        echo "=================="
+        echo "Disk space before sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel:"
+        df -h
+        
+        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
+        
+        echo "Disk space after:"
+        df -h
+        echo "------------------"
+        echo ""
+        
+        echo "=================="
+        echo "Disk space before sudo apt-get autoremove -y:"
+        df -h
+        
+        sudo apt-get autoremove -y
+        
+        echo "Disk space after:"
+        df -h
+        echo "------------------"
+        echo ""
+        
+        echo "=================="
+        echo "Disk space before sudo apt clean:"
+        df -h
+        
+        sudo apt clean
+        
+        echo "Disk space after:"
+        df -h
+        echo "------------------"
+        echo ""
 
         #echo "Listing 100 largest packages"
         #dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
@@ -38,15 +69,31 @@ runs:
 
         echo "Removing large directories"
         # https://github.com/apache/flink/blob/master/tools/azure-pipelines/free_disk_space.sh
+        echo "=================="
+        echo "Disk space before rm -rf /usr/share/dotnet/:"
+        df -h
+        
         rm -rf /usr/share/dotnet/
-
-        # https://github.com/actions/virtual-environments/issues/709#issuecomment-612569242
-        rm -rf "/usr/local/share/boost"
-        #rm -rf "$AGENT_TOOLSDIRECTORY"  This can break Python
-
-        # After
-        echo "------------------"
+        
         echo "Disk space after:"
         df -h
         echo "------------------"
-          
+        echo ""
+
+        # https://github.com/actions/virtual-environments/issues/709#issuecomment-612569242
+        echo "=================="
+        echo "Disk space before rm -rf "/usr/local/share/boost":"
+        df -h
+        
+        rm -rf "/usr/local/share/boost"
+        
+        echo "Disk space after:"
+        df -h
+        echo "------------------"
+        echo ""
+
+        # Discarded
+        #sudo swapoff -a
+        #sudo rm -f /swapfile
+        #rm -rf "$AGENT_TOOLSDIRECTORY"  This can break Python
+        #docker rmi $(docker images -q)  # removing docker images breaks appleboy/telegram-action action.
