@@ -1,0 +1,21 @@
+name: Test deploy telegram
+
+on:
+  workflow_dispatch: 
+    
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send file to telegram with MTProto API
+        uses: mnicolas94/telegram-file-uploader@main
+        with:
+          session-name: ${{ secrets.TELEGRAM_SESSION }}
+          api-id: ${{ secrets.TELEGRAM_API_ID }}
+          api-hash: ${{ secrets.TELEGRAM_API_HASH }}
+          bot-token: ${{ secrets.TELEGRAM_TOKEN }}
+          chat-id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          file-path: "README.md"
+          message: "Test message"
+          reply-request: 'Reply to this message'

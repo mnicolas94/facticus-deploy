@@ -30,12 +30,12 @@ Deploy is a Unity package that allows you to build your game for multiple platfo
     - Telegram
     - Itch.io
     - Play Store (Google Play)
-3. ... TODO
+3. > TODO
 
 ## Requirements
 1. Your project has to be hosted on GitHub.
 2. I only tested it on 2021.1+ Unity versions. Versions prior to that should work, but I'm not sure.
-3. ... TODO
+3. > TODO
 
 ## How to install
 ### Via OpenUPM
