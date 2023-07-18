@@ -75,7 +75,15 @@ runs:
           Library-
     - name: Free CI system disk space
       if: ${{ inputs.freeDiskSpace == 'true' }}
-      uses: mnicolas94/facticus-deploy/.github/actions/free-disk-space@v0.1.83
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false
+        swap-storage: false
           
     - name: Build step
       uses: game-ci/unity-builder@v2
