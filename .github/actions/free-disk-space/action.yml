@@ -12,45 +12,33 @@ runs:
         echo "=============================================================================="
 
         echo "=================="
-        echo "Disk space before sudo apt-get remove -y 'php.*':"
+        echo "Disk space at the beginning:"
         df -h
         
         sudo apt-get remove -y 'php.*'
         
-        echo "Disk space after:"
+        echo "Disk space after sudo apt-get remove -y 'php.*':"
         df -h
         echo "------------------"
         echo ""
         
-        echo "=================="
-        echo "Disk space before sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel:"
-        df -h
+        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
         
-        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
-        
-        echo "Disk space after:"
+        echo "Disk space after sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel:"
         df -h
         echo "------------------"
         echo ""
-        
-        echo "=================="
-        echo "Disk space before sudo apt-get autoremove -y:"
-        df -h
         
         sudo apt-get autoremove -y
         
-        echo "Disk space after:"
+        echo "Disk space after sudo apt-get autoremove -y:"
         df -h
         echo "------------------"
         echo ""
         
-        echo "=================="
-        echo "Disk space before sudo apt clean:"
-        df -h
-        
         sudo apt clean
         
-        echo "Disk space after:"
+        echo "Disk space after sudo apt clean:"
         df -h
         echo "------------------"
         echo ""
@@ -69,25 +57,17 @@ runs:
 
         echo "Removing large directories"
         # https://github.com/apache/flink/blob/master/tools/azure-pipelines/free_disk_space.sh
-        echo "=================="
-        echo "Disk space before rm -rf /usr/share/dotnet/:"
-        df -h
-        
         rm -rf /usr/share/dotnet/
         
-        echo "Disk space after:"
+        echo "Disk space after rm -rf /usr/share/dotnet/:"
         df -h
         echo "------------------"
         echo ""
 
         # https://github.com/actions/virtual-environments/issues/709#issuecomment-612569242
-        echo "=================="
-        echo "Disk space before rm -rf "/usr/local/share/boost":"
-        df -h
-        
         rm -rf "/usr/local/share/boost"
         
-        echo "Disk space after:"
+        echo "Disk space after rm -rf "/usr/local/share/boost":"
         df -h
         echo "------------------"
         echo ""
