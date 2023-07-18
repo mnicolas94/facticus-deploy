@@ -15,14 +15,14 @@ runs:
         echo "Disk space at the beginning:"
         df -h
         
-        sudo apt-get remove -y 'php.*'
+        sudo apt-get remove -qq -y 'php.*'
         
         echo "Disk space after sudo apt-get remove -y 'php.*':"
         df -h
         echo "------------------"
         echo ""
         
-        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
+        sudo apt-get remove -qq -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
         
         echo "Disk space after sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel:"
         df -h
