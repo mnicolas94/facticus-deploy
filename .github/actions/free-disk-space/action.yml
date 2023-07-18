@@ -18,11 +18,11 @@ runs:
         echo "Disk space at the beginning:"
         df -h
         
-        sudo apt-get remove -y '^ghc-8.*'
-        sudo apt-get remove -y '^dotnet-.*'
-        sudo apt-get remove -y '^llvm-.*'
-        sudo apt-get remove -y 'php.*'
-        sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel || true
+        sudo apt-get remove -qq -y '^ghc-8.*'
+        sudo apt-get remove -qq -y '^dotnet-.*'
+        sudo apt-get remove -qq -y '^llvm-.*'
+        sudo apt-get remove -qq -y 'php.*'
+        sudo apt-get remove -y azure-cli google-cloud-sdk google-chrome-stable firefox powershell mono-devel || true
         sudo apt-get autoremove -y
         sudo apt clean
         
