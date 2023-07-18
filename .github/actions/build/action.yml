@@ -73,17 +73,6 @@ runs:
         restore-keys: |
           Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-
           Library-
-    - name: Free CI system disk space
-      if: ${{ inputs.freeDiskSpace == 'true' }}
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: false
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: false
-        swap-storage: false
           
     - name: Build step
       uses: game-ci/unity-builder@v2

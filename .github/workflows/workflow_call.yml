@@ -65,6 +65,19 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
     steps:
+      # --- Free disk space
+      - name: Free CI system disk space
+        if: ${{ inputs.freeDiskSpace == 'true' }}
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
+          
       # --- Build ---
       - name: Build
         id: build
