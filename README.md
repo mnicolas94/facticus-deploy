@@ -56,7 +56,7 @@ And finally, install the Deploy package itself `https://github.com/mnicolas94/fa
 1. Inside Unity open the Deploy's editor window with `Tools/Facticus/Deploy/Edit sets`.
 ![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/01eadaa7-b4b7-40aa-a8f0-d60dbd5914da)
 2. [optional] Dock the window somewhere within your editor. This is recommended due to a known issue where the window wont open anymore if you lose its focus while it is floating.
-3. Click on the `Package settings` tab.![facticus-deploy-setup-guide - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/b0b8dd6c-c31b-4fea-b626-ad98a6d8e555)
+3. Click on the `Package settings` tab.![facticus-deploy-setup-guide - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://user-images.githubusercontent.com/35781652/254600925-2142ad88-2576-4359-b58a-bdba7acd1985.jpg)
 4. First configure the `Git Directory` field if needed. It should point to your git repository's root directory relative to your Unity project's root. Commonly, both directories match, in which case you should leave the field empty.
 5. Then, click the `Generate workflow` button and choose whatever name you want. This will be the name of the GitHub Actions workflow yml file created to build and deploy the project. Just keep this in mind to select a name different from other existent workflows you already have in your project.
 6. Leave the other fields as they are for now and commit and push your changes. This will push the created workflow to GitHub in order for it to be called later.
@@ -92,7 +92,7 @@ You need to configure some [Secrets](https://docs.github.com/en/actions/security
     - PLAY_STORE_PACKAGE_NAME: The package name, or Application Id, of the app you are uploading, e.g. `com.example.myapp`.
 
 #### Notification platforms' secrets
-A notification platform is a channel to notify the success or failure of your workflows. Currently Deploy only supports Telegram as notification platform. To enable it you have to select Telegram in the Package settings' `Notify platform` dropdown field.![UnityEditor IMGUI Controls AdvancedDropdownWindow](https://github.com/mnicolas94/facticus-deploy/assets/35781652/f09eb62e-b5f8-4d46-b718-8b6c7ac2ac55)
+A notification platform is a channel to notify the success or failure of your workflows. Currently, Deploy only supports Telegram as notification platform. To enable it you have to select Telegram in the Package settings' `Notify platform` dropdown field. More info in the [docs](https://github.com/mnicolas94/facticus-deploy/wiki/Package-settings)
 - Telegram
     - TELEGRAM_TOKEN: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy#deploy-platforms-secrets).
     - TELEGRAM_CHAT_ID: same as Telegram deploy platform [above](https://github.com/mnicolas94/facticus-deploy#deploy-platforms-secrets).
