@@ -1,4 +1,4 @@
-## ⚠️Notice: This project and its documentation are a work in progress. Breaking changes are expected. Use carefully.
+## ⚠️Notice: This project and its documentation are a work in progress. Use carefully.
 
 # Deploy
 
