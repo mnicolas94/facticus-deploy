@@ -60,7 +60,7 @@ runs:
         lfs: true
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.88
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.1.89
     - name: Cache
       uses: actions/cache@v2
       with:
@@ -92,7 +92,7 @@ runs:
     # --- Get build path ---    
     - name: Get platform display name
       id: display_name
-      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.88
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.1.89
       with:
         platform: ${{ inputs.targetPlatform }}
     - name: Construct zip name (Standalone and WebGL)
