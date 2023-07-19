@@ -12,10 +12,6 @@ inputs:
     required: false
     default: 'Semantic'
     description: 'The versioning scheme to use when building the project'
-  freeDiskSpace:
-    required: false
-    default: 'false'
-    description: 'Whether to free disk space before build'
   buildVariables:
     required: true
     description: 'Base64 encoded build variables'

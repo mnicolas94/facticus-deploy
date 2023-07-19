@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
     steps:
-      # --- Free disk space
+      # --- Free disk space if requested
       - name: Free CI system disk space
         if: ${{ matrix.freeDiskSpace == 'true' }}
         uses: kfir4444/free-disk-space@main
@@ -88,7 +88,6 @@ jobs:
           targetPlatform: ${{ matrix.buildPlatform }}
           developmentBuild: ${{ matrix.developmentBuild }}
           versioningStrategy: ${{ matrix.versioningStrategy }}
-          freeDiskSpace: ${{ matrix.freeDiskSpace }}
           buildVariables: ${{ matrix.buildVariables }}
           # Android specific
           androidAppBundle: ${{ fromJson(matrix.buildParams).appBundle }}

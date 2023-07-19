@@ -14,9 +14,7 @@ Deploy is a Unity package that allows you to build your game for multiple platfo
     - [Secrets security](https://github.com/mnicolas94/facticus-deploy#secrets-security)  
 - [How to use](https://github.com/mnicolas94/facticus-deploy#how-to-use)  
 - [Override variables feature](https://github.com/mnicolas94/facticus-deploy#override-variables-feature)  
-- [Limitations](https://github.com/mnicolas94/facticus-deploy#limitations)  
 - [Known issues](https://github.com/mnicolas94/facticus-deploy#known-issues)  
-- [FAQ](https://github.com/mnicolas94/facticus-deploy#faq)  
 - [Acknowledgements](https://github.com/mnicolas94/facticus-deploy#acknowledgements)  
 
 ## Features
