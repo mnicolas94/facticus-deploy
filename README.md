@@ -13,7 +13,7 @@ Deploy is a Unity package that allows you to build your game for multiple platfo
     - [Configuring Secrets](https://github.com/mnicolas94/facticus-deploy#configuring-secrets)  
     - [Secrets security](https://github.com/mnicolas94/facticus-deploy#secrets-security)  
 - [How to use](https://github.com/mnicolas94/facticus-deploy#how-to-use)  
-- [Override variables feature](https://github.com/mnicolas94/facticus-deploy#override-variables-feature)  
+- [Documentation](https://github.com/mnicolas94/facticus-deploy#documentation)
 - [Known issues](https://github.com/mnicolas94/facticus-deploy#known-issues)  
 - [Acknowledgements](https://github.com/mnicolas94/facticus-deploy#acknowledgements)  
 
@@ -28,13 +28,13 @@ Deploy is a Unity package that allows you to build your game for multiple platfo
     - Telegram
     - Itch.io
     - Play Store (Google Play)
-3. > TODO
+3. [Override variables](https://github.com/mnicolas94/facticus-deploy/wiki/Override-variables-feature)
 
 ## Requirements
 1. Your project has to be hosted on GitHub.
-2. I only tested it on 2021.1+ Unity versions. Versions prior to that should work, but I'm not sure.
+2. I only tested it on 2021.1+ Unity versions. Versions prior to that one should work, but I'm not sure.
 3. > TODO
-
+   
 ## How to install
 ### Via OpenUPM
 To install it with [OpenUPM](https://openupm.com/) run:
@@ -105,15 +105,15 @@ After setting up the initial configurations you can start configuring your build
 
 https://github.com/mnicolas94/facticus-deploy/assets/35781652/c9c1969b-4526-4e9a-84fc-48773790ab5d
 
-Each set has the followig fields:
+Each set has the following fields:
 1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy#create-the-workflow).
-2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the sections [below](https://github.com/mnicolas94/facticus-deploy#override-variables-feature).
+2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the [docs](https://github.com/mnicolas94/facticus-deploy/wiki/Override-variables-feature).
 3. Platforms: a list of Build-Deploy platforms pairs. Each element of the list describes a platform to build for, a platform to deploy to and whether the build should be flagged with [Development build](https://docs.unity3d.com/Manual/BuildSettings.html).
 
-After configuring yout Set press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
+After configuring your Set press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
 
-## Override variables feature
-> TODO
+## Documentation
+The full documentation is in the [wiki](https://github.com/mnicolas94/facticus-deploy/wiki). You will find there a more detailed description of each Deploy's feature.
 
 ## Known issues
 > TODO
@@ -125,5 +125,4 @@ After configuring yout Set press the `Build and Deploy` button to start building
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q7G6N97)
 
 ## License
-
 MIT License
