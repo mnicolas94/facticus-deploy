@@ -97,7 +97,7 @@ runs:
     # Itchio
     - name: Deploy to Itch.io
       if: ${{ inputs.deployPlatform == 'Itch'}}
-      uses: josephbmanley/butler-publish-itchio-action@master
+      uses: yeslayla/butler-publish-itchio-action@master
       env:
         BUTLER_CREDENTIALS: ${{ inputs.ITCH_BUTLER_CREDENTIALS }}
         CHANNEL: ${{ inputs.itch_channel }}

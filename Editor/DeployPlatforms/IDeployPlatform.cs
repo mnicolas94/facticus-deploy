@@ -56,7 +56,7 @@ namespace Deploy.Editor.DeployPlatforms
                 {"userFraction", userFraction.ToString()},
             };
             
-            if (status is "draft" or "completed")
+            if (status is not "inProgress" and not "halted" )
             {
                 dict.Remove("userFraction");
             }
