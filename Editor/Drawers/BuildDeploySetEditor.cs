@@ -102,10 +102,15 @@ namespace Deploy.Editor.Drawers
 
         private object Clone(object original)
         {
-            var type = original.GetType();
-            var json = JsonUtility.ToJson(original);
-            var copy = JsonUtility.FromJson(json, type);
-            return copy;
+            if (original != null)
+            {
+                var type = original.GetType();
+                var json = JsonUtility.ToJson(original);
+                var copy = JsonUtility.FromJson(json, type);
+                return copy;
+            }
+
+            return null;
         }
 
         private void OnVariableAdded(IEnumerable<int> newIndices)
