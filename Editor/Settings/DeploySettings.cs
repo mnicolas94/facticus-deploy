@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Deploy.Editor.BackEnds;
 using Deploy.Editor.NotifyPlatforms;
@@ -53,15 +54,13 @@ namespace Deploy.Editor.Settings
 
             return Instance;
         }
-        
-        private List<string> GetVersioningStrategies()
+
+        private void OnValidate()
         {
-            return new List<string>
+            if (_backend == null)
             {
-                "Semantic",
-                "Tag",
-                "None",
-            };
+                _backend = new GithubActionsBackend();
+            }
         }
     }
 }
