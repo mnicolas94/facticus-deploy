@@ -137,7 +137,7 @@ jobs:
       - name: commit, tag and push version file
         run: |
           git add .
-          git commit -m "(skip-ci) bump version patch and update package.json"
+          git commit -m "[no ci] bump version patch and update package.json"
           version=v${{ steps.version.outputs.version }}
           if [[ ${{ steps.version.outputs.is_new }} == 'false' ]]; then
             git tag -d $version
