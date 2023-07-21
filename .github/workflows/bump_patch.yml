@@ -9,7 +9,6 @@ jobs:
   bumpVersion:
     name: Bump the project's version
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}  # skip based on commit message
     steps:
       - uses: actions/checkout@v2
         with:
