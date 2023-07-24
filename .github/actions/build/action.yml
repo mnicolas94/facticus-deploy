@@ -54,7 +54,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         lfs: true
@@ -62,7 +62,7 @@ runs:
       id: project_name
       uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.2.2
     - name: Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: Library
         key: Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-${{ inputs.targetPlatform }}
