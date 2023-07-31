@@ -21,7 +21,6 @@ namespace Deploy.Editor.Settings
 
         public void OnPackageSelectionChange(PackageInfo packageInfo)
         {
-            Debug.Log(packageInfo.name);
         }
 
         public void OnPackageAddedOrUpdated(PackageInfo packageInfo)
