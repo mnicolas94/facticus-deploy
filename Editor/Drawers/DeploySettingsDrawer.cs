@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using Deploy.Editor.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -11,19 +13,47 @@ namespace Deploy.Editor.Drawers
     public class DeploySettingsDrawer : UnityEditor.Editor
     {
         private VisualElement _root;
-        
+
         public override VisualElement CreateInspectorGUI()
         {
             _root = new VisualElement();
+            var drawers = new Dictionary<string, Func<SerializedProperty, VisualElement>>
+            {
+                { "_workflowId", DrawWorkflowIdField }
+            };
             
-            var workflowIdField = new PropertyField(serializedObject.FindProperty("_workflowId"));
-            var gitDirectoryField = new PropertyField(serializedObject.FindProperty("_gitDirectory"));
-            var defaultAssetDirectoryField = new PropertyField(serializedObject.FindProperty("_defaultAssetDirectory"));
-            var backendField = new PropertyField(serializedObject.FindProperty("_backend"));
-            var notifyPlatformField = new PropertyField(serializedObject.FindProperty("_notifyPlatform"));
-            var versioningStrategyField = new PropertyField(serializedObject.FindProperty("_versioningStrategy"));
+            var sps = PropertiesUtils.GetSerializedProperties(serializedObject);
+            foreach (var serializedProperty in sps)
+            {
+                var spName = serializedProperty.name;
+                VisualElement visualElement;
+                if (drawers.ContainsKey(spName))
+                {
+                    visualElement = drawers[spName](serializedProperty);
+                }
+                else
+                {
+                    visualElement = new PropertyField(serializedProperty);
+                }
+                _root.Add(visualElement);
+            }
+            
+            return _root;
+        }
 
-            workflowIdField.style.flexGrow = 1;
+        private VisualElement DrawWorkflowIdField(SerializedProperty sp)
+        {
+            var workflowIdField = new PropertyField(sp)
+            {
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
+            var generateWorkflowButton = new Button(OnGenerateWorkflow)
+            {
+                text = "Generate workflow"
+            };
             var workflowContainer = new VisualElement
             {
                 style =
@@ -31,20 +61,9 @@ namespace Deploy.Editor.Drawers
                     flexDirection = FlexDirection.Row
                 }
             };
-            var generateWorkflowButton = new Button(OnGenerateWorkflow)
-            {
-                text = "Generate workflow"
-            };
             workflowContainer.Add(workflowIdField);
             workflowContainer.Add(generateWorkflowButton);
-            
-            _root.Add(workflowContainer);
-            _root.Add(gitDirectoryField);
-            _root.Add(defaultAssetDirectoryField);
-            _root.Add(backendField);
-            _root.Add(notifyPlatformField);
-            _root.Add(versioningStrategyField);
-            return _root;
+            return workflowContainer;
         }
 
         private void OnGenerateWorkflow()
