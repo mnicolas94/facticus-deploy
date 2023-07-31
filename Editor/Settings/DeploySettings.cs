@@ -13,6 +13,10 @@ namespace Deploy.Editor.Settings
     public class DeploySettings : ScriptableObjectSingleton<DeploySettings>
     {
         [SerializeField] private string _workflowId;
+        [SerializeField, Tooltip("Update the workflow file automatically on package update. It will update the version " +
+                                 "of actions used to build and deploy your project. Remember to commit and push the changes" +
+                                 " to the workflow file before clicking 'Build and Deploy'")]
+        private bool _updateWorkflowAutomatically;
         [SerializeField] private string _gitDirectory;
         [SerializeField] private string _defaultAssetDirectory = "Assets/Editor/Deploy";
         [SerializeReference, SubclassSelector] private ICicdBackend _backend;
@@ -24,6 +28,8 @@ namespace Deploy.Editor.Settings
             get => _workflowId;
             set => _workflowId = value;
         }
+
+        public bool UpdateWorkflowAutomatically => _updateWorkflowAutomatically;
 
         public string GitDirectory => _gitDirectory;
 
