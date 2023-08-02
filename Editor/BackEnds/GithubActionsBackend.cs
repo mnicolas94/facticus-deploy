@@ -22,60 +22,69 @@ namespace Deploy.Editor.BackEnds
     {
         public async Task<bool> BuildAndDeploy(BuildDeploySet set)
         {
+            // Display warning if workflow has changes
+            if (ThereAreAnyChangesInWorkflow())
+            {
+                var message = $"Your workflow file ({GetWorkflowPath()}) has changes that have not been pushed to " + 
+                              $"your remote repository. Are you sure you want to continue?";
+                var cont = EditorInputDialog.ShowYesNoDialog("Warning", message);
+                if (!cont)
+                {
+                    return false;
+                }
+            }
+            
             bool tokenIsNotValid = false;
             bool success;
 
             do
             {
                 tokenIsNotValid = false;
-                var elements = set.Platforms;
-                var branch = set.RepositoryBranchOrTag;
-                var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
-                var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
-
-                var (owner, repo) = GetOwnerAndRepo();
-                var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
-                var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
-                var userAgent = GetGitUser();
                 var entered = TryGetToken(out var token);
                 success = entered;
                 
                 if (entered)
                 {
+                    var elements = set.Platforms;
+                    var branch = set.RepositoryBranchOrTag;
+                    var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
+                    var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
+                    
+                    var (owner, repo) = GetOwnerAndRepo();
+                    var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
+                    var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
+                    var userAgent = GetGitUser();
                     var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
+                    
                     var requestContent = new StringContent(stringContent);
-                    using (var httpClient = new HttpClient())
+                    using var httpClient = new HttpClient();
+                    using var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri);
+                    request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
+                    request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
+                    request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                    request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
+
+                    request.Content = requestContent;
+                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+
+                    var response = await httpClient.SendAsync(request);
+                    var content = await response.Content.ReadAsStringAsync();
+                    var responseCode = (int)response.StatusCode;
+
+                    // Bad credentials
+                    if (responseCode == 401)  // request token and try again
                     {
-                        using (var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri))
+                        var message = "Your Github authentication token is no longer valid, please enter a new valid one.";
+                        entered = TryAskForTokenDialog(message, out var _);
+                        success = false;
+                        if (entered)
                         {
-                            request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
-                            request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
-                            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
-                            request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
-
-                            request.Content = requestContent;
-                            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
-
-                            var response = await httpClient.SendAsync(request);
-                            var content = await response.Content.ReadAsStringAsync();
-                            var responseCode = (int)response.StatusCode;
-
-                            // Bad credentials
-                            if (responseCode == 401)  // request token and try again
-                            {
-                                var message = "Your Github authentication token is no longer valid, please enter a new valid one.";
-                                entered = TryAskForTokenDialog(message, out var _);
-                                success = false;
-                                if (entered)
-                                {
-                                    tokenIsNotValid = true;  // try again
-                                }
-                            }
-                            else if (responseCode >= 300)
-                            {
-                                throw new HttpRequestException($"Error {responseCode}\n{content}");
-                            }
+                            tokenIsNotValid = true;  // try again
                         }
+                    }
+                    else if (responseCode >= 300)
+                    {
+                        throw new HttpRequestException($"Error {responseCode}\n{content}");
                     }
                 }
             } while (tokenIsNotValid);
@@ -250,6 +259,50 @@ namespace Deploy.Editor.BackEnds
             var (stdout, _) = TerminalUtils.RunCommand("git",gitCommand, DeploySettings.GetOrCreate().GitDirectory);
             stdout = stdout.Trim();
             return stdout;
+        }
+
+        private static bool ThereAreAnyChangesInWorkflow()
+        {
+            var deploySettings = DeploySettings.GetOrCreate();
+            var gitRoot = deploySettings.GitDirectory;
+
+            try
+            {
+                // this is needed in some cases to allow "diff-index" command bellow to work properly
+                TerminalUtils.RunCommand("git","update-index --refresh", gitRoot);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            var workflowPath = GetWorkflowPath();
+            var relativePath = MakePathRelativeToRoot(workflowPath, gitRoot);
+            relativePath = relativePath.Trim('\\', '/');
+            var (output, error) = TerminalUtils.RunCommand("git", $"diff-index HEAD -- {relativePath}", gitRoot);
+            if (!String.IsNullOrEmpty(output) || !String.IsNullOrEmpty(error))
+            {
+                // there is a change
+                return true;
+            }
+            
+            return false;
+        }
+
+        private static string GetWorkflowPath()
+        {
+            var deploySettings = DeploySettings.GetOrCreate();
+            var gitRoot = deploySettings.GitDirectory;
+            return Path.Combine(gitRoot, ".github", "workflows", $"{deploySettings.WorkflowId}.yml");
+        }
+
+        private static string MakePathRelativeToRoot(string workPath, string gitRoot)
+        {
+            if (gitRoot == "")
+            {
+                return workPath;
+            }
+            return workPath.Replace(gitRoot, "");
         }
     }
 }
