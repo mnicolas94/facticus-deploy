@@ -64,6 +64,12 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
     steps:
+      # --- Store start time
+      - name: Store start time
+        id: time
+        run: |
+          echo "start=$(date +%s)" >> $GITHUB_OUTPUT
+
       # --- Free disk space if requested
       - name: Free CI system disk space
         if: ${{ matrix.freeDiskSpace == 'true' }}
@@ -144,12 +150,23 @@ jobs:
           version=${version:1}
           echo "version=$version" >> $GITHUB_OUTPUT
           
+      - name: Get total elapsed time
+        if: success() || failure()
+        id: elapsed
+        run: |
+          start=${{ steps.time.outputs.start }}
+          end=$(date +%s)
+          elapsed=$((end - start))
+          echo "hours=$((elapsed_time / 3600))" >> $GITHUB_OUTPUT
+          echo "minutes=$((elapsed_time % 3600 / 60))" >> $GITHUB_OUTPUT
+          echo "seconds=$((elapsed_time % 60))" >> $GITHUB_OUTPUT
+          
       - name: Construct message info
         if: success() || failure()
         id: messageInfo
         run: |
           name="${{ steps.project_name.outputs.projectNameNoSpaces }}"
-          messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}"
+          messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}. Total time: ${{ steps.elapsed.outputs.hours}}:${{ steps.elapsed.outputs.minutes}}:${{ steps.elapsed.outputs.seconds}}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 
       # Success message
