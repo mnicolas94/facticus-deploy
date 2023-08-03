@@ -157,9 +157,9 @@ jobs:
           start=${{ steps.time.outputs.start }}
           end=$(date +%s)
           elapsed=$((end - start))
-          hours=$((elapsed_time / 3600))
-          minutes=$((elapsed_time % 3600 / 60))
-          seconds=$((elapsed_time % 60))
+          hours=$((elapsed / 3600))
+          minutes=$((elapsed % 3600 / 60))
+          seconds=$((elapsed % 60))
           formatted_hours=$(printf "%02d" $hours)
           formatted_minutes=$(printf "%02d" $minutes)
           formatted_seconds=$(printf "%02d" $seconds)
