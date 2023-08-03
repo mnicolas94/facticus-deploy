@@ -157,9 +157,15 @@ jobs:
           start=${{ steps.time.outputs.start }}
           end=$(date +%s)
           elapsed=$((end - start))
-          echo "hours=$((elapsed_time / 3600))" >> $GITHUB_OUTPUT
-          echo "minutes=$((elapsed_time % 3600 / 60))" >> $GITHUB_OUTPUT
-          echo "seconds=$((elapsed_time % 60))" >> $GITHUB_OUTPUT
+          hours=$((elapsed_time / 3600))
+          minutes=$((elapsed_time % 3600 / 60))
+          seconds=$((elapsed_time % 60))
+          formatted_hours=$(printf "%02d" $hours)
+          formatted_minutes=$(printf "%02d" $minutes)
+          formatted_seconds=$(printf "%02d" $seconds)
+          echo "hours=$formatted_hours" >> $GITHUB_OUTPUT
+          echo "minutes=$formatted_minutes" >> $GITHUB_OUTPUT
+          echo "seconds=$formatted_seconds" >> $GITHUB_OUTPUT
           
       - name: Construct message info
         if: success() || failure()
