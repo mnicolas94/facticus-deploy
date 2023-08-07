@@ -95,7 +95,9 @@ namespace Deploy.Editor.BackEnds
         public static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
-            var inputStrings = elements.Select(element =>
+            var inputStrings = elements
+                .Where(element => element.Enabled)  // only build enabled elements
+                .Select(element =>
             {
                 var inputString = GetInputsString(element, variables);
                 
