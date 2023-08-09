@@ -147,10 +147,18 @@ namespace Deploy.Editor.Drawers
             {
                 _buildButton.SetEnabled(false);
                 var backend = DeploySettings.GetOrCreate().Backend;
-                var success = await backend.BuildAndDeploy((BuildDeploySet) target);
-                if (success)
+                var set = (BuildDeploySet) target;
+                if (set.AllDisabled)
                 {
-                    EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
+                    EditorWindow.focusedWindow.ShowNotification(new GUIContent("Can't start workflow. All platforms are disabled"));
+                }
+                else
+                {
+                    var success = await backend.BuildAndDeploy(set);
+                    if (success)
+                    {
+                        EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
+                    }
                 }
             }
             catch (Exception e)

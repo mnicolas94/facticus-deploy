@@ -32,5 +32,7 @@ namespace Deploy.Editor.Data
                 Debug.Log($"VariableValue: {JsonUtility.ToJson(variableValue)}");
             }
         }
+
+        public bool AllDisabled => _platforms.TrueForAll(element => !element.Enabled);
     }
 }
