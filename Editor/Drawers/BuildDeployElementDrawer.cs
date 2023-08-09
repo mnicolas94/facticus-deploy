@@ -97,7 +97,6 @@ namespace Deploy.Editor.Drawers
         private void UpdateLabel()
         {
             var newLabel = GetLabel(_property);
-            Debug.Log(newLabel);
             _foldout.text = newLabel;
         }
 
