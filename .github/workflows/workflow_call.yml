@@ -142,14 +142,6 @@ jobs:
         id: project_name
         uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.2.11
         
-      - name: Get version variable
-        if: success() || failure()
-        id: version
-        run: |
-          version=$(git describe --tags --abbrev=0 --match v[0-9]*)
-          version=${version:1}
-          echo "version=$version" >> $GITHUB_OUTPUT
-          
       - name: Get total elapsed time
         if: success() || failure()
         id: elapsed
@@ -172,7 +164,7 @@ jobs:
         id: messageInfo
         run: |
           name="${{ steps.project_name.outputs.projectNameNoSpaces }}"
-          messageInfo="#$name (${{ steps.version.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}. Total time: ${{ steps.elapsed.outputs.hours}}:${{ steps.elapsed.outputs.minutes}}:${{ steps.elapsed.outputs.seconds}}"
+          messageInfo="#$name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}. Total time: ${{ steps.elapsed.outputs.hours}}:${{ steps.elapsed.outputs.minutes}}:${{ steps.elapsed.outputs.seconds}}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 
       # Success message
