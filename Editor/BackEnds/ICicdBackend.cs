@@ -5,6 +5,6 @@ namespace Deploy.Editor.BackEnds
 {
     public interface ICicdBackend
     {
-        Task<bool> BuildAndDeploy(BuildDeploySet set);
+        Task<bool> BuildAndDeploy(DeployContext context);
     }
 }

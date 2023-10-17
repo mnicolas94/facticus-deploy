@@ -53,7 +53,7 @@ And finally, install the Deploy package itself `https://github.com/mnicolas94/fa
 
 ## How to setup
 ### Create the workflow
-1. Inside Unity open the Deploy's editor window with `Tools/Facticus/Deploy/Edit sets`.
+1. Inside Unity open the Deploy's editor window with `Tools/Facticus/Deploy/Open Deploy editor window`.
 ![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/01eadaa7-b4b7-40aa-a8f0-d60dbd5914da)
 2. [optional] Dock the window somewhere within your editor. This is recommended due to a known issue where the window wont open anymore if you lose its focus while it is floating.
 3. Click on the `Package settings` tab.![facticus-deploy-setup-guide - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/0f71172a-e2b2-461c-8851-481927cd2ba1)
@@ -101,16 +101,16 @@ A notification platform is a channel to notify the success or failure of your wo
 Since secrets generally hold sensitive credentials and information, it is important to know how these variables are used by third-party actions and workflows, like the ones Deploy uses. This [article](https://blog.gitguardian.com/github-actions-security-cheat-sheet/) describes good practices and security measures to take when using Github Actions. I recommend reading it before using this package.
 
 ## How to use
-After setting up the initial configurations you can start configuring your builds. Just go to the Sets tab in the Deploy's editor window (`Tools/Facticus/Deploy/Edit sets`) and create a new Build-Deploy set (name subject to change).
+After setting up the initial configurations you can start configuring your builds. Just go to the Contexts tab in the Deploy's editor window (`Tools/Facticus/Deploy/Open Deploy editor window`) and create a new Deploy context.
 
 https://github.com/mnicolas94/facticus-deploy/assets/35781652/c9c1969b-4526-4e9a-84fc-48773790ab5d
 
-Each set has the following fields:
+Each context has the following fields:
 1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy#create-the-workflow).
 2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the [docs](https://github.com/mnicolas94/facticus-deploy/wiki/Override-variables-feature).
 3. Platforms: a list of Build-Deploy platforms pairs. Each element of the list describes a platform to build for, a platform to deploy to and whether the build should be flagged with [Development build](https://docs.unity3d.com/Manual/BuildSettings.html).
 
-After configuring your Set press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
+After configuring your Context press the `Build and Deploy` button to start building your game remotely. The first time, you have to provide a github authentication token. Info on how te get one [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and [here](https://docs.github.com/en/rest/overview/authenticating-to-the-rest-api?apiVersion=2022-11-28). This token will be stored in the project's [Application.persistentDataPath](https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html) so it wont be versioned by git for security reasons.
 
 ## Documentation
 The full documentation is in the [wiki](https://github.com/mnicolas94/facticus-deploy/wiki). You will find there a more detailed description of each Deploy's feature.

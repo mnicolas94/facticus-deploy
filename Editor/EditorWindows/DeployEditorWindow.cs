@@ -16,18 +16,18 @@ namespace Deploy.Editor.EditorWindows
     {
         [SerializeField] private int _listSelectedIndex = -1;
         
-        private VisualElement _setsContainer;
+        private VisualElement _contextsContainer;
         private VisualElement _settingsContainer;
-        private List<BuildDeploySet> _sets = new List<BuildDeploySet>();
+        private List<DeployContext> _contexts = new List<DeployContext>();
         private ListView _list;
         private Button _addButton;
         private Button _removeButton;
         private Button _refreshButton;
         private VisualElement _inspectorContainer;
-        private Label _setNameLabel;
+        private Label _contextNameLabel;
         private InspectorElement _ie;
 
-        [MenuItem("Tools/Facticus/Deploy/Edit sets")]
+        [MenuItem("Tools/Facticus/Deploy/Open Deploy editor window")]
         public static void ShowExample()
         {
             DeployEditorWindow wnd = GetWindow<DeployEditorWindow>();
@@ -44,30 +44,30 @@ namespace Deploy.Editor.EditorWindows
             uxmlContent.style.flexGrow = 1;
             root.Add(uxmlContent);
             
-            var setsToggle = root.Q<ToolbarToggle>("sets-toolbar-toggle");
+            var contextsToggle = root.Q<ToolbarToggle>("contexts-toolbar-toggle");
             var settingsToggle = root.Q<ToolbarToggle>("settings-toolbar-toggle");
-            _setsContainer = root.Q("sets-container");
+            _contextsContainer = root.Q("contexts-container");
             _settingsContainer = root.Q("settings-container");
             TabBarUtility.SetupTabBar(new List<(Toggle, VisualElement)>
             {
-                (setsToggle, _setsContainer),
+                (contextsToggle, _contextsContainer),
                 (settingsToggle, _settingsContainer)
             });
             
-            SetupSetsView(root);
+            SetupContextsView(root);
             SetupSettingsView(root);
         }
 
-        private void SetupSetsView(VisualElement root)
+        private void SetupContextsView(VisualElement root)
         {
             // get inspector element
-            _inspectorContainer = root.Q("SetEditorContainer");
+            _inspectorContainer = root.Q("ContextEditorContainer");
 
-            // set name label
-            _setNameLabel = root.Q<Label>("SetNameLabel");
+            // context name label
+            _contextNameLabel = root.Q<Label>("ContextNameLabel");
 
             // Get and populate list view
-            _list = root.Q<ListView>("SetsList");
+            _list = root.Q<ListView>("ContextsList");
             _list.onSelectionChange += OnListSelectionChange;
             RefreshList();
 
@@ -87,7 +87,7 @@ namespace Deploy.Editor.EditorWindows
             var listContainer = root.Q("ListContainer");
             var splitView = new TwoPaneSplitView(
                 0, 250, TwoPaneSplitViewOrientation.Horizontal);
-            _setsContainer.Add(splitView);
+            _contextsContainer.Add(splitView);
             splitView.Add(listContainer);
             splitView.Add(_inspectorContainer);
         }
@@ -101,30 +101,30 @@ namespace Deploy.Editor.EditorWindows
 
         private void PopulateList()
         {
-            BuildDeploySetsListPopulator.LoadSets(_sets);
-            BuildDeploySetsListPopulator.FillListView(_list, _sets, OnSetViewCreated);
+            DeployContextsListPopulator.LoadContexts(_contexts);
+            DeployContextsListPopulator.FillListView(_list, _contexts, OnContextViewCreated);
             _list.selectedIndex = _listSelectedIndex;
         }
 
-        private void OnSetViewCreated(VisualElement item)
+        private void OnContextViewCreated(VisualElement item)
         {
-            ContextualMenuManipulator contextManipulator = new ContextualMenuManipulator(SetupBuildSetContextMenu);
+            ContextualMenuManipulator contextManipulator = new ContextualMenuManipulator(SetupContextContextMenu);
             contextManipulator.target = item;
         }
         
-        private void SetupBuildSetContextMenu(ContextualMenuPopulateEvent ctx)
+        private void SetupContextContextMenu(ContextualMenuPopulateEvent ctx)
         {
             var label = ctx.target;
             ctx.menu.AppendAction(
                 "Duplicate",
-                action => DuplicateSet(action, (VisualElement) label),
+                action => DuplicateContext(action, (VisualElement) label),
                 DropdownMenuAction.Status.Normal);
         }
 
-        private void DuplicateSet(DropdownMenuAction action, VisualElement label)
+        private void DuplicateContext(DropdownMenuAction action, VisualElement label)
         {
-            var set = label.userData as BuildDeploySet;
-            var copy = set.DuplicateScriptableObjectWithSubAssets();
+            var context = label.userData as DeployContext;
+            var copy = context.DuplicateScriptableObjectWithSubAssets();
             RefreshList();
         }
 
@@ -141,9 +141,9 @@ namespace Deploy.Editor.EditorWindows
 
         private void OnAddNewClicked()
         {
-            var newSet = CreateInstance<BuildDeploySet>();
-            var assetName = "New Set";
-            CreateSetAsset(assetName, newSet);
+            var newContext = CreateInstance<DeployContext>();
+            var assetName = "New Context";
+            CreateContextAsset(assetName, newContext);
             RefreshList();
         }
 
@@ -154,8 +154,8 @@ namespace Deploy.Editor.EditorWindows
                 return;
             }
             
-            var set = _list.selectedItem as BuildDeploySet;
-            var path = AssetDatabase.GetAssetPath(set);
+            var context = _list.selectedItem as DeployContext;
+            var path = AssetDatabase.GetAssetPath(context);
             AssetDatabase.DeleteAsset(path);
             
             RefreshList();
@@ -169,7 +169,7 @@ namespace Deploy.Editor.EditorWindows
         private void OnListSelectionChange(IEnumerable<object> obj)
         {
             _listSelectedIndex = _list.selectedIndex;
-            string setLabelText = "";
+            string contextLabelText = "";
             
             if (_inspectorContainer.Contains(_ie))
             {
@@ -178,23 +178,23 @@ namespace Deploy.Editor.EditorWindows
             
             if (_listSelectedIndex < 0)
             {
-                setLabelText = "-";
+                contextLabelText = "-";
             }
             else
             {
-                var set = _list.selectedItem as BuildDeploySet;
-                if (set != null)
+                var context = _list.selectedItem as DeployContext;
+                if (context != null)
                 {
-                    _ie = new InspectorElement(set);
+                    _ie = new InspectorElement(context);
                     _inspectorContainer.Add(_ie);
-                    setLabelText = set.name;
+                    contextLabelText = context.name;
                 }
             }
 
-            _setNameLabel.text = setLabelText;
+            _contextNameLabel.text = contextLabelText;
         }
 
-        private static void CreateSetAsset(string assetName, BuildDeploySet newSet)
+        private static void CreateContextAsset(string assetName, DeployContext newContext)
         {
             // create the directory if it does not exist
             var dir = DeploySettings.GetOrCreate().DefaultAssetDirectory;
@@ -204,7 +204,7 @@ namespace Deploy.Editor.EditorWindows
             // create the new asset
             var path = Path.Combine(dir, $"{assetName}.asset");
             path = AssetDatabase.GenerateUniqueAssetPath(path);
-            AssetDatabase.CreateAsset(newSet, path);
+            AssetDatabase.CreateAsset(newContext, path);
             AssetDatabase.SaveAssets();
         }
     }

@@ -28,25 +28,25 @@ namespace Deploy.Editor.BackEnds
         [SerializeField, PathSelector(isDirectory: true)] private string _buildsDirectory;
         [SerializeField, PathSelector] private string _secretsDir;
         
-        public async Task<bool> BuildAndDeploy(BuildDeploySet set)
+        public async Task<bool> BuildAndDeploy(DeployContext context)
         {
             if (_buildWithAct)
             {
-                BuildDeployWithAct(set);
+                BuildDeployWithAct(context);
             }
             else
             {
-                await BuildLocallyDeployWithAct(set);
+                await BuildLocallyDeployWithAct(context);
             }
 
             await Task.Yield();
             return true;
         }
 
-        private void BuildDeployWithAct(BuildDeploySet set)
+        private void BuildDeployWithAct(DeployContext context)
         {
-            var elements = set.Platforms;
-            var overrideVariables = set.OverrideVariables.ToList();
+            var elements = context.Platforms;
+            var overrideVariables = context.OverrideVariables.ToList();
             
             var buildSetInput = GithubActionsBackend.GetBuildSetInput(elements, overrideVariables);
             
@@ -67,17 +67,17 @@ namespace Deploy.Editor.BackEnds
             Debug.Log("Act started building. See outputs in terminal");
         }
 
-        private async Task BuildLocallyDeployWithAct(BuildDeploySet set)
+        private async Task BuildLocallyDeployWithAct(DeployContext context)
         {
-            var elements = set.Platforms;
-            var overrideVariables = set.OverrideVariables.ToList();
+            var elements = context.Platforms;
+            var overrideVariables = context.OverrideVariables.ToList();
             
             for (int i = 0; i < elements.Count; i++)
             {
                 var buildDeployElement = elements[i];
                 
                 // create build folder name
-                var buildFolderName = $"{set.name}-{i}-{buildDeployElement.BuildPlatform.GetGameCiName()}";
+                var buildFolderName = $"{context.name}-{i}-{buildDeployElement.BuildPlatform.GetGameCiName()}";
 
                 // build locally
                 var buildPath = BuildLocally(buildDeployElement, buildFolderName, overrideVariables);

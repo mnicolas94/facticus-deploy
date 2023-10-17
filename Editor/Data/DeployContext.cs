@@ -2,12 +2,14 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.Serialization;
 
 namespace Deploy.Editor.Data
 {
-    [CreateAssetMenu(fileName = "BuildDeploySet", menuName = "Facticus/Deploy/BuildDeploySet", order = 0)]
-    public class BuildDeploySet : ScriptableObject
+    [CreateAssetMenu(fileName = "DeployContext", menuName = "Facticus/Deploy/DeployContext", order = 0)]
+    [MovedFrom(false, null, null, sourceClassName: "BuildDeploySet")]
+    public class DeployContext : ScriptableObject
     {
         [FormerlySerializedAs("_repositoryBranch")] [SerializeField]
         private string _repositoryBranchOrTag;

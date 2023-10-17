@@ -11,44 +11,44 @@ using Object = UnityEngine.Object;
 
 namespace Deploy.Editor.Utility
 {
-    public static class BuildDeploySetsListPopulator
+    public static class DeployContextsListPopulator
     {
-        public static void LoadSets(List<BuildDeploySet> sets)
+        public static void LoadContexts(List<DeployContext> contexts)
         {
-            sets.Clear();
+            contexts.Clear();
             AssetDatabase.Refresh();
-            var loadedSets = AssetDatabase.FindAssets("t:BuildDeploySet")
+            var loadedContexts = AssetDatabase.FindAssets("t:DeployContext")
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<BuildDeploySet>)
+                .Select(AssetDatabase.LoadAssetAtPath<DeployContext>)
                 .ToList();
-            sets.AddRange(loadedSets); 
+            contexts.AddRange(loadedContexts); 
         }
         
-        public static void FillListView(ListView listView, List<BuildDeploySet> sets, Action<VisualElement> onBind)
+        public static void FillListView(ListView listView, List<DeployContext> contexts, Action<VisualElement> onBind)
         {
             listView.makeItem = () => new RenamableLabel("");
             listView.bindItem = (item, index) =>
             {
-                var set = sets[index];
-                item.userData = set;
+                var context = contexts[index];
+                item.userData = context;
                 if (item is RenamableLabel renamableLabel)
                 {
-                    renamableLabel.Text = set.name;
+                    renamableLabel.Text = context.name;
                     renamableLabel.OnRename += (newText) => RenameItemData(newText, renamableLabel);
                 }
                 
                 onBind.Invoke(item);
             };
-            listView.itemsSource = sets;
+            listView.itemsSource = contexts;
         }
 
         private static void RenameItemData(string newName, RenamableLabel renamableLabel)
         {
-            var set = renamableLabel.userData as BuildDeploySet;
-            Undo.RecordObject(set, "Change BuildDeploySet name");
-            var path = AssetDatabase.GetAssetPath(set);
+            var context = renamableLabel.userData as DeployContext;
+            Undo.RecordObject(context, "Change DeployContext name");
+            var path = AssetDatabase.GetAssetPath(context);
             AssetDatabase.RenameAsset(path, newName);
-            EditorUtility.SetDirty(set);
+            EditorUtility.SetDirty(context);
             AssetDatabase.SaveAssets();
         }
     }

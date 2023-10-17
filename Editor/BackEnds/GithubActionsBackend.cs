@@ -20,7 +20,7 @@ namespace Deploy.Editor.BackEnds
     [AddTypeMenu("Github Actions")]
     public class GithubActionsBackend : ICicdBackend
     {
-        public async Task<bool> BuildAndDeploy(BuildDeploySet set)
+        public async Task<bool> BuildAndDeploy(DeployContext context)
         {
             // Display warning if workflow has changes
             if (ThereAreAnyChangesInWorkflow())
@@ -45,9 +45,9 @@ namespace Deploy.Editor.BackEnds
                 
                 if (entered)
                 {
-                    var elements = set.Platforms;
-                    var branch = set.RepositoryBranchOrTag;
-                    var buildSetInput = GetBuildSetInput(elements, set.OverrideVariables.ToList());
+                    var elements = context.Platforms;
+                    var branch = context.RepositoryBranchOrTag;
+                    var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
                     var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
                     
                     var (owner, repo) = GetOwnerAndRepo();

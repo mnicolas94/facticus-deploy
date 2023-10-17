@@ -15,9 +15,9 @@ using Utils.Editor;
 
 namespace Deploy.Editor.Drawers
 {
-    [CustomEditor(typeof(BuildDeploySet))]
+    [CustomEditor(typeof(DeployContext))]
     [CanEditMultipleObjects]
-    public class BuildDeploySetEditor : UnityEditor.Editor
+    public class DeployContextEditor : UnityEditor.Editor
     {
         private VisualElement _root;
         private Button _buildButton;
@@ -26,7 +26,7 @@ namespace Deploy.Editor.Drawers
         {
             _root = new VisualElement();
             
-            var tree = Resources.Load<VisualTreeAsset>("BuildDeploySetEditor");
+            var tree = Resources.Load<VisualTreeAsset>("DeployContextEditor");
             tree.CloneTree(_root);
             var defaultInspectorContainer = _root.Q("Default");
             InspectorElement.FillDefaultInspector(defaultInspectorContainer, serializedObject, this);
@@ -88,15 +88,15 @@ namespace Deploy.Editor.Drawers
 
         private void OnPlatformsAdded(IEnumerable<int> newIndices)
         {
-            var set = (BuildDeploySet) target;
+            var context = (DeployContext) target;
             foreach (var i in newIndices)
             {
-                var buildPlatform = set.Platforms[i].BuildPlatform;
-                var deployPlatform = set.Platforms[i].DeployPlatform;
-                set.Platforms[i].BuildPlatform = (IBuildPlatform) Clone(buildPlatform);
-                set.Platforms[i].DeployPlatform = (IDeployPlatform) Clone(deployPlatform);
+                var buildPlatform = context.Platforms[i].BuildPlatform;
+                var deployPlatform = context.Platforms[i].DeployPlatform;
+                context.Platforms[i].BuildPlatform = (IBuildPlatform) Clone(buildPlatform);
+                context.Platforms[i].DeployPlatform = (IDeployPlatform) Clone(deployPlatform);
                 
-                EditorUtility.SetDirty(set);
+                EditorUtility.SetDirty(context);
             }
         }
 
@@ -115,21 +115,21 @@ namespace Deploy.Editor.Drawers
 
         private void OnVariableAdded(IEnumerable<int> newIndices)
         {
-            var set = (BuildDeploySet) target;
+            var context = (DeployContext) target;
             foreach (var i in newIndices)
             {
-                set.OverrideVariables[i].Value = null;
-                set.OverrideVariables[i].Variable = null;
-                EditorUtility.SetDirty(set);
+                context.OverrideVariables[i].Value = null;
+                context.OverrideVariables[i].Variable = null;
+                EditorUtility.SetDirty(context);
             }
         }
 
         private void OnVariableRemoved(IEnumerable<int> indices)
         {
-            var set = (BuildDeploySet) target;
-            var values = set.OverrideVariables.Select(variable => variable.Value).ToList();
+            var context = (DeployContext) target;
+            var values = context.OverrideVariables.Select(variable => variable.Value).ToList();
 
-            var path = AssetDatabase.GetAssetPath(set);
+            var path = AssetDatabase.GetAssetPath(context);
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);
             var assetsToRemove = assets.Where(
                 asset => AssetDatabase.IsSubAsset(asset) && !values.Contains(asset));
@@ -137,7 +137,7 @@ namespace Deploy.Editor.Drawers
             {
                 AssetDatabase.RemoveObjectFromAsset(asset);
             }
-            EditorUtility.SetDirty(set);
+            EditorUtility.SetDirty(context);
             AssetDatabase.SaveAssets();
         }
 
@@ -147,14 +147,14 @@ namespace Deploy.Editor.Drawers
             {
                 _buildButton.SetEnabled(false);
                 var backend = DeploySettings.GetOrCreate().Backend;
-                var set = (BuildDeploySet) target;
-                if (set.AllDisabled)
+                var context = (DeployContext) target;
+                if (context.AllDisabled)
                 {
                     EditorWindow.focusedWindow.ShowNotification(new GUIContent("Can't start workflow. All platforms are disabled"));
                 }
                 else
                 {
-                    var success = await backend.BuildAndDeploy(set);
+                    var success = await backend.BuildAndDeploy(context);
                     if (success)
                     {
                         EditorWindow.focusedWindow.ShowNotification(new GUIContent("Workflow started successfully"));
