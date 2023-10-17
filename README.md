@@ -54,9 +54,9 @@ And finally, install the Deploy package itself `https://github.com/mnicolas94/fa
 ## How to setup
 ### Create the workflow
 1. Inside Unity open the Deploy's editor window with `Tools/Facticus/Deploy/Open Deploy editor window`.
-![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/01eadaa7-b4b7-40aa-a8f0-d60dbd5914da)
+![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/92d9f9fa-c696-4255-ab33-e8b60de8cc8b)
 2. [optional] Dock the window somewhere within your editor. This is recommended due to a known issue where the window wont open anymore if you lose its focus while it is floating.
-3. Click on the `Package settings` tab.![facticus-deploy-setup-guide - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11](https://github.com/mnicolas94/facticus-deploy/assets/35781652/0f71172a-e2b2-461c-8851-481927cd2ba1)
+3. Click on the `Package settings` tab.![facticus-deploy - SampleScene - Windows, Mac, Linux - Unity 2021 3 15f1 Personal DX11_2](https://github.com/mnicolas94/facticus-deploy/assets/35781652/a34f5e87-9cba-4096-b2c1-c5163a14f709)
 4. First configure the `Git Directory` field if needed. It should point to your git repository's root directory relative to your Unity project's root. Commonly, both directories match, in which case you should leave the field empty.
 5. Then, click the `Generate workflow` button and choose whatever name you want. This will be the name of the GitHub Actions workflow yml file created to build and deploy the project. Just keep this in mind to select a name different from other existent workflows you already have in your project.
 6. Leave the other fields as they are for now and commit and push your changes. This will push the created workflow to GitHub in order for it to be called later.
@@ -101,7 +101,7 @@ A notification platform is a channel to notify the success or failure of your wo
 Since secrets generally hold sensitive credentials and information, it is important to know how these variables are used by third-party actions and workflows, like the ones Deploy uses. This [article](https://blog.gitguardian.com/github-actions-security-cheat-sheet/) describes good practices and security measures to take when using Github Actions. I recommend reading it before using this package.
 
 ## How to use
-After setting up the initial configurations you can start configuring your builds. Just go to the Contexts tab in the Deploy's editor window (`Tools/Facticus/Deploy/Open Deploy editor window`) and create a new Deploy context.
+After setting up the initial configurations you can start configuring your builds. Just go to the Contexts tab (called Sets in the following video as it is from a previous version) in the Deploy's editor window (`Tools/Facticus/Deploy/Open Deploy editor window`) and create a new Deploy context.
 
 https://github.com/mnicolas94/facticus-deploy/assets/35781652/c9c1969b-4526-4e9a-84fc-48773790ab5d
 
