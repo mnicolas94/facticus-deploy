@@ -62,7 +62,7 @@ And finally, install the Deploy package itself `https://github.com/mnicolas94/fa
 6. Leave the other fields as they are for now and commit and push your changes. This will push the created workflow to GitHub in order for it to be called later.
 
 ### Configure Secrets
-You need to configure some [Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) in your repository in order to use this package. To add secrets you have to go to your repository's `Settings -> Secrets and variables -> Actions`. Almost each build and deploy platform has its own set of secrets that need to be configured in order to use it. You only need to configure the secrets of platforms you intend to use.
+You need to configure some [Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) in your Github repository in order to use this package. To add secrets you have to go to your repository's `Settings -> Secrets and variables -> Actions`. Almost each build and deploy platform has its own set of secrets that need to be configured in order to use it. You only need to configure the secrets of platforms you intend to use.
 
 #### General secrets (required for any build and deploy platform)
 - UNITY_LICENSE: The contents of a Unity license file (Unity_v20XX.x.ulf). Info on how to get it [here](https://game.ci/docs/github/activation).
