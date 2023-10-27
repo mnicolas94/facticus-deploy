@@ -71,6 +71,7 @@ runs:
           Library-
           
     - name: Build step
+      if: ${{ inputs.targetPlatform != "Dummy"}}
       uses: game-ci/unity-builder@v2
       id: build
       env:
@@ -101,6 +102,10 @@ runs:
       run: |
         echo "zipName=${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.zip" >> $GITHUB_OUTPUT
 
+    # Dummy (did not build)
+    - name: Create txt as a dummy build
+      run: |
+        touch "dummy.txt"
     # Standalone
     - name: Rename build folder
       if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
@@ -145,6 +150,8 @@ runs:
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
         elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') == 'true' }} ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
+        elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
+          echo 'path="dummy.txt"' >> $GITHUB_OUTPUT
         else
           echo 'path=ERROR' >> $GITHUB_OUTPUT
         fi

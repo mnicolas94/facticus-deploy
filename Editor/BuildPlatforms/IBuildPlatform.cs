@@ -9,6 +9,13 @@ namespace Deploy.Editor.BuildPlatforms
     }
     
     [Serializable]
+    [AddTypeMenu("Dummy (does not build, only for tests)")]
+    public class Dummy : IBuildPlatform
+    {
+        public string GetGameCiName() => "Dummy";
+    }
+    
+    [Serializable]
     public class Windows : IBuildPlatform
     {
         public string GetGameCiName() => "StandaloneWindows64";
