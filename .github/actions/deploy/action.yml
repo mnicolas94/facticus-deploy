@@ -126,6 +126,7 @@ runs:
     # Github Release
     - name: Create tag if it doesn't exist
       id: tag
+      shell: bash
       run: |
         if [ $(git describe --tags --exact-match HEAD) ]; then
           echo "Current commit already has tag."
