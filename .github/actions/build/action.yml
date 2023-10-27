@@ -71,7 +71,7 @@ runs:
           Library-
           
     - name: Build step
-      if: ${{ inputs.targetPlatform != "Dummy"}}
+      if: ${{ inputs.targetPlatform != 'Dummy' }}
       uses: game-ci/unity-builder@v2
       id: build
       env:
