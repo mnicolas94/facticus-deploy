@@ -124,10 +124,21 @@ runs:
 #        debugSymbols: ${{ inputs. }}
 
     # Github Release
+    - name: Create tag if it doesn't exist
+      id: tag
+      run: |
+        if [ $(git describe --tags --exact-match HEAD) ]; then
+          echo "Current commit already has tag."
+          echo "tag=$(git describe --tags --exact-match HEAD)" >> $GITHUB_OUTPUT
+        else
+          git tag v${{ inputs.version }}
+          git push origin v${{ inputs.version }}
+          echo "tag=v${{ inputs.version }}" >> $GITHUB_OUTPUT
+        fi
     - name: Deploy to a Github release
       if: ${{ inputs.deployPlatform == 'GithubRelease'}}
       uses: softprops/action-gh-release@v1
       with:
         name: v${{ inputs.version }}
-        tag_name: v${{ inputs.version }}
+        tag_name: ${{ steps.tag.outputs.tag }}
         files: ${{ inputs.buildPath }}
