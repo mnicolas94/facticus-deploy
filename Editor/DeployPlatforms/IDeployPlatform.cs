@@ -35,6 +35,12 @@ namespace Deploy.Editor.DeployPlatforms
     }
     
     [Serializable]
+    public class GithubRelease : IDeployPlatform
+    {
+        public string GetPlatformName() => "GithubRelease";
+    }
+    
+    [Serializable]
     public class PlayStore : IDeployPlatform, IJsonSerializable
     {
         public string GetPlatformName() => "PlayStore";

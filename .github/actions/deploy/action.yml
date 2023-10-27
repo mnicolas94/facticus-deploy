@@ -122,3 +122,12 @@ runs:
 #        whatsNewDirectory: ${{ inputs. }}
 #        mappingFile: ${{ inputs. }}
 #        debugSymbols: ${{ inputs. }}
+
+    # Github Release
+    - name: Deploy to a Github release
+      if: ${{ inputs.deployPlatform == 'GithubRelease'}}
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ inputs.version }}
+        tag_name: v${{ inputs.version }}
+        files: ${{ inputs.buildPath }}
