@@ -149,7 +149,7 @@ runs:
           echo 'path=${{ steps.android_path.outputs.path }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'WebGL' }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
-        elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') == 'true' }} ]; then
+        elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
           echo 'path="dummy.txt"' >> $GITHUB_OUTPUT
