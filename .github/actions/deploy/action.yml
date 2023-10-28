@@ -125,6 +125,7 @@ runs:
 
     # Github Release
     - name: Create tag if it doesn't exist
+      if: ${{ inputs.deployPlatform == 'GithubRelease'}}
       id: tag
       shell: bash
       run: |
