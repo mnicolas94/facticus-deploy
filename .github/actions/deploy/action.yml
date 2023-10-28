@@ -133,6 +133,7 @@ runs:
           echo "tag=$(git describe --tags --exact-match HEAD)" >> $GITHUB_OUTPUT
         else
           if [ -n $(git tag -l v${{ inputs.version }}) ]; then
+            git tag v${{ inputs.version }}
             git push origin v${{ inputs.version }}
           fi
           echo "tag=v${{ inputs.version }}" >> $GITHUB_OUTPUT
