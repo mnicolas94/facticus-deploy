@@ -1,0 +1,29 @@
+﻿name: Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      json_parameters:
+        type: string
+        required: true
+      build_platform:
+        type: string
+        required: true
+      build_parameters:
+        type: string
+        required: true
+      deploy_platform:
+        type: string
+        required: true
+      deploy_parameters:
+        type: string
+        required: true
+
+jobs:
+  run:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo ${{ inputs.json_parameters }}
+          echo ${{ secrets.TELEGRAM_TOKEN }}
