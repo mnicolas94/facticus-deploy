@@ -2,28 +2,46 @@
 
 on:
   workflow_dispatch:
-    inputs:
-      json_parameters:
-        type: string
-        required: true
-      build_platform:
-        type: string
-        required: true
-      build_parameters:
-        type: string
-        required: true
-      deploy_platform:
-        type: string
-        required: true
-      deploy_parameters:
-        type: string
-        required: true
 
 jobs:
-  run:
-    name: Test
+  tests:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo ${{ inputs.json_parameters }}
-          echo ${{ secrets.TELEGRAM_TOKEN }}
+          echo b
+  builda:
+    name: Build Android
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo b
+  buildw:
+    name: Build Windows
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo b
+  depa:
+    name: Deploy to Google Play
+    needs: builda
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo b
+  depw:
+    name: Deploy to Itch
+    needs: buildw
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo b
+  not:
+    name: Notify
+    needs: [depa, depw]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo b
