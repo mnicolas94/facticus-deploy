@@ -25,7 +25,7 @@ namespace Deploy.Editor.EditorWindows
         private Button _refreshButton;
         private VisualElement _inspectorContainer;
         private Label _contextNameLabel;
-        private InspectorElement _ie;
+        private InspectorElement _inspectorElement;
 
         [MenuItem("Tools/Facticus/Deploy/Open Deploy editor window")]
         public static void ShowExample()
@@ -103,7 +103,10 @@ namespace Deploy.Editor.EditorWindows
         {
             DeployContextsListPopulator.LoadContexts(_contexts);
             DeployContextsListPopulator.FillListView(_list, _contexts, OnContextViewCreated);
-            _list.selectedIndex = _listSelectedIndex;
+            
+            // set the previous selection index and ensure to draw the selected context
+            _list.SetSelectionWithoutNotify(new []{ _listSelectedIndex });
+            DrawSelectedContext();
         }
 
         private void OnContextViewCreated(VisualElement item)
@@ -168,14 +171,19 @@ namespace Deploy.Editor.EditorWindows
 
         private void OnListSelectionChange(IEnumerable<object> obj)
         {
+            DrawSelectedContext();
+        }
+
+        private void DrawSelectedContext()
+        {
             _listSelectedIndex = _list.selectedIndex;
             string contextLabelText = "";
-            
-            if (_inspectorContainer.Contains(_ie))
+
+            if (_inspectorContainer.Contains(_inspectorElement))
             {
-                _inspectorContainer.Remove(_ie);
+                _inspectorContainer.Remove(_inspectorElement);
             }
-            
+
             if (_listSelectedIndex < 0)
             {
                 contextLabelText = "-";
@@ -185,8 +193,8 @@ namespace Deploy.Editor.EditorWindows
                 var context = _list.selectedItem as DeployContext;
                 if (context != null)
                 {
-                    _ie = new InspectorElement(context);
-                    _inspectorContainer.Add(_ie);
+                    _inspectorElement = new InspectorElement(context);
+                    _inspectorContainer.Add(_inspectorElement);
                     contextLabelText = context.name;
                 }
             }
