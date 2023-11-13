@@ -2,46 +2,22 @@
 
 on:
   workflow_dispatch:
+    inputs:
+      base64:
+        type: string
+        required: true
+      json:
+        type: string
+        required: true
 
 jobs:
   tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - name: parse base64
+        run: |
           echo b
-  builda:
-    name: Build Android
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo b
-  buildw:
-    name: Build Windows
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo b
-  depa:
-    name: Deploy to Google Play
-    needs: builda
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo b
-  depw:
-    name: Deploy to Itch
-    needs: buildw
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo b
-  not:
-    name: Notify
-    needs: [depa, depw]
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
+      - name: run for loop
+        run: |
           echo b

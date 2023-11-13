@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Deploy.Editor.BackEnds;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.Serialization;
@@ -29,10 +30,8 @@ namespace Deploy.Editor.Data
         [ContextMenu("Debug")]
         public void DebugVariables()
         {
-            foreach (var variableValue in _overrideVariables)
-            {
-                Debug.Log($"VariableValue: {JsonUtility.ToJson(variableValue)}");
-            }
+            var inputs = GithubActionsBackend.GetBuildSetInput(_platforms.AsReadOnly(), _overrideVariables);
+            Debug.Log($"{inputs}");
         }
 
         public bool AllDisabled => _platforms.TrueForAll(element => !element.Enabled);

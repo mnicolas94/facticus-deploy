@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Deploy.Editor.Data;
 using Deploy.Editor.Settings;
 using Deploy.Editor.Utility;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using Utils.Editor;
@@ -27,8 +29,8 @@ namespace Deploy.Editor.BackEnds
             {
                 var message = $"Your workflow file ({GetWorkflowPath()}) has changes that have not been pushed to " + 
                               $"your remote repository. Are you sure you want to continue?";
-                var cont = EditorInputDialog.ShowYesNoDialog("Warning", message);
-                if (!cont)
+                var doContinue = EditorInputDialog.ShowYesNoDialog("Warning", message);
+                if (!doContinue)
                 {
                     return false;
                 }
@@ -45,11 +47,13 @@ namespace Deploy.Editor.BackEnds
                 
                 if (entered)
                 {
+                    // construct workflow inputs
                     var elements = context.Platforms;
                     var branch = context.RepositoryBranchOrTag;
                     var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
                     var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
                     
+                    // construct github api request
                     var (owner, repo) = GetOwnerAndRepo();
                     var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
                     var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
@@ -63,7 +67,6 @@ namespace Deploy.Editor.BackEnds
                     request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
                     request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
                     request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
-
                     request.Content = requestContent;
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
@@ -97,37 +100,55 @@ namespace Deploy.Editor.BackEnds
         {
             var inputStrings = elements
                 .Where(element => element.Enabled)  // only build enabled elements
-                .Select(element =>
-            {
-                var inputString = GetInputsString(element, variables);
+                .GroupBy(element =>  // group by build platforms with same parameters to only build once
+                {
+                    var platformName = element.BuildPlatform.GetGameCiName();
+                    var parameters = ToJson(element.BuildPlatform);
+                    return $"{platformName}-{parameters}-{element.DevelopmentBuild}-{element.FreeDiskSpaceBeforeBuild}";
+                })
+                .Select(group =>
+                {
+                    var inputString = GetInputsString(group.ToList(), variables);
                 
-                // prevent escaped double quotes to be affected by the next line
-                inputString = inputString.Replace(@"\""", @"@@@");
+                    // prevent escaped double quotes to be affected by the next line
+                    inputString = inputString.Replace(@"\""", @"@@@");
                 
-                inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
+                    inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
                 
-                inputString = inputString.Replace("@@@", @"\\\\\\\""");
+                    inputString = inputString.Replace("@@@", @"\\\\\\\""");
 
-                return inputString;
-            });
+                    return inputString;
+                });
 
             var joined = string.Join(",", inputStrings);
             var buildSetInput = $"[{joined}]";
             return buildSetInput;
         }
         
-        private static string GetInputsString(BuildDeployElement element, List<BuildVariableValue> variables)
+        public static string GetInputsString(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
         {
-            var buildPlatform = element.BuildPlatform.GetGameCiName();
-            var buildParameters = ToJson(element.BuildPlatform);
+            var first = elements[0];
+            var buildPlatform = first.BuildPlatform.GetGameCiName();
+            var buildParameters = ToJson(first.BuildPlatform);
             var overrideVariablesBase64 = variables.OverrideVariablesToBase64();
-            var developmentBuild = element.DevelopmentBuild;
-            var freeDiskSpace = element.FreeDiskSpaceBeforeBuild;
-            var deployPlatform = element.DeployPlatform.GetPlatformName();
-            var deployParameters = ToJson(element.DeployPlatform);
+            var developmentBuild = first.DevelopmentBuild;
+            var freeDiskSpace = first.FreeDiskSpaceBeforeBuild;
+            
+            // join deploy platforms separated by semicolon
+            var deployPlatforms = elements.Select(e => e.DeployPlatform.GetPlatformName());
+            var deployPlatformInput = string.Join(";", deployPlatforms);
+            // merge deploy parameters jsons 
+            var deployParameters = elements.Select(e => ToJson(e.DeployPlatform, false))
+                .Aggregate((jsonA, jsonB) =>
+                {
+                    var parsedA = JObject.Parse(jsonA);
+                    var parsedB = JObject.Parse(jsonB);
+                    parsedA.Merge(parsedB);
+                    return parsedA.ToString(Formatting.None);
+                });
+            deployParameters = PreProcessJsonString(deployParameters);
 
             var deploySettings = DeploySettings.GetOrCreate();
-            
             var notifyPlatform = deploySettings.NotifyPlatform;
             var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.GetPlatformName();
             var versioningStrategy = deploySettings.VersioningStrategy;
@@ -139,14 +160,14 @@ namespace Deploy.Editor.BackEnds
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
                                $"\"freeDiskSpace\":\"{freeDiskSpace.ToString().ToLower()}\"," +
                                $"\"deployParams\":\"{deployParameters}\"," +
-                               $"\"deployPlatform\":\"{deployPlatform}\"," +
+                               $"\"deployPlatform\":\"{deployPlatformInput}\"," +
                                $"\"notifyPlatform\":\"{notifyPlatformName}\"," +
                                $"\"versioningStrategy\":\"{versioningStrategy}\"" +
                                "}";
             return inputsString;
         }
 
-        private static string ToJson(object obj)
+        private static string ToJson(object obj, bool preprocess = true)
         {
             string json = "";
             if (obj is IJsonSerializable jsonSerializable)
@@ -157,7 +178,11 @@ namespace Deploy.Editor.BackEnds
             {
                 json = JsonUtility.ToJson(obj);
             }
-            json = PreProcessJsonString(json);
+
+            if (preprocess)
+            {
+                json = PreProcessJsonString(json);
+            }
             
             return json;
         }
