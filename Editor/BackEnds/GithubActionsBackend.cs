@@ -50,10 +50,8 @@ namespace Deploy.Editor.BackEnds
                 }
                 
                 // construct workflow inputs
-                var elements = context.Platforms;
                 var branch = context.RepositoryBranchOrTag;
-                // var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
-                var inputs = GetBuildSetInput(elements, context.OverrideVariables.ToList());
+                var inputs = GetGroupedWorkflowsInputs(context.Platforms, context.OverrideVariables.ToList());
                 foreach (var input in inputs)
                 {
                     var json = input.ToString(Formatting.None);
@@ -106,7 +104,14 @@ namespace Deploy.Editor.BackEnds
             return success;
         }
         
-        public static List<JObject> GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
+        /// <summary>
+        /// Group build-deploy elements by build platform to only build once if the same build platform
+        /// is going to be deployed to several deploy platforms.
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <param name="variables"></param>
+        /// <returns></returns>
+        public static List<JObject> GetGroupedWorkflowsInputs(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
             var inputStrings = elements
@@ -119,7 +124,7 @@ namespace Deploy.Editor.BackEnds
                 })
                 .Select(group =>
                 {
-                    var inputString = GetInputsString(group.ToList(), variables);
+                    var inputString = GetWorkflowInputAsJsonObject(group.ToList(), variables);
 
                     return inputString;
                 });
@@ -127,7 +132,7 @@ namespace Deploy.Editor.BackEnds
             return inputStrings.ToList();
         }
         
-        public static JObject GetInputsString(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
+        public static JObject GetWorkflowInputAsJsonObject(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
         {
             var first = elements[0];
             var buildPlatform = first.BuildPlatform.GetGameCiName();
@@ -176,14 +181,6 @@ namespace Deploy.Editor.BackEnds
             }
 
             return JObject.Parse(json);
-        }
-
-        private static string PreProcessJsonString(string buildParameters)
-        {
-            buildParameters = buildParameters.Replace("false", @"""false""");
-            buildParameters = buildParameters.Replace("true", @"""true""");
-            buildParameters = buildParameters.Replace("\"", "\\\"");
-            return buildParameters;
         }
 
         private static bool TryGetToken(out string token)

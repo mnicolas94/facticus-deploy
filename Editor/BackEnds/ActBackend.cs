@@ -48,7 +48,7 @@ namespace Deploy.Editor.BackEnds
             var elements = context.Platforms;
             var overrideVariables = context.OverrideVariables.ToList();
             
-            var inputs = GithubActionsBackend.GetBuildSetInput(elements, overrideVariables);
+            var inputs = GithubActionsBackend.GetGroupedWorkflowsInputs(elements, overrideVariables);
             foreach (var input in inputs)
             {
                 var secretsPath = _secretsDir;
