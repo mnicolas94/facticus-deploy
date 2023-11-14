@@ -94,7 +94,7 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/build@feat/build_once
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
