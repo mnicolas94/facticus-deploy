@@ -155,7 +155,7 @@ runs:
         elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
-          echo 'path=${{ steps.dummy.output.path }}' >> $GITHUB_OUTPUT
+          echo 'path=${{ steps.dummy.outputs.path }}' >> $GITHUB_OUTPUT
         else
           echo 'path=ERROR' >> $GITHUB_OUTPUT
         fi
