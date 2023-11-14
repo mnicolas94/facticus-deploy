@@ -119,11 +119,11 @@ namespace Deploy.Editor.BackEnds
                     var inputString = GetInputsString(group.ToList(), variables);
                 
                     // prevent escaped double quotes to be affected by the next line
-                    inputString = inputString.Replace(@"\""", @"@@@");
-                
-                    inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
-                
-                    inputString = inputString.Replace("@@@", @"\\\\\\\""");
+                    // inputString = inputString.Replace(@"\""", @"@@@");
+                    //
+                    // inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
+                    //
+                    // inputString = inputString.Replace("@@@", @"\\\\\\\""");
 
                     return inputString;
                 });
