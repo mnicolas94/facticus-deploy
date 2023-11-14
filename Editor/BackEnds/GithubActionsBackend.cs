@@ -54,7 +54,11 @@ namespace Deploy.Editor.BackEnds
                 var inputs = GetListBuildSetInput(elements, context.OverrideVariables.ToList());
                 foreach (var input in inputs)
                 {
-                    var inputsString = $"{{\"json_parameters\":\"{input}\"}}";
+                    // encode with base64
+                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(input);
+                    var inputBase64 = Convert.ToBase64String(plainTextBytes);
+                    
+                    var inputsString = $"{{\"json_parameters\":\"{inputBase64}\"}}";
                     // construct github api request
                     var (owner, repo) = GetOwnerAndRepo();
                     var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
@@ -115,11 +119,11 @@ namespace Deploy.Editor.BackEnds
                     var inputString = GetInputsString(group.ToList(), variables);
                 
                     // prevent escaped double quotes to be affected by the next line
-                    // inputString = inputString.Replace(@"\""", @"@@@");
-                    //
-                    // inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
-                    //
-                    // inputString = inputString.Replace("@@@", @"\\\\\\\""");
+                    inputString = inputString.Replace(@"\""", @"@@@");
+                
+                    inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
+                
+                    inputString = inputString.Replace("@@@", @"\\\\\\\""");
 
                     return inputString;
                 });
