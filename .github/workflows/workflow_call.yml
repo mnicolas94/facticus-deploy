@@ -66,7 +66,8 @@ jobs:
     env:
       json: ${{ needs.parse_input.outputs.input }}
     outputs:
-      artifact: "TODO"
+      artifact: ${{ steps.uuid.outputs.uuid }}
+      build_path: ${{ steps.build.outputs.buildPath }}
       start_time: ${{ steps.time.outputs.start }}
       project_name: ${{ steps.project_name.outputs.projectNameNoSpaces }}
       version: ${{ steps.build.outputs.version }}
@@ -114,6 +115,18 @@ jobs:
         if: success() || failure()
         id: project_name
         uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.13
+      
+      - name: Generate unique id for artifact
+        id: uuid
+        run: |
+          echo "uuid=$(uuidgen)" >> $GITHUB_OUTPUT
+      
+      - name: Upload build as artifact
+        id: artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.uuid.outputs.uuid }}
+          path: ${{ steps.build.outputs.buildPath }}
         
   # --- Deploy ---
   deploy:
@@ -126,11 +139,19 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.parse_input.outputs.input).deployPlatforms }}
     steps:
+      - name: Download artifact build
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
-          buildPath: ${{ needs.build.outputs.buildPath }}
+          buildPath: ${{ needs.build.outputs.build_path }}
           version: ${{ needs.build.outputs.version }}
           # Telegram
           telegram_message: ${{ matrix.deployParams.message }}
