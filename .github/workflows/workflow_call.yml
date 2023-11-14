@@ -72,6 +72,10 @@ jobs:
       - name: echo parsed inputs
         run: |
           echo ${{ needs.parse_input.outputs.input }}
+          echo ${{ fromJson(env.json).buildPlatform }}
+          echo ${{ fromJson(env.json).deployPlatforms[0].deployPlatform }}
+          echo ${{ fromJson(env.json).deployPlatforms[0].deployParams.channel }}
+          echo ${{ fromJson(env.json).deployPlatforms[0].notifyPlatform }}
       # --- Store start time
       - name: Store start time
         id: time

@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Deploy.Editor.Data;
 using Deploy.Editor.Settings;
 using Deploy.Editor.Utility;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using Utils.Editor;
 
@@ -54,8 +56,9 @@ namespace Deploy.Editor.BackEnds
                 var inputs = GetListBuildSetInput(elements, context.OverrideVariables.ToList());
                 foreach (var input in inputs)
                 {
+                    var json = input.ToString(Formatting.None);
                     // encode with base64
-                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(input);
+                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
                     var inputBase64 = Convert.ToBase64String(plainTextBytes);
                     
                     var inputsString = $"{{\"json_parameters\":\"{inputBase64}\"}}";
@@ -103,7 +106,7 @@ namespace Deploy.Editor.BackEnds
             return success;
         }
         
-        public static List<string> GetListBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
+        public static List<JObject> GetListBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
             var inputStrings = elements
@@ -117,13 +120,6 @@ namespace Deploy.Editor.BackEnds
                 .Select(group =>
                 {
                     var inputString = GetInputsString(group.ToList(), variables);
-                
-                    // prevent escaped double quotes to be affected by the next line
-                    // inputString = inputString.Replace(@"\""", @"@@@");
-                    //
-                    // inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
-                    //
-                    // inputString = inputString.Replace("@@@", @"\\\\\\\""");
 
                     return inputString;
                 });
@@ -145,13 +141,6 @@ namespace Deploy.Editor.BackEnds
                 .Select(group =>
                 {
                     var inputString = GetInputsString(group.ToList(), variables);
-                
-                    // prevent escaped double quotes to be affected by the next line
-                    inputString = inputString.Replace(@"\""", @"@@@");
-                
-                    inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
-                
-                    inputString = inputString.Replace("@@@", @"\\\\\\\""");
 
                     return inputString;
                 });
@@ -161,11 +150,11 @@ namespace Deploy.Editor.BackEnds
             return buildSetInput;
         }
         
-        public static string GetInputsString(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
+        public static JObject GetInputsString(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
         {
             var first = elements[0];
             var buildPlatform = first.BuildPlatform.GetGameCiName();
-            var buildParameters = ToJson(first.BuildPlatform);
+            var buildParameters = ToJObject(first.BuildPlatform);
             var overrideVariablesBase64 = variables.OverrideVariablesToBase64();
             var developmentBuild = first.DevelopmentBuild;
             var freeDiskSpace = first.FreeDiskSpaceBeforeBuild;
@@ -174,32 +163,44 @@ namespace Deploy.Editor.BackEnds
             var versioningStrategy = deploySettings.VersioningStrategy;
             var notifyPlatform = deploySettings.NotifyPlatform;
             var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.GetPlatformName();
-            
-            // construct workflow input for each deploy platform
-            var deployPlatforms = elements.Select(e =>
-            {
-                var includeString = "{" +
-                                   $"\"deployPlatform\":\"{e.DeployPlatform.GetPlatformName()}\"," +
-                                   $"\"deployParams\":\"{ToJson(e.DeployPlatform)}\"," +
-                                   $"\"notifyPlatform\":\"{notifyPlatformName}\"" +
-                                   "}";
-                return includeString;
-            });
-            var joined = string.Join(",", deployPlatforms);
-            var deployPlatformMatrix = $"[{joined}]";
 
-            var inputsString = "{" +
-                               $"\"buildPlatform\":\"{buildPlatform}\"," +
-                               $"\"buildParams\":\"{buildParameters}\"," +
-                               $"\"buildVariables\":\"{overrideVariablesBase64}\"," +
-                               $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
-                               $"\"freeDiskSpace\":\"{freeDiskSpace.ToString().ToLower()}\"," +
-                               $"\"versioningStrategy\":\"{versioningStrategy}\"," +
-                               $"\"deployPlatforms\":\"{deployPlatformMatrix}\"" +
-                               "}";
-            return inputsString;
+            // construct workflow input for each deploy platform
+            var deployPlatformsList = elements.Select(e => new JObject
+            {
+                { "deployPlatform", e.DeployPlatform.GetPlatformName() },
+                { "deployParams", ToJObject(e.DeployPlatform) },
+                { "notifyPlatform", notifyPlatformName },
+            }).ToList();
+            var deployPlatforms = new JArray(deployPlatformsList);
+
+            var jsonObject = new JObject
+            {
+                { "buildPlatform", buildPlatform },
+                { "buildParams", buildParameters },
+                { "buildVariables", overrideVariablesBase64 },
+                { "developmentBuild", developmentBuild },
+                { "freeDiskSpace", freeDiskSpace },
+                { "versioningStrategy", versioningStrategy.ToString() },
+                { "deployPlatforms", deployPlatforms },
+            };
+            return jsonObject;
         }
 
+        private static JObject ToJObject(object obj)
+        {
+            string json = "";
+            if (obj is IJsonSerializable jsonSerializable)
+            {
+                json = jsonSerializable.ToJson();
+            }
+            else
+            {
+                json = JsonUtility.ToJson(obj);
+            }
+
+            return JObject.Parse(json);
+        }
+        
         private static string ToJson(object obj, bool preprocess = true)
         {
             string json = "";
@@ -216,7 +217,7 @@ namespace Deploy.Editor.BackEnds
             {
                 json = PreProcessJsonString(json);
             }
-            
+
             return json;
         }
 
