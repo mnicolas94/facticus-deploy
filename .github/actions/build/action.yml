@@ -108,7 +108,7 @@ runs:
       shell: bash
       run: |
         path="dummy.txt"
-        touch $path
+        echo "Content" >> $path
         echo "path=$path" >> $GITHUB_OUTPUT
     # Standalone
     - name: Rename build folder
