@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deploy.Editor.Data;
+using Deploy.Editor.DeployPlatforms;
 using Deploy.Editor.Settings;
 using Deploy.Editor.Utility;
 using Newtonsoft.Json;
@@ -157,7 +158,7 @@ namespace Deploy.Editor.BackEnds
             var deployPlatformsList = elements.Select(e => new JObject
             {
                 { "deployPlatform", e.DeployPlatform.GetPlatformName() },
-                { "deployParams", ToJObject(e.DeployPlatform) },
+                { "deployParams", AddDeployPlatformPrefixToFields(ToJObject(e.DeployPlatform), e.DeployPlatform) },
                 { "notifyPlatform", notifyPlatformName },
             }).ToList();
             var deployPlatforms = new JArray(deployPlatformsList);
@@ -188,6 +189,17 @@ namespace Deploy.Editor.BackEnds
             }
 
             return JObject.Parse(json);
+        }
+
+        private static JObject AddDeployPlatformPrefixToFields(JObject obj, IDeployPlatform platform)
+        {
+            var newObj = new JObject();
+            foreach (var (key, value) in obj)
+            {
+                newObj.Add($"{platform.GetFieldsPrefix()}_{key}", value);
+            }
+
+            return newObj;
         }
 
         private static bool TryGetToken(out string token)

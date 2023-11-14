@@ -10,12 +10,14 @@ namespace Deploy.Editor.DeployPlatforms
     public interface IDeployPlatform
     {
         string GetPlatformName();
+        string GetFieldsPrefix();
     }
 
     [Serializable]
     public class Telegram : IDeployPlatform
     {
         public string GetPlatformName() => "Telegram";
+        public string GetFieldsPrefix() => "tg";
 
         [SerializeField] private string message;
 
@@ -30,6 +32,7 @@ namespace Deploy.Editor.DeployPlatforms
     public class Itch : IDeployPlatform
     {
         public string GetPlatformName() => "Itch";
+        public string GetFieldsPrefix() => "itch";
 
         [SerializeField] private string channel;
     }
@@ -38,12 +41,14 @@ namespace Deploy.Editor.DeployPlatforms
     public class GithubRelease : IDeployPlatform
     {
         public string GetPlatformName() => "GithubRelease";
+        public string GetFieldsPrefix() => "ghR";
     }
     
     [Serializable]
     public class PlayStore : IDeployPlatform, IJsonSerializable
     {
         public string GetPlatformName() => "PlayStore";
+        public string GetFieldsPrefix() => "ps";
 
         [SerializeField, Dropdown(nameof(GetTrackValues))]
         private string track;
