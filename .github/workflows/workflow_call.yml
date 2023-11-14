@@ -223,7 +223,7 @@ jobs:
 
       # Error message
       - name: Send error message if failed
-        if: ${{ failure() || needs.build.result == 'failure') }}
+        if: ${{ failure() || needs.build.result == 'failure' }}
         uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.13
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
