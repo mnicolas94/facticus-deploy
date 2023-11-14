@@ -30,7 +30,7 @@ namespace Deploy.Editor.Data
         [ContextMenu("Debug")]
         public void DebugVariables()
         {
-            var inputs = GithubActionsBackend.GetListBuildSetInput(_platforms.AsReadOnly(), _overrideVariables);
+            var inputs = GithubActionsBackend.GetBuildSetInput(_platforms.AsReadOnly(), _overrideVariables);
             Debug.Log($"{string.Join("\n", inputs)}");
         }
         

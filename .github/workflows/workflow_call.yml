@@ -128,11 +128,12 @@ jobs:
   # --- Deploy ---
   deploy:
     name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
-    needs: [parse_input, build, parse_matrix]
+    needs: [parse_input, build]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.parse_matrix.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.parse_input.outputs.input).deployPlatforms }}
     steps:
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
