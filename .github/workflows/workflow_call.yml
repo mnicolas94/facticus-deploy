@@ -107,7 +107,7 @@ jobs:
           versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
           buildVariables: ${{ fromJson(env.json).buildVariables }}
           # Android specific
-          androidAppBundle: ${{ fromJson(fromJson(env.json).buildParams).appBundle }}
+          androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
