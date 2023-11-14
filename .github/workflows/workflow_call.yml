@@ -116,6 +116,10 @@ jobs:
         id: project_name
         uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.13
       
+      - name: echo files to check for dummy file
+        run: |
+          ls
+      
       - name: Generate unique id for artifact
         id: uuid
         run: |

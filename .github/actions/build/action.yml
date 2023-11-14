@@ -104,9 +104,12 @@ runs:
 
     # Dummy (did not build)
     - name: Create txt as a dummy build
+      id: dummy
       shell: bash
       run: |
         touch "dummy.txt"
+        ls
+        echo "path='dummy.txt'" >> $GITHUB_OUTPUT
     # Standalone
     - name: Rename build folder
       if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
@@ -152,7 +155,7 @@ runs:
         elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
-          echo 'path="dummy.txt"' >> $GITHUB_OUTPUT
+          echo 'path=${{ steps.dummy.output.path }}' >> $GITHUB_OUTPUT
         else
           echo 'path=ERROR' >> $GITHUB_OUTPUT
         fi
