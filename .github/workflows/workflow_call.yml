@@ -48,13 +48,13 @@ on:
 
 jobs:
   build:
-    name: Build ${{ fromJson(env.json).buildPlatform }}
+    name: Build ${{ fromJson(github.event.inputs.json_parameters).buildPlatform }}
     runs-on: ubuntu-latest
+    env:
+      json: ${{ github.event.inputs.json_parameters }}
     outputs:
       artifact: "TODO"
       start_time: ${{ steps.time.outputs.start }}
-    env:
-      json: github.event.inputs.json_parameters
     steps:
       # --- Store start time
       - name: Store start time
