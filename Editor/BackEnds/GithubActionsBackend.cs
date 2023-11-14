@@ -44,22 +44,27 @@ namespace Deploy.Editor.BackEnds
                 tokenIsNotValid = false;
                 var entered = TryGetToken(out var token);
                 success = entered;
-                
-                if (entered)
+
+                if (!entered)
                 {
-                    // construct workflow inputs
-                    var elements = context.Platforms;
-                    var branch = context.RepositoryBranchOrTag;
-                    var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
-                    var inputsString = $"{{\"json_parameters\":\"{buildSetInput}\"}}";
-                    
+                    continue;
+                }
+                
+                // construct workflow inputs
+                var elements = context.Platforms;
+                var branch = context.RepositoryBranchOrTag;
+                // var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
+                var inputs = GetListBuildSetInput(elements, context.OverrideVariables.ToList());
+                foreach (var input in inputs)
+                {
+                    var inputsString = $"{{\"json_parameters\":\"{input}\"}}";
                     // construct github api request
                     var (owner, repo) = GetOwnerAndRepo();
                     var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
                     var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
                     var userAgent = GetGitUser();
                     var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
-                    
+                        
                     var requestContent = new StringContent(stringContent);
                     using var httpClient = new HttpClient();
                     using var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri);
@@ -84,6 +89,8 @@ namespace Deploy.Editor.BackEnds
                         {
                             tokenIsNotValid = true;  // try again
                         }
+
+                        break;
                     }
                     else if (responseCode >= 300)
                     {
@@ -93,6 +100,34 @@ namespace Deploy.Editor.BackEnds
             } while (tokenIsNotValid);
             
             return success;
+        }
+        
+        public static List<string> GetListBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
+            List<BuildVariableValue> variables)
+        {
+            var inputStrings = elements
+                .Where(element => element.Enabled)  // only build enabled elements
+                .GroupBy(element =>  // group by build platforms with same parameters to only build once
+                {
+                    var platformName = element.BuildPlatform.GetGameCiName();
+                    var parameters = ToJson(element.BuildPlatform);
+                    return $"{platformName}-{parameters}-{element.DevelopmentBuild}-{element.FreeDiskSpaceBeforeBuild}";
+                })
+                .Select(group =>
+                {
+                    var inputString = GetInputsString(group.ToList(), variables);
+                
+                    // prevent escaped double quotes to be affected by the next line
+                    inputString = inputString.Replace(@"\""", @"@@@");
+                
+                    inputString = inputString.Replace("\"", @"\\\""");  // escape double quotes
+                
+                    inputString = inputString.Replace("@@@", @"\\\\\\\""");
+
+                    return inputString;
+                });
+
+            return inputStrings.ToList();
         }
         
         public static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
@@ -134,35 +169,32 @@ namespace Deploy.Editor.BackEnds
             var developmentBuild = first.DevelopmentBuild;
             var freeDiskSpace = first.FreeDiskSpaceBeforeBuild;
             
-            // join deploy platforms separated by semicolon
-            var deployPlatforms = elements.Select(e => e.DeployPlatform.GetPlatformName());
-            var deployPlatformInput = string.Join(";", deployPlatforms);
-            // merge deploy parameters jsons 
-            var deployParameters = elements.Select(e => ToJson(e.DeployPlatform, false))
-                .Aggregate((jsonA, jsonB) =>
-                {
-                    var parsedA = JObject.Parse(jsonA);
-                    var parsedB = JObject.Parse(jsonB);
-                    parsedA.Merge(parsedB);
-                    return parsedA.ToString(Formatting.None);
-                });
-            deployParameters = PreProcessJsonString(deployParameters);
-
             var deploySettings = DeploySettings.GetOrCreate();
+            var versioningStrategy = deploySettings.VersioningStrategy;
             var notifyPlatform = deploySettings.NotifyPlatform;
             var notifyPlatformName = notifyPlatform == null ? "" : notifyPlatform.GetPlatformName();
-            var versioningStrategy = deploySettings.VersioningStrategy;
             
+            // construct workflow input for each deploy platform
+            var deployPlatforms = elements.Select(e =>
+            {
+                var includeString = "{" +
+                                   $"\"deployPlatform\":\"{e.DeployPlatform.GetPlatformName()}\"," +
+                                   $"\"deployParams\":\"{ToJson(e.DeployPlatform)}\"," +
+                                   $"\"notifyPlatform\":\"{notifyPlatformName}\"" +
+                                   "}";
+                return includeString;
+            });
+            var joined = string.Join(",", deployPlatforms);
+            var deployPlatformMatrix = $"[{joined}]";
+
             var inputsString = "{" +
                                $"\"buildPlatform\":\"{buildPlatform}\"," +
                                $"\"buildParams\":\"{buildParameters}\"," +
                                $"\"buildVariables\":\"{overrideVariablesBase64}\"," +
                                $"\"developmentBuild\":\"{developmentBuild.ToString().ToLower()}\"," +
                                $"\"freeDiskSpace\":\"{freeDiskSpace.ToString().ToLower()}\"," +
-                               $"\"deployParams\":\"{deployParameters}\"," +
-                               $"\"deployPlatform\":\"{deployPlatformInput}\"," +
-                               $"\"notifyPlatform\":\"{notifyPlatformName}\"," +
-                               $"\"versioningStrategy\":\"{versioningStrategy}\"" +
+                               $"\"versioningStrategy\":\"{versioningStrategy}\"," +
+                               $"\"deployPlatforms\":\"{deployPlatformMatrix}\"" +
                                "}";
             return inputsString;
         }

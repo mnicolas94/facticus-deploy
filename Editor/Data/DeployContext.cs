@@ -30,8 +30,16 @@ namespace Deploy.Editor.Data
         [ContextMenu("Debug")]
         public void DebugVariables()
         {
-            var inputs = GithubActionsBackend.GetBuildSetInput(_platforms.AsReadOnly(), _overrideVariables);
-            Debug.Log($"{inputs}");
+            var inputs = GithubActionsBackend.GetListBuildSetInput(_platforms.AsReadOnly(), _overrideVariables);
+            Debug.Log($"{string.Join("\n", inputs)}");
+        }
+        
+        [ContextMenu("Debug call")]
+        public async void DebugWorkflowCall()
+        {
+            var ci = new GithubActionsBackend();
+            var success = ci.BuildAndDeploy(this);
+            Debug.Log($"{success}");
         }
 
         public bool AllDisabled => _platforms.TrueForAll(element => !element.Enabled);

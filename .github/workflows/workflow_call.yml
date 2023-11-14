@@ -47,22 +47,14 @@ on:
       
 
 jobs:
-  parse_input:
-    name: Parse input
+  build:
+    name: Build ${{ fromJson(env.json).buildPlatform }}
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - id: set-matrix
-        run: echo "matrix={\"include\":${{ github.event.inputs.json_parameters }}}" >> $GITHUB_OUTPUT
-
-  build_and_deploy:
-    name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
-    needs: parse_input
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
+      artifact: "TODO"
+      start_time: ${{ steps.time.outputs.start }}
+    env:
+      json: github.event.inputs.json_parameters
     steps:
       # --- Store start time
       - name: Store start time
@@ -72,7 +64,7 @@ jobs:
 
       # --- Free disk space if requested
       - name: Free CI system disk space
-        if: ${{ matrix.freeDiskSpace == 'true' }}
+        if: ${{ fromJson(env.json).freeDiskSpace == 'true' }}
         uses: kfir4444/free-disk-space@main
         with:
           tool-cache: false
@@ -90,19 +82,38 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          targetPlatform: ${{ matrix.buildPlatform }}
-          developmentBuild: ${{ matrix.developmentBuild }}
-          versioningStrategy: ${{ matrix.versioningStrategy }}
-          buildVariables: ${{ matrix.buildVariables }}
+          targetPlatform: ${{ fromJson(env.json).buildPlatform }}
+          developmentBuild: ${{ fromJson(env.json).developmentBuild }}
+          versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
+          buildVariables: ${{ fromJson(env.json).buildVariables }}
           # Android specific
-          androidAppBundle: ${{ fromJson(matrix.buildParams).appBundle }}
+          androidAppBundle: ${{ fromJson(fromJson(env.json).buildParams).appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
-
-      # --- Deploy ---
+          
+  # --- Parse deploy matrix ---
+  parse_input:
+    name: Parse input for deploy matrix
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "matrix={\"include\":${{ fromJson(github.event.inputs.json_parameters).deployPlatforms }}}" >> $GITHUB_OUTPUT
+        
+  # --- Deploy ---
+  deploy:
+    name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
+    needs: [parse_input, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
+    steps:
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
         with:
@@ -135,7 +146,7 @@ jobs:
         id: display_name
         uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.3.13
         with:
-          platform: ${{ matrix.buildPlatform }}
+          platform: ${{ fromJson(github.event.inputs.json_parameters).buildPlatform }}
           
       - name: Get project name variable
         if: success() || failure()
