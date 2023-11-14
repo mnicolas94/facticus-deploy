@@ -48,29 +48,21 @@ on:
 
 jobs:
   parse_input:
-    name: Parse base64 input
+    name: Parse input
     runs-on: ubuntu-latest
     outputs:
-      input: ${{ steps.decode.outputs.input }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Decode input
-        id: decode
-        run: |
-          input=$(echo '${{ github.event.inputs.json_parameters }}' | base64 --decode)
-          echo "input=$input" >> $GITHUB_OUTPUT
-          
-  build:
-    name: Build for ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
+      - id: set-matrix
+        run: echo "matrix={\"include\":${{ github.event.inputs.json_parameters }}}" >> $GITHUB_OUTPUT
+
+  build_and_deploy:
+    name: Build ${{ matrix.buildPlatform }} and Deploy to ${{ matrix.deployPlatform }}
     needs: parse_input
     runs-on: ubuntu-latest
-    env:
-      json: ${{ needs.parse_input.outputs.input }}
-    outputs:
-      artifact: ${{ steps.uuid.outputs.uuid }}
-      build_path: ${{ steps.build.outputs.buildPath }}
-      start_time: ${{ steps.time.outputs.start }}
-      project_name: ${{ steps.project_name.outputs.projectNameNoSpaces }}
-      version: ${{ steps.build.outputs.version }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.parse_input.outputs.matrix) }}
     steps:
       # --- Store start time
       - name: Store start time
@@ -80,7 +72,7 @@ jobs:
 
       # --- Free disk space if requested
       - name: Free CI system disk space
-        if: ${{ fromJson(env.json).freeDiskSpace == 'true' }}
+        if: ${{ matrix.freeDiskSpace == 'true' }}
         uses: kfir4444/free-disk-space@main
         with:
           tool-cache: false
@@ -94,100 +86,67 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@feat/build_once
+        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.3.14
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          targetPlatform: ${{ fromJson(env.json).buildPlatform }}
-          developmentBuild: ${{ fromJson(env.json).developmentBuild }}
-          versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
-          buildVariables: ${{ fromJson(env.json).buildVariables }}
+          targetPlatform: ${{ matrix.buildPlatform }}
+          developmentBuild: ${{ matrix.developmentBuild }}
+          versioningStrategy: ${{ matrix.versioningStrategy }}
+          buildVariables: ${{ matrix.buildVariables }}
           # Android specific
-          androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
+          androidAppBundle: ${{ fromJson(matrix.buildParams).appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
-      
-      # get project name in this job as it is the one checkouts the repository during the build step
-      - name: Get project name variable
-        if: success() || failure()
-        id: project_name
-        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.13
-      
-      - name: Generate unique id for artifact
-        id: uuid
-        run: |
-          echo "uuid=$(uuidgen)" >> $GITHUB_OUTPUT
-      
-      - name: Upload build as artifact
-        id: artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.uuid.outputs.uuid }}
-          path: ${{ steps.build.outputs.buildPath }}
-        
-  # --- Deploy ---
-  deploy:
-    name: Deploy to ${{ matrix.deployPlatform }}
-    needs: [parse_input, build]
-    if: always()
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{ fromJson(needs.parse_input.outputs.input).deployPlatforms }}
-    steps:
-      - name: Download artifact build
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ needs.build.outputs.artifact }}
-        
+
+      # --- Deploy ---
       - name: Deploy
-        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.14
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
-          buildPath: ${{ needs.build.outputs.build_path }}
-          version: ${{ needs.build.outputs.version }}
+          buildPath: ${{ steps.build.outputs.buildPath }}
+          version: ${{ steps.build.outputs.version }}
           # Telegram
-          telegram_message: ${{ matrix.deployParams.tg_message }}
+          telegram_message: ${{ fromJson(matrix.deployParams).message }}
           TELEGRAM_SESSION: ${{ secrets.TELEGRAM_SESSION }}
           TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
           TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           # Itch
-          itch_channel: ${{ matrix.deployParams.itch_channel }}
+          itch_channel: ${{ fromJson(matrix.deployParams).channel }}
           ITCH_BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_CREDENTIALS }}
           ITCH_GAME: ${{ secrets.ITCH_GAME }}
           ITCH_USER: ${{ secrets.ITCH_USER }}
           # PlayStore
-          playstore_track: ${{ matrix.deployParams.ps_track }}
-          playstore_status: ${{ matrix.deployParams.ps_status }}
-          playstore_inAppUpdatePriority: ${{ matrix.deployParams.ps_inAppUpdatePriority }}
-          playstore_userFraction: ${{ matrix.deployParams.ps_userFraction }}
+          playstore_track: ${{ fromJson(matrix.deployParams).track }}
+          playstore_status: ${{ fromJson(matrix.deployParams).status }}
+          playstore_inAppUpdatePriority: ${{ fromJson(matrix.deployParams).inAppUpdatePriority }}
+          playstore_userFraction: ${{ fromJson(matrix.deployParams).userFraction }}
           PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
-
-      - name: Delete artifact
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          name: ${{ needs.build.outputs.artifact }}
 
       # --- Notify ---
       - name: Get platform display name
         if: success() || failure()
         id: display_name
-        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.3.14
         with:
-          platform: ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
+          platform: ${{ matrix.buildPlatform }}
           
+      - name: Get project name variable
+        if: success() || failure()
+        id: project_name
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.14
+        
       - name: Get total elapsed time
         if: success() || failure()
         id: elapsed
         run: |
-          start=${{ needs.build.outputs.start_time }}
+          start=${{ steps.time.outputs.start }}
           end=$(date +%s)
           elapsed=$((end - start))
           hours=$((elapsed / 3600))
@@ -204,14 +163,13 @@ jobs:
         if: success() || failure()
         id: messageInfo
         run: |
-          name="${{ needs.build.outputs.project_name }}"
-          messageInfo="#$name (${{ needs.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}. Total time: ${{ steps.elapsed.outputs.hours}}:${{ steps.elapsed.outputs.minutes}}:${{ steps.elapsed.outputs.seconds}}"
+          name="${{ steps.project_name.outputs.projectNameNoSpaces }}"
+          messageInfo="#$name (${{ steps.build.outputs.version }}): #${{ steps.display_name.outputs.display_name }} >> #${{ matrix.deployPlatform }}. Total time: ${{ steps.elapsed.outputs.hours}}:${{ steps.elapsed.outputs.minutes}}:${{ steps.elapsed.outputs.seconds}}"
           echo "info=$messageInfo" >> $GITHUB_OUTPUT
 
       # Success message
       - name: Send success message if not failed
-        if: ${{ success() && needs.build.result == 'success' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.14
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
@@ -220,8 +178,8 @@ jobs:
 
       # Error message
       - name: Send error message if failed
-        if: ${{ failure() || needs.build.result == 'failure' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.13
+        if: failure()
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.14
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
