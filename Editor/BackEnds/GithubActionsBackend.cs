@@ -54,12 +54,7 @@ namespace Deploy.Editor.BackEnds
                 var inputs = GetGroupedWorkflowsInputs(context.Platforms, context.OverrideVariables.ToList());
                 foreach (var input in inputs)
                 {
-                    var json = input.ToString(Formatting.None);
-                    // encode with base64
-                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
-                    var inputBase64 = Convert.ToBase64String(plainTextBytes);
-                    
-                    var inputsString = $"{{\"json_parameters\":\"{inputBase64}\"}}";
+                    var inputsString = $"{{\"json_parameters\":\"{input}\"}}";
                     // construct github api request
                     var (owner, repo) = GetOwnerAndRepo();
                     var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
@@ -111,7 +106,7 @@ namespace Deploy.Editor.BackEnds
         /// <param name="elements"></param>
         /// <param name="variables"></param>
         /// <returns></returns>
-        public static List<JObject> GetGroupedWorkflowsInputs(ReadOnlyCollection<BuildDeployElement> elements,
+        public static List<string> GetGroupedWorkflowsInputs(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
             var inputStrings = elements
@@ -124,12 +119,24 @@ namespace Deploy.Editor.BackEnds
                 })
                 .Select(group =>
                 {
-                    var inputString = GetWorkflowInputAsJsonObject(group.ToList(), variables);
-
+                    var inputString = GetWorkflowInputAsBase64(group.ToList(), variables);
                     return inputString;
                 });
 
             return inputStrings.ToList();
+        }
+
+        public static string GetWorkflowInputAsBase64(List<BuildDeployElement> elements,
+            List<BuildVariableValue> variables)
+        {
+            var inputObject = GetWorkflowInputAsJsonObject(elements, variables);
+            var json = inputObject.ToString(Formatting.None);
+            
+            // encode with base64
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var inputBase64 = Convert.ToBase64String(plainTextBytes);
+            
+            return inputBase64;
         }
         
         public static JObject GetWorkflowInputAsJsonObject(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
