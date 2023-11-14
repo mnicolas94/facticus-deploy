@@ -116,10 +116,6 @@ jobs:
         id: project_name
         uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.13
       
-      - name: echo files to check for dummy file
-        run: |
-          ls
-      
       - name: Generate unique id for artifact
         id: uuid
         run: |
@@ -147,9 +143,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ needs.build.outputs.artifact }}
-
-      - name: Display structure of downloaded files
-        run: ls -R
         
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
