@@ -109,7 +109,7 @@ runs:
       run: |
         touch "dummy.txt"
         ls
-        echo "path='dummy.txt'" >> $GITHUB_OUTPUT
+        echo "path=dummy.txt" >> $GITHUB_OUTPUT
     # Standalone
     - name: Rename build folder
       if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
