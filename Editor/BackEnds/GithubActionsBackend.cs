@@ -53,7 +53,7 @@ namespace Deploy.Editor.BackEnds
                 var elements = context.Platforms;
                 var branch = context.RepositoryBranchOrTag;
                 // var buildSetInput = GetBuildSetInput(elements, context.OverrideVariables.ToList());
-                var inputs = GetListBuildSetInput(elements, context.OverrideVariables.ToList());
+                var inputs = GetBuildSetInput(elements, context.OverrideVariables.ToList());
                 foreach (var input in inputs)
                 {
                     var json = input.ToString(Formatting.None);
@@ -106,7 +106,7 @@ namespace Deploy.Editor.BackEnds
             return success;
         }
         
-        public static List<JObject> GetListBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
+        public static List<JObject> GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
             var inputStrings = elements
@@ -114,7 +114,7 @@ namespace Deploy.Editor.BackEnds
                 .GroupBy(element =>  // group by build platforms with same parameters to only build once
                 {
                     var platformName = element.BuildPlatform.GetGameCiName();
-                    var parameters = ToJson(element.BuildPlatform);
+                    var parameters = ToJObject(element.BuildPlatform);
                     return $"{platformName}-{parameters}-{element.DevelopmentBuild}-{element.FreeDiskSpaceBeforeBuild}";
                 })
                 .Select(group =>
@@ -125,29 +125,6 @@ namespace Deploy.Editor.BackEnds
                 });
 
             return inputStrings.ToList();
-        }
-        
-        public static string GetBuildSetInput(ReadOnlyCollection<BuildDeployElement> elements,
-            List<BuildVariableValue> variables)
-        {
-            var inputStrings = elements
-                .Where(element => element.Enabled)  // only build enabled elements
-                .GroupBy(element =>  // group by build platforms with same parameters to only build once
-                {
-                    var platformName = element.BuildPlatform.GetGameCiName();
-                    var parameters = ToJson(element.BuildPlatform);
-                    return $"{platformName}-{parameters}-{element.DevelopmentBuild}-{element.FreeDiskSpaceBeforeBuild}";
-                })
-                .Select(group =>
-                {
-                    var inputString = GetInputsString(group.ToList(), variables);
-
-                    return inputString;
-                });
-
-            var joined = string.Join(",", inputStrings);
-            var buildSetInput = $"[{joined}]";
-            return buildSetInput;
         }
         
         public static JObject GetInputsString(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
@@ -199,26 +176,6 @@ namespace Deploy.Editor.BackEnds
             }
 
             return JObject.Parse(json);
-        }
-        
-        private static string ToJson(object obj, bool preprocess = true)
-        {
-            string json = "";
-            if (obj is IJsonSerializable jsonSerializable)
-            {
-                json = jsonSerializable.ToJson();
-            }
-            else
-            {
-                json = JsonUtility.ToJson(obj);
-            }
-
-            if (preprocess)
-            {
-                json = PreProcessJsonString(json);
-            }
-
-            return json;
         }
 
         private static string PreProcessJsonString(string buildParameters)

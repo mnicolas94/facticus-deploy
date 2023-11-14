@@ -96,23 +96,23 @@ jobs:
           swap-storage: false
           
       # --- Build ---
-      - name: Build
-        id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.3.13
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          targetPlatform: ${{ fromJson(env.json).buildPlatform }}
-          developmentBuild: ${{ fromJson(env.json).developmentBuild }}
-          versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
-          buildVariables: ${{ fromJson(env.json).buildVariables }}
-          # Android specific
-          androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
-          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
-          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
-          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
-          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+#      - name: Build
+#        id: build
+#        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.3.13
+#        env:
+#          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+#        with:
+#          targetPlatform: ${{ fromJson(env.json).buildPlatform }}
+#          developmentBuild: ${{ fromJson(env.json).developmentBuild }}
+#          versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
+#          buildVariables: ${{ fromJson(env.json).buildVariables }}
+#          # Android specific
+#          androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
+#          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+#          androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
+#          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+#          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+#          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
           
   # --- Parse deploy matrix ---
   parse_matrix:

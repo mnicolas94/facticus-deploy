@@ -48,22 +48,24 @@ namespace Deploy.Editor.BackEnds
             var elements = context.Platforms;
             var overrideVariables = context.OverrideVariables.ToList();
             
-            var buildSetInput = GithubActionsBackend.GetBuildSetInput(elements, overrideVariables);
+            var inputs = GithubActionsBackend.GetBuildSetInput(elements, overrideVariables);
+            foreach (var input in inputs)
+            {
+                var secretsPath = _secretsDir;
+                secretsPath = Path.GetFullPath(secretsPath);
+                var deploySettings = DeploySettings.GetOrCreate();
+                var workflowName = $"{deploySettings.WorkflowId}.yml";
+                var workflowPath = Path.Combine(".github", "workflows", workflowName);
             
-            var secretsPath = _secretsDir;
-            secretsPath = Path.GetFullPath(secretsPath);
-            var deploySettings = DeploySettings.GetOrCreate();
-            var workflowName = $"{deploySettings.WorkflowId}.yml";
-            var workflowPath = Path.Combine(".github", "workflows", workflowName);
-            
-            var command =
-                $"workflow_dispatch -W {workflowPath}" +
-                $" --input \"json_parameters={buildSetInput}\"" +
-                $" --secret-file {secretsPath}";
+                var command =
+                    $"workflow_dispatch -W {workflowPath}" +
+                    $" --input \"json_parameters={input}\"" +
+                    $" --secret-file {secretsPath}";
 
-            command = AddExtraArgumentsToActCommand(command);
+                command = AddExtraArgumentsToActCommand(command);
 
-            TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
+                TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
+            }
             Debug.Log("Act started building. See outputs in terminal");
         }
 
