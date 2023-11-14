@@ -48,7 +48,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ fromJson(github.event.inputs.json_parameters).buildPlatform }}
+    name: Build X # ${{ fromJson(github.event.inputs.json_parameters).buildPlatform }}
     runs-on: ubuntu-latest
     env:
       json: ${{ github.event.inputs.json_parameters }}
