@@ -17,7 +17,7 @@ inputs:
     description: 'Base64 encoded build variables'
   dummyDirectory:
     required: false
-    default: '.'
+    default: ''
     description: 'Test purposes only. Directory to save the dummy file.'
   androidAppBundle:
     required: false
@@ -113,8 +113,13 @@ runs:
       id: dummy
       shell: bash
       run: |
-        mkdir ${{ inputs.dummyDirectory }} || true
-        path="${{ inputs.dummyDirectory }}/dummy.txt"
+        dir=${{ inputs.dummyDirectory }}
+        if [ ! -z "$dir" -a "$dir" != " " ]; then
+          mkdir -p $dir
+          path="$dir/dummy.txt"
+        else
+          path="dummy.txt"
+        fi
         echo "Content" >> $path
         echo "path=$path" >> $GITHUB_OUTPUT
     # Standalone
