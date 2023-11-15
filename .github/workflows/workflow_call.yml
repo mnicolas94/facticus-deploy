@@ -94,7 +94,7 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.4.1
+        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.4.2
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
@@ -114,7 +114,7 @@ jobs:
       - name: Get project name variable
         if: success() || failure()
         id: project_name
-        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.4.2
       
       - name: Generate unique id for artifact
         id: uuid
@@ -145,7 +145,7 @@ jobs:
           name: ${{ needs.build.outputs.artifact }}
         
       - name: Deploy
-        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.4.2
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
           buildPath: ${{ needs.build.outputs.build_path }}
@@ -179,7 +179,7 @@ jobs:
       - name: Get platform display name
         if: success() || failure()
         id: display_name
-        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.4.2
         with:
           platform: ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
           
@@ -211,7 +211,7 @@ jobs:
       # Success message
       - name: Send success message if not failed
         if: ${{ success() && needs.build.result == 'success' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.2
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
@@ -221,7 +221,7 @@ jobs:
       # Error message
       - name: Send error message if failed
         if: ${{ failure() || needs.build.result == 'failure' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.3.13
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.2
         with:
           notifyPlatform: ${{ matrix.notifyPlatform }}
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
