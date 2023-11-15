@@ -80,7 +80,7 @@ jobs:
 
       # --- Free disk space if requested
       - name: Free CI system disk space
-        if: ${{ fromJson(env.json).freeDiskSpace == 'true' }}
+        if: ${{ fromJson(env.json).freeDiskSpace == true }}
         uses: kfir4444/free-disk-space@main
         with:
           tool-cache: false
