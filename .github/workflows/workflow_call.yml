@@ -147,17 +147,17 @@ jobs:
         with:
           name: ${{ needs.build.outputs.artifact }}
         
-      - name: echo paths
+      - name: Get real file path
+        id: path
         run: |
-          echo ${{ needs.build.outputs.build_path }}
-          echo ${{ steps.download.outputs.download-path }}
-          ls
+          filepath=$(basename "${{ needs.build.outputs.build_path }}")
+          echo "path=$filepath" >> $GITHUB_OUTPUT
           
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.4.6
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
-          buildPath: ${{ needs.build.outputs.build_path }}
+          buildPath: ${{ steps.path.outputs.path }}
           version: ${{ needs.build.outputs.version }}
           # Telegram
           telegram_message: ${{ matrix.deployParams.message }}
