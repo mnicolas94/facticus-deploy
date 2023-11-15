@@ -102,6 +102,8 @@ jobs:
           developmentBuild: ${{ fromJson(env.json).developmentBuild }}
           versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
           buildVariables: ${{ fromJson(env.json).buildVariables }}
+          # Dummy specific
+          dummyDirectory: ${{ fromJson(env.json).buildParams.dummyDirectory }}
           # Android specific
           androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -149,6 +151,7 @@ jobs:
         run: |
           echo ${{ needs.build.outputs.build_path }}
           echo ${{ steps.download.outputs.download-path }}
+          ls
           
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.4.3

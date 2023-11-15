@@ -13,6 +13,8 @@ namespace Deploy.Editor.BuildPlatforms
     public class Dummy : IBuildPlatform
     {
         public string GetGameCiName() => "Dummy";
+
+        [SerializeField] private string dummyDirectory;
     }
     
     [Serializable]
