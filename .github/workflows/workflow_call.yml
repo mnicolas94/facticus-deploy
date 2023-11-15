@@ -57,6 +57,7 @@ jobs:
         id: decode
         run: |
           input=$(echo '${{ github.event.inputs.json_parameters }}' | base64 --decode)
+          echo "$input"
           echo "input=$input" >> $GITHUB_OUTPUT
           
   build:
@@ -160,22 +161,22 @@ jobs:
           buildPath: ${{ steps.path.outputs.path }}
           version: ${{ needs.build.outputs.version }}
           # Telegram
-          telegram_message: ${{ matrix.deployParams.message }}
+          telegram_message: ${{ matrix.deployParams.tg_message }}
           TELEGRAM_SESSION: ${{ secrets.TELEGRAM_SESSION }}
           TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
           TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           # Itch
-          itch_channel: ${{ matrix.deployParams.channel }}
+          itch_channel: ${{ matrix.deployParams.itch_channel }}
           ITCH_BUTLER_CREDENTIALS: ${{ secrets.ITCH_BUTLER_CREDENTIALS }}
           ITCH_GAME: ${{ secrets.ITCH_GAME }}
           ITCH_USER: ${{ secrets.ITCH_USER }}
           # PlayStore
-          playstore_track: ${{ matrix.deployParams.track }}
-          playstore_status: ${{ matrix.deployParams.status }}
-          playstore_inAppUpdatePriority: ${{ matrix.deployParams.inAppUpdatePriority }}
-          playstore_userFraction: ${{ matrix.deployParams.userFraction }}
+          playstore_track: ${{ matrix.deployParams.ps_track }}
+          playstore_status: ${{ matrix.deployParams.ps_status }}
+          playstore_inAppUpdatePriority: ${{ matrix.deployParams.ps_inAppUpdatePriority }}
+          playstore_userFraction: ${{ matrix.deployParams.ps_userFraction }}
           PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
 
