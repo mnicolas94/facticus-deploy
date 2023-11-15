@@ -101,6 +101,7 @@ runs:
       uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.4.4
       with:
         platform: ${{ inputs.targetPlatform }}
+        
     - name: Construct zip name (Standalone and WebGL)
       id: zipName
       shell: bash
@@ -112,7 +113,7 @@ runs:
       id: dummy
       shell: bash
       run: |
-        mkdir ${{ inputs.dummyDirectory }}
+        mkdir ${{ inputs.dummyDirectory }} || true
         path="${{ inputs.dummyDirectory }}/dummy.txt"
         echo "Content" >> $path
         echo "path=$path" >> $GITHUB_OUTPUT

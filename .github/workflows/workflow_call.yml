@@ -157,7 +157,7 @@ jobs:
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.4.4
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
-          buildPath: ${{ steps.download.outputs.download-path }}
+          buildPath: ${{ needs.build.outputs.build_path }}
           version: ${{ needs.build.outputs.version }}
           # Telegram
           telegram_message: ${{ matrix.deployParams.message }}
