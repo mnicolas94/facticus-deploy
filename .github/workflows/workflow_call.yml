@@ -140,15 +140,21 @@ jobs:
         include: ${{ fromJson(needs.parse_input.outputs.input).deployPlatforms }}
     steps:
       - name: Download artifact build
+        id: download
         uses: actions/download-artifact@v3
         with:
           name: ${{ needs.build.outputs.artifact }}
         
+      - name: echo paths
+        run: |
+          echo ${{ needs.build.outputs.build_path }}
+          echo ${{ steps.download.outputs.download-path }}
+          
       - name: Deploy
         uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.4.2
         with:
           deployPlatform: ${{ matrix.deployPlatform }}
-          buildPath: ${{ needs.build.outputs.build_path }}
+          buildPath: ${{ steps.download.outputs.download-path }}
           version: ${{ needs.build.outputs.version }}
           # Telegram
           telegram_message: ${{ matrix.deployParams.message }}
