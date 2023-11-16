@@ -180,11 +180,6 @@ jobs:
           PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
 
-      - name: Delete artifact
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          name: ${{ needs.build.outputs.artifact }}
-
       # --- Notify ---
       - name: Get platform display name
         if: success() || failure()
@@ -237,3 +232,16 @@ jobs:
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          
+  # --- Clean artifact ---
+  clean_artifact:
+    name: Clean artifact
+    needs: [ parse_input, build, deploy ]
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          
