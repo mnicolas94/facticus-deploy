@@ -21,6 +21,7 @@ namespace Deploy.Editor.Drawers
     {
         private VisualElement _root;
         private Button _buildButton;
+        private Button _buildLocallyButton;
         
         public override VisualElement CreateInspectorGUI()
         {
@@ -33,6 +34,9 @@ namespace Deploy.Editor.Drawers
 
             _buildButton = _root.Q<Button>("BuildButton");
             _buildButton.clickable.clicked += OnBuildClicked;
+            
+            _buildLocallyButton = _root.Q<Button>("BuildLocallyButton");
+            _buildLocallyButton.clickable.clicked += OnBuildLocallyClicked;
 
             RegisterPlatformsEvents();
             RegisterOverrideVariablesEvents();
@@ -168,6 +172,28 @@ namespace Deploy.Editor.Drawers
             finally
             {
                 _buildButton.SetEnabled(true);
+            }
+        }
+
+        private void OnBuildLocallyClicked()
+        {
+            try
+            {
+                var context = (DeployContext)target;
+                if (context.AllDisabled)
+                {
+                    EditorWindow.focusedWindow.ShowNotification(
+                        new GUIContent("Can't start workflow. All platforms are disabled"));
+                }
+                else
+                {
+                    BackEnds.Utility.BuildLocally(context);
+                }
+            }
+            catch (Exception e)
+            {
+                EditorInputDialog.ShowMessage("Error", e.Message);
+                throw;
             }
         }
     }

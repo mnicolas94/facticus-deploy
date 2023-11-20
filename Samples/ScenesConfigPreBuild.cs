@@ -1,4 +1,6 @@
-﻿using UnityEditor.Build;
+﻿#if UNITY_EDITOR
+
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 namespace Deploy.Samples
@@ -13,3 +15,5 @@ namespace Deploy.Samples
         }
     }
 }
+
+#endif

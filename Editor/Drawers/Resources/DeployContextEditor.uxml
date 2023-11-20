@@ -4,5 +4,6 @@
     </ui:ScrollView>
     <ui:VisualElement style="flex-direction: row-reverse; flex-shrink: 0;">
         <ui:Button text="Build and Deploy" display-tooltip-when-elided="true" name="BuildButton" enable-rich-text="true" />
+        <ui:Button text="Build Locally" display-tooltip-when-elided="true" name="BuildLocallyButton" enable-rich-text="true" tooltip="Build locally. Does not deploy the built apps." style="margin-right: 10px;" />
     </ui:VisualElement>
 </ui:UXML>
