@@ -114,5 +114,28 @@ namespace Deploy.Editor.Data
 
             return serializableVariables.SerializedVariables;
         }
+        
+        public static string OriginalVariablesToBase64(this List<BuildVariableValue> variables)
+        {
+            var serializableVariables = variables.ConvertAll(variableValue =>
+            {
+                var variable = variableValue.Variable;
+                var value = variableValue.Variable;
+                var path = AssetDatabase.GetAssetPath(variable);
+                var guid = AssetDatabase.AssetPathToGUID(path);
+                var valueJson = JsonUtility.ToJson(value);
+                var serializable = new BuildVariableValueJsonSerializable(guid, valueJson);
+                return serializable;
+            });
+            var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
+            
+            var json = JsonUtility.ToJson(serializableList);
+            
+            // encode with base64
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var base64 = Convert.ToBase64String(plainTextBytes);
+            
+            return base64;
+        }
     }
 }

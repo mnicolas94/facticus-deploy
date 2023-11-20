@@ -22,7 +22,7 @@ namespace Deploy.Editor.BackEnds
 
             var elements = context.Platforms.Where(element => element.Enabled).ToList();
             var overrideVariables = context.OverrideVariables.ToList();
-            var overridesBackup = overrideVariables.OverrideVariablesToBase64();
+            var overridesBackup = overrideVariables.OriginalVariablesToBase64();
             
             for (int i = 0; i < elements.Count; i++)
             {
