@@ -31,6 +31,7 @@ namespace Deploy.Editor.Settings
             {
                 if (DeploySettings.GetOrCreate().UpdateWorkflowAutomatically)
                 {
+                    Debug.Log(packageInfo.git.revision);
                     var newVersion = $"v{packageInfo.version}";
                     SetWorkflowVersion(newVersion);
                 }
