@@ -126,7 +126,7 @@ jobs:
             
                 # if branch is other than main, use it as version instead of tag
                 branch = "${{ github.ref }}"
-                version = "v${{ steps.version.outputs.version }}" branch == "main" else branch
+                version = "v${{ steps.version.outputs.version }}" if branch == "main" else branch
                 group_name = "ver"
                 pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@(?P<{group_name}>.*)"
             
