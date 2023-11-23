@@ -145,8 +145,8 @@ runs:
         mkdir renamed
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
-        app_name=${{ steps.project_name.outputs.projectName }}
-        app_path=renamed/$app_name/$app_name.app/Contents/MacOS/$app_name
+        app_name="${{ steps.project_name.outputs.projectName }}"
+        app_path="renamed/$app_name/$app_name.app/Contents/MacOS/$app_name"
         echo $app_name
         echo $app_path
         
