@@ -31,8 +31,10 @@ namespace Deploy.Editor.Settings
             {
                 if (DeploySettings.GetOrCreate().UpdateWorkflowAutomatically)
                 {
-                    Debug.Log(packageInfo.git.revision);
-                    var newVersion = $"v{packageInfo.version}";
+                    var revision = packageInfo.git.revision;
+                    Debug.Log(revision);
+                    var isMainRev = revision == "main";
+                    var newVersion = isMainRev ? $"v{packageInfo.version}" : revision;
                     SetWorkflowVersion(newVersion);
                 }
             }
