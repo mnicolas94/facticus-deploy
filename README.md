@@ -106,7 +106,7 @@ After setting up the initial configurations you can start configuring your build
 https://github.com/mnicolas94/facticus-deploy/assets/35781652/c9c1969b-4526-4e9a-84fc-48773790ab5d
 
 Each context has the following fields:
-1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy#create-the-workflow).
+1. Repository branch or tag: as the name says, here you must specify the repository's branch or tag you want to build and deploy. The branch or tag must contain the workflow file created in the steps [above](https://github.com/mnicolas94/facticus-deploy#create-the-workflow). Also, you can specify the remote you want to use, in case you have more than one, with the syntax `[remote]/[branch or tag]`. In case you just set `[branch or tag]` remote defaults to `origin`.
 2. Override variables: a list of scriptable objects overrides. An override is just a new value that will be overriden in the build for a scriptable object in your project. More info in the [docs](https://github.com/mnicolas94/facticus-deploy/wiki/Override-variables-feature).
 3. Platforms: a list of Build-Deploy platforms pairs. Each element of the list describes a platform to build for, a platform to deploy to and whether the build should be flagged with [Development build](https://docs.unity3d.com/Manual/BuildSettings.html).
 
