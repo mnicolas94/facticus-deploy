@@ -64,7 +64,7 @@ runs:
         lfs: true
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@refs/heads/feat/fix_macos
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@feat/fix_macos
     - name: Cache
       if: ${{ inputs.targetPlatform != 'Dummy' }}
       uses: actions/cache@v3
@@ -98,7 +98,7 @@ runs:
     # --- Get build path ---    
     - name: Get platform display name
       id: display_name
-      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@refs/heads/feat/fix_macos
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@feat/fix_macos
       with:
         platform: ${{ inputs.targetPlatform }}
         
