@@ -122,9 +122,9 @@ runs:
         fi
         echo "Content" >> $path
         echo "path=$path" >> $GITHUB_OUTPUT
-    # Standalone
+    # Standalone (not OSX)
     - name: Rename build folder
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
       id: renaming
       shell: bash
       run: |
@@ -132,10 +132,31 @@ runs:
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - uses: vimtor/action-zip@v1
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
       with:
         files: renamed
         dest: ${{ steps.zipName.outputs.zipName }}
+    # Standalone OSX
+    - name: Give permissions and tar
+      if: ${{ inputs.targetPlatform == 'StandaloneOSX' }}
+      id: osx
+      shell: bash
+      run: |
+        mkdir renamed
+        cp -r "build/${{ inputs.targetPlatform }}" renamed
+        mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
+        app_name=${{ steps.project_name.outputs.projectName }}
+        app_path=renamed/$app_name/$app_name.app/Contents/MacOS/$app_name
+        echo $app_name
+        echo $app_path
+        
+        chmod +x $app_path
+        xattr -d com.apple.quarantine $app_path
+        tar_path=$app_name.tar
+        echo $tar_path
+        
+        tar -cf $tar_path renamed --preserve-permissions
+        echo "path=$tar_path" >> $GITHUB_OUTPUT
     # WebGL
     - uses: vimtor/action-zip@v1
       if: ${{ inputs.targetPlatform == 'WebGL' }}
@@ -164,8 +185,10 @@ runs:
           echo 'path=${{ steps.android_path.outputs.path }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'WebGL' }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
-        elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') }} == 'true' ]; then
+        elif [ ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }} == 'true' ]; then
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
+        elif [ ${{ inputs.targetPlatform == 'StandaloneOSX' }} == 'true' ]; then
+          echo 'path=${{ steps.osx.outputs.path }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
           echo 'path=${{ steps.dummy.outputs.path }}' >> $GITHUB_OUTPUT
         else
