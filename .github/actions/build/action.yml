@@ -150,8 +150,8 @@ runs:
         echo $app_name
         echo $app_path
         
-        chmod +x $app_path
-        xattr -d com.apple.quarantine $app_path
+        chmod +x "$app_path"
+        xattr -d com.apple.quarantine "$app_path"
         tar_path=$app_name.tar
         echo $tar_path
         
