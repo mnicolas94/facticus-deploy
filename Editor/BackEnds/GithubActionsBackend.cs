@@ -50,17 +50,22 @@ namespace Deploy.Editor.BackEnds
                     continue;
                 }
                 
-                // construct workflow inputs
+                // get repository data
                 var branch = context.RepositoryBranchOrTag;
+                var split = branch.Split('/');
+                var remote = split.Length > 1 ? split[0] : "origin";
+                
+                branch = split.Length > 1 ? split[1] : branch;
+                var (owner, repo) = GetOwnerAndRepo(remote);
+                var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
+                var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
+                var userAgent = GetGitUser();
+                
                 var inputs = GetGroupedWorkflowsInputs(context.Platforms, context.OverrideVariables.ToList());
+                
                 foreach (var input in inputs)
                 {
                     var inputsString = $"{{\"json_parameters\":\"{input}\"}}";
-                    // construct github api request
-                    var (owner, repo) = GetOwnerAndRepo();
-                    var workflowId = $"{DeploySettings.GetOrCreate().WorkflowId}.yml";
-                    var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
-                    var userAgent = GetGitUser();
                     var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
                         
                     var requestContent = new StringContent(stringContent);
@@ -276,10 +281,10 @@ namespace Deploy.Editor.BackEnds
             return tokenPath;
         }
 
-        private static (string, string) GetOwnerAndRepo()
+        private static (string, string) GetOwnerAndRepo(string remote = "origin")
         {
             // limitations: only works on remotes named "origin"
-            var (output, _) = TerminalUtils.RunCommand("git", "remote get-url origin", DeploySettings.GetOrCreate().GitDirectory);
+            var (output, _) = TerminalUtils.RunCommand("git", $"remote get-url {remote}", DeploySettings.GetOrCreate().GitDirectory);
             var rx = new Regex("https://github.com/(.*)/(.*).git");
             var matches = rx.Matches(output);
             var owner = matches[0].Groups[1].Value;
