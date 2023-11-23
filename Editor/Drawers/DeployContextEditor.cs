@@ -168,6 +168,7 @@ namespace Deploy.Editor.Drawers
             catch (Exception e)
             {
                 EditorInputDialog.ShowMessage("Error", e.Message);
+                throw;
             }
             finally
             {
