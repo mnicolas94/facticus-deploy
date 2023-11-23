@@ -2,8 +2,7 @@ name: Bump version patch on push to main branch
 
 
 on:
-  push:
-    branches: [ main ]
+  push
     
 jobs:
   bumpVersion:
@@ -16,6 +15,7 @@ jobs:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Bump patch
+        if: github.ref == 'main'  # only on main branch
         id: version
         run: |
           strindex() {
@@ -50,9 +50,11 @@ jobs:
             echo "version=$version" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/setup-python@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
 
       - name: Update package.json file
+        if: github.ref == 'main'  # only on main branch
         uses: jannekem/run-python-script-action@v1
         with:
           script: |
@@ -122,7 +124,9 @@ jobs:
                 # normalize paths to properly compare later
                 ignore_files = [os.path.normpath(p) for p in ignore_files]
             
-                version = "v${{ steps.version.outputs.version }}"
+                # if branch is other than main, use it as version instead of tag
+                branch = "${{ github.ref }}"
+                version = "v${{ steps.version.outputs.version }}" branch == "main" else branch
                 group_name = "ver"
                 pattern = f"uses: mnicolas94/facticus-deploy/.github/.*/.*@(?P<{group_name}>.*)"
             
@@ -135,6 +139,7 @@ jobs:
       - uses: fregante/setup-git-user@v1
 
       - name: commit, tag and push version file
+        if: github.ref == 'main'  # only on main branch
         run: |
           git add .
           git commit -m "[no ci] bump version patch and update package.json"
@@ -146,3 +151,10 @@ jobs:
           git tag $version
           git push origin
           git push origin $version
+          
+      - name: only commit if branch is other than main
+        if: github.ref != 'main'
+        run: |
+          git add .
+          git commit -m "[no ci] bump version patch and update package.json"
+          git push origin
