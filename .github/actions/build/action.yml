@@ -152,10 +152,10 @@ runs:
         
         chmod +x "$app_path"
         #xattr -d com.apple.quarantine "$app_path"
-        tar_path=$app_path.tar
+        tar_path=$app_path.tar.gz
         echo $tar_path
         
-        tar -cf "$tar_path" renamed --preserve-permissions
+        tar -czf "$tar_path" "renamed/${{ steps.project_name.outputs.projectName }}" --preserve-permissions
         echo "path=$tar_path" >> $GITHUB_OUTPUT
     # WebGL
     - uses: vimtor/action-zip@v1
