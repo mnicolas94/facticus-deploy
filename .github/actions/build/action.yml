@@ -152,7 +152,7 @@ runs:
         
         chmod +x "$app_path"
         #xattr -d com.apple.quarantine "$app_path"
-        tar_path=${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.tar.gz
+        tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.tar.gz"
         echo $tar_path
         
         tar -czf "$tar_path" "renamed/${{ steps.project_name.outputs.projectName }}" --preserve-permissions
