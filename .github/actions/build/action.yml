@@ -155,7 +155,7 @@ runs:
         tar_path=$app_path.tar
         echo $tar_path
         
-        tar -cf $tar_path renamed --preserve-permissions
+        tar -cf "$tar_path" renamed --preserve-permissions
         echo "path=$tar_path" >> $GITHUB_OUTPUT
     # WebGL
     - uses: vimtor/action-zip@v1
