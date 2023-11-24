@@ -152,7 +152,7 @@ runs:
         
         chmod +x "$app_path"
         #xattr -d com.apple.quarantine "$app_path"
-        tar_path=$app_name.tar
+        tar_path=$app_path.tar
         echo $tar_path
         
         tar -cf $tar_path renamed --preserve-permissions
