@@ -2,12 +2,8 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
 using Deploy.Editor.BuildPlatforms;
 using Deploy.Editor.Data;
-using Deploy.Editor.Settings;
-using Deploy.Editor.Utility;
-using Newtonsoft.Json;
 using UnityBuilderAction;
 using UnityEditor;
 using UnityEngine;
@@ -19,7 +15,14 @@ namespace Deploy.Editor.BackEnds
         public static void BuildLocally(DeployContext context)
         {
             var buildsDirectory = EditorUtility.OpenFolderPanel("Select builds directory", "", "");
+            var wasCancelled = string.IsNullOrEmpty(buildsDirectory);
 
+            if (wasCancelled)
+            {
+                // do not build if builds directory is not selected
+                return;
+            }
+            
             var elements = context.Platforms.Where(element => element.Enabled).ToList();
             var overrideVariables = context.OverrideVariables.ToList();
             var overridesBackup = overrideVariables.OriginalVariablesToBase64();
