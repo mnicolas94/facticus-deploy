@@ -2,7 +2,7 @@
 
 # Deploy
 
-Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your workstation) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) and [GameCI](https://game.ci/) under the hood to run the builds on GitHub servers.
+Deploy is a Unity package that allows you to build your game for multiple platforms and deploy them to various stores, remotely (rather than on your PC) and with a single click inside Unity. It uses [GitHub Actions](https://github.com/features/actions) and [GameCI](https://game.ci/) under the hood to run the builds on GitHub servers.
 
 ## Table of contents
 - [Features](https://github.com/mnicolas94/facticus-deploy#features)  
