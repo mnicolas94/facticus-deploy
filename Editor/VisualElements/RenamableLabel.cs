@@ -42,10 +42,10 @@ namespace Deploy.Editor.VisualElements
             _renameField.style.display = DisplayStyle.None;
             _renameField.ElementAt(0).style.fontSize = _label.style.fontSize;
             _renameField.ElementAt(0).style.height = 18f;
-            _renameField.style.paddingTop = 8.5f;
-            _renameField.style.paddingLeft = 4f;
-            _renameField.style.paddingRight = 4f;
-            _renameField.style.paddingBottom = 7.5f;
+            // _renameField.style.paddingTop = 8.5f;
+            // _renameField.style.paddingLeft = 4f;
+            // _renameField.style.paddingRight = 4f;
+            // _renameField.style.paddingBottom = 7.5f;
             Insert(1, _renameField);
  
             VisualElement textInput = _renameField.Q(TextField.textInputUssName);
