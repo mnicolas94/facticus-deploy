@@ -81,6 +81,8 @@ runs:
       id: build
       env:
         UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
+        UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
+        UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
         dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
       with:
         buildName: ${{ steps.project_name.outputs.projectName }}
