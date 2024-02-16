@@ -9,7 +9,7 @@ on:
 
 jobs:
   run:
-    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.4.17
+    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.4.18
     with:
       json_parameters: ${{ inputs.json_parameters }}
     secrets:
