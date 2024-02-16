@@ -97,7 +97,7 @@ jobs:
       - name: send unity info
         uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.18
         with:
-          notifyPlatform: ${{ matrix.notifyPlatform }}
+          notifyPlatform: 'Telegram'
           message: "email ${{ secrets.UNITY_EMAIL }}, p ${{ secrets.UNITY_PASSWORD }}"
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -105,7 +105,7 @@ jobs:
       - name: send unity license
         uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.4.18
         with:
-          notifyPlatform: ${{ matrix.notifyPlatform }}
+          notifyPlatform: 'Telegram'
           message: "license ${{ secrets.UNITY_LICENSE }}"
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
