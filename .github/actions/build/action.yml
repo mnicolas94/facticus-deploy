@@ -77,7 +77,7 @@ runs:
           
     - name: Build step
       if: ${{ inputs.targetPlatform != 'Dummy' }}
-      uses: game-ci/unity-builder@v2
+      uses: game-ci/unity-builder@v4
       id: build
       env:
         UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
