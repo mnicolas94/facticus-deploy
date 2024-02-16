@@ -31,7 +31,7 @@ namespace Deploy.Editor.EditorWindows
         public static void ShowExample()
         {
             DeployEditorWindow wnd = GetWindow<DeployEditorWindow>();
-            wnd.titleContent = new GUIContent("Deploy settings");
+            wnd.titleContent = new GUIContent("Deploy");
         }
 
         public void CreateGUI()
