@@ -11,6 +11,10 @@ on:
       # Build secrets
       UNITY_LICENSE:
         required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
       # Build for Android
       ANDROID_KEYSTORE_NAME:
         required: true
@@ -98,7 +102,7 @@ jobs:
         uses: mnicolas94/facticus-deploy/.github/actions/notify@feat/test_unity_secrets
         with:
           notifyPlatform: 'Telegram'
-          message: "email ${{ secrets.UNITY_EMAIL }}, p ${{ secrets.UNITY_PASSWORD }}"
+          message: "email ${{ secrets.UNITY_EMAIL }}"
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       # *** test ***
