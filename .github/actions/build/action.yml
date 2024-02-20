@@ -84,12 +84,13 @@ runs:
         UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
         dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
+        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[inputs.androidAppBundle == 'true'] }}
       with:
         buildName: ${{ steps.project_name.outputs.projectName }}
         buildMethod: UnityBuilderAction.BuildScript.Build
         targetPlatform: ${{ inputs.targetPlatform }}
         versioning: ${{ inputs.versioningStrategy }}
-        androidAppBundle: ${{ inputs.androidAppBundle }}
+        androidExportType: ${{ env.androidExportType }}
         androidKeystoreName: ${{ inputs.androidKeystoreName }}
         androidKeystoreBase64: ${{ inputs.androidKeystoreBase64 }}
         androidKeystorePass: ${{ inputs.androidKeystorePass }}
@@ -112,6 +113,7 @@ runs:
 
     # Dummy (did not build)
     - name: Create txt as a dummy build
+      if: ${{ inputs.targetPlatform == 'Dummy' }}
       id: dummy
       shell: bash
       run: |
@@ -173,6 +175,10 @@ runs:
         ext: ${{ fromJSON('[".apk", ".aab"]')[inputs.androidAppBundle == 'true'] }}
       shell: bash
       run: |
+        cd build
+        ls
+        cd Android
+        ls
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
         newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
         sudo mv "$oldfilename" "$newfilename"
