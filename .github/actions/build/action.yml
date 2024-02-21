@@ -181,6 +181,8 @@ runs:
         cd Android
         echo "*** Android"
         ls
+        cd ..
+        cd ..
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
         newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
         sudo mv "$oldfilename" "$newfilename"
