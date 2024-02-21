@@ -176,8 +176,10 @@ runs:
       shell: bash
       run: |
         cd build
+        echo "*** build"
         ls
         cd Android
+        echo "*** Android"
         ls
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
         newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
