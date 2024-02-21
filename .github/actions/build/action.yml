@@ -185,6 +185,16 @@ runs:
         cd ..
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
         newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
+        
+        if [ ! -f $oldfilename ]; then
+          echo "not found $oldfilename"
+        fi
+        
+        oldfilenameother="./build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
+        if [ ! -f $oldfilenameother ]; then
+          echo "not found $oldfilenameother"
+        fi
+        
         sudo mv "$oldfilename" "$newfilename"
         echo "path=$newfilename" >> $GITHUB_OUTPUT
     
