@@ -66,6 +66,9 @@ You need to configure some [Secrets](https://docs.github.com/en/actions/security
 
 #### General secrets (required for any build and deploy platform)
 - UNITY_LICENSE: The contents of a Unity license file (Unity_v20XX.x.ulf). Info on how to get it [here](https://game.ci/docs/github/activation).
+- UNITY_EMAIL: The email address that you use to login to Unity.
+- UNITY_PASSWORD: The password that you use to login to Unity.
+Deploy does not acquire nor store your Unity email, password, or license file contents. They are required by [GameCI](https://game.ci/) to activate the license during build. More info [here](https://game.ci/docs/github/activation).
 
 #### Build platforms' secrets
 - Android:
