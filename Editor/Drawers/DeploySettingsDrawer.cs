@@ -19,7 +19,7 @@ namespace Deploy.Editor.Drawers
             _root = new VisualElement();
             var drawers = new Dictionary<string, Func<SerializedProperty, VisualElement>>
             {
-                { "_workflowId", DrawWorkflowIdField }
+                { DeploySettings.PropertyNameWorkflowId, DrawWorkflowIdField },
             };
             
             var sps = PropertiesUtils.GetSerializedProperties(serializedObject);
