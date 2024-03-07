@@ -64,7 +64,7 @@ runs:
         lfs: true
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.5.6
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.5.7
     - name: Cache
       if: ${{ inputs.targetPlatform != 'Dummy' }}
       uses: actions/cache@v3
@@ -101,7 +101,7 @@ runs:
     # --- Get build path ---    
     - name: Get platform display name
       id: display_name
-      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.5.6
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.5.7
       with:
         platform: ${{ inputs.targetPlatform }}
         
