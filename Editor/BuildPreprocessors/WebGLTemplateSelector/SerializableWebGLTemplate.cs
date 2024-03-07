@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using Utils.Attributes;
@@ -11,8 +12,18 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
         public string Template => _template;
 
         [SerializeField, HideInInspector] private List<(string, string)> _templates = new();
-        
+
+        private void OnEnable()
+        {
+            EnsureDefaultTemplates();
+        }
+
         private void OnValidate()
+        {
+            EnsureDefaultTemplates();
+        }
+
+        private void EnsureDefaultTemplates()
         {
             if (_templates == null || _templates.Count == 0)
             {
