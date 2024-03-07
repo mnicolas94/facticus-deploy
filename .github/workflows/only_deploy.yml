@@ -37,7 +37,7 @@ jobs:
     steps:
       # --- Deploy ---
       - name: Deploy
-        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.5.1
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.5.2
         with:
           deployPlatform: ${{ inputs.deployPlatform }}
           buildPath: ${{ inputs.buildPath }}
@@ -66,14 +66,14 @@ jobs:
       - name: Get platform display name
         if: success() || failure()
         id: display_name
-        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.5.1
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.5.2
         with:
           platform: ${{ inputs.buildPlatform }}
           
       - name: Get project name variable
         if: success() || failure()
         id: project_name
-        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.5.1
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.5.2
         
       - name: Get version variable
         if: success() || failure()
@@ -93,7 +93,7 @@ jobs:
 
       # Success message
       - name: Send success message if not failed
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.5.1
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.5.2
         with:
           notifyPlatform: ${{ inputs.notifyPlatform }}
           message: "✅ Success ${{ steps.messageInfo.outputs.info }}"
@@ -103,7 +103,7 @@ jobs:
       # Error message
       - name: Send error message if failed
         if: failure()
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.5.1
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.5.2
         with:
           notifyPlatform: ${{ inputs.notifyPlatform }}
           message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
