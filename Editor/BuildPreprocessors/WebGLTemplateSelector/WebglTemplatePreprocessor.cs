@@ -9,7 +9,7 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
     [Serializable]
     public class WebglTemplatePreprocessor : OnDemandBuildPreprocessorWithReport
     {
-        private const string TemplateResourcePath = "WebGLTemplateSelector";
+        public const string TemplateResourcePath = "WebGLTemplateSelector";
         
         [SerializeField] private SerializableWebGLTemplate _templateSelector;
 

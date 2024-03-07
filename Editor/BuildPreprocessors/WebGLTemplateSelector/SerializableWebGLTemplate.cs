@@ -33,9 +33,11 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
 
         private DropdownList<string> GetTemplates()
         {
+            var templateSelector = Resources.Load<SerializableWebGLTemplate>(WebglTemplatePreprocessor.TemplateResourcePath);
+
             var templates = new DropdownList<string>();
 
-            foreach (var (displayName, template) in _templates)
+            foreach (var (displayName, template) in templateSelector._templates)
             {
                 templates.Add(displayName, template);
             }
