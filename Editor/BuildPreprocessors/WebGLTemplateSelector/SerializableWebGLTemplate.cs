@@ -26,7 +26,8 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
                 var templatesDirs = Directory.GetDirectories(customTemplatesDirectory);
                 foreach (var templateDir in templatesDirs)
                 {
-                    var splits = templateDir.Split(Path.DirectorySeparatorChar);
+                    var fullPath = Path.GetFullPath(templateDir);
+                    var splits = fullPath.Split(Path.DirectorySeparatorChar);
                     var templateName = splits[^1];
                     templates.Add(templateName, $"PROJECT:{templateName}");
                 }
