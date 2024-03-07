@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Utils.Attributes;
@@ -11,59 +12,27 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
         [SerializeField, Dropdown(nameof(GetTemplates))] private string _template = "APPLICATION:Default";
         public string Template => _template;
 
-        [SerializeField, HideInInspector] private List<(string, string)> _templates = new();
-
-        private void OnEnable()
-        {
-            EnsureDefaultTemplates();
-        }
-
-        private void OnValidate()
-        {
-            EnsureDefaultTemplates();
-        }
-
-        private void EnsureDefaultTemplates()
-        {
-            if (_templates == null || _templates.Count == 0)
-            {
-                ResetToDefault();
-            }
-        }
-
         private DropdownList<string> GetTemplates()
         {
-            var templateSelector = Resources.Load<SerializableWebGLTemplate>(WebglTemplatePreprocessor.TemplateResourcePath);
-
             var templates = new DropdownList<string>();
 
-            foreach (var (displayName, template) in templateSelector._templates)
+            templates.Add("Default", "APPLICATION:Default");
+            templates.Add("Minimal", "APPLICATION:Minimal");
+            templates.Add("PWA", "APPLICATION:PWA");
+
+            var customTemplatesDirectory = "Assets/WebGLTemplates/";
+            if (Directory.Exists(customTemplatesDirectory))
             {
-                templates.Add(displayName, template);
+                var templatesDirs = Directory.GetDirectories(customTemplatesDirectory);
+                foreach (var templateDir in templatesDirs)
+                {
+                    var splits = templateDir.Split(Path.DirectorySeparatorChar);
+                    var templateName = splits[^1];
+                    templates.Add(templateName, $"PROJECT:{templateName}");
+                }
             }
 
             return templates;
-        }
-
-        [ContextMenu("Reset to default templates")]
-        private void ResetToDefault()
-        {
-            _templates = new()
-            {
-                ("Default", "APPLICATION:Default"),
-                ("Minimal", "APPLICATION:Minimal"),
-                ("PWA", "APPLICATION:PWA"),
-            };
-        }
-        
-        [ContextMenu("Add current template to list")]
-        private void AddCurrentTemplate()
-        {
-            var template = PlayerSettings.WebGL.template;
-            var elements = template.Split(':');
-            var displayName = elements[^1];
-            _templates.Add((displayName, template));
-            EditorUtility.SetDirty(this);
         }
     }
 }
