@@ -27,6 +27,8 @@ namespace Deploy.Editor.EditorWindows
         private Label _contextNameLabel;
         private InspectorElement _inspectorElement;
 
+        public DeployContext CurrentContext => _listSelectedIndex >= 0 ? _contexts[_listSelectedIndex] : null;
+
         [MenuItem("Tools/Facticus/Deploy/Open Deploy editor window")]
         public static void ShowExample()
         {

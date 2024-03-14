@@ -12,7 +12,7 @@ namespace Deploy.Editor.BuildPreprocessors.WebGLTemplateSelector
         public const string TemplateResourcePath = "WebGLTemplateSelector";
         
         [SerializeField] private SerializableWebGLTemplate _templateSelector;
-
+        
         protected override void OnPreprocessBuildInternal(BuildReport report)
         {
             if (report.summary.platform == BuildTarget.WebGL)

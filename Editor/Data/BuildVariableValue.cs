@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using Deploy.Runtime;
 using UnityEditor;
+using UnityEditor.Presets;
 using UnityEngine;
 
 namespace Deploy.Editor.Data
 {
+    public enum ValueMode
+    {
+        Preset,
+        ScriptableObject_Deprecated,
+    }
+    
     [Serializable]
     public class BuildVariableValue
     {
-        [SerializeReference] private ScriptableObject _variable;
-        [SerializeReference] private ScriptableObject _value;
+        [SerializeField] private ScriptableObject _variable;
+        [SerializeField] private ScriptableObject _value;
+        [SerializeField] private Preset _preset;
+        [SerializeField] private ValueMode _valueMode;
 
         public ScriptableObject Variable
         {
