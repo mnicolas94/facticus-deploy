@@ -1,6 +1,10 @@
-﻿using Deploy.Editor.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Deploy.Editor.Drawers
@@ -16,12 +20,17 @@ namespace Deploy.Editor.Drawers
     
     public class BuildVariableValueElement : VisualElement
     {
+        private static List<ValueMode> Choices = Enum.GetNames(typeof(ValueMode))
+            .Select(enumString => Enum.Parse<ValueMode>(enumString)).ToList();
+        
         private SerializedProperty _property;
         private SerializedProperty _variableProperty;
         private SerializedProperty _modeProperty;
 
+        
         private ScriptableObjectValueElement _soDrawer;
         private PresetValueElement _presetDrawer;
+        private ToolbarMenu _modeMenu;
 
         private bool IsPreset => GetMode() == ValueMode.Preset;
 
@@ -30,16 +39,21 @@ namespace Deploy.Editor.Drawers
             _property = property;
             _variableProperty = property.FindPropertyRelative("_variable");
             _modeProperty = property.FindPropertyRelative("_valueMode");
+
+            var variableContainer = new VisualElement();
+            variableContainer.style.flexDirection = FlexDirection.Row;
+            Add(variableContainer);
             
             // variable
             var variableField = new PropertyField(_variableProperty);
+            variableField.style.flexGrow = 1;
             variableField.RegisterValueChangeCallback(OnVariableChange);
-            Add(variableField);
+            variableContainer.Add(variableField);
             
             // mode
-            var modeField = new PropertyField(_modeProperty);
-            modeField.RegisterValueChangeCallback(OnModeChange);
-            Add(modeField);
+            _modeMenu = new ToolbarMenu();
+            ConstructModesMenu();
+            variableContainer.Add(_modeMenu);
 
             // value
             _soDrawer = new ScriptableObjectValueElement(_property, _variableProperty);
@@ -47,6 +61,31 @@ namespace Deploy.Editor.Drawers
             Add(_soDrawer);
             Add(_presetDrawer);
             SetDrawerVisibility();
+        }
+
+        private void ConstructModesMenu()
+        {
+            var modes = Enum.GetValues(typeof(ValueMode)).Cast<ValueMode>();
+            foreach (var mode in modes)
+            {
+                _modeMenu.menu.AppendAction(
+                    mode.ToString(),
+                    menuItem =>
+                    {
+                        var newMode = ((ValueMode)menuItem.userData);
+                        _modeProperty.enumValueIndex = (int)newMode;
+                        _modeProperty.serializedObject.ApplyModifiedProperties();
+                        OnModeChange();
+                    },
+                    menuItem =>
+                    {
+                        var currentMode = GetMode();
+                        var mode = ((ValueMode)menuItem.userData);
+                        return mode == currentMode ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
+                    },
+                    mode
+                );
+            }
         }
 
         private ValueMode GetMode()
@@ -72,7 +111,7 @@ namespace Deploy.Editor.Drawers
             }
         }
         
-        private void OnModeChange(SerializedPropertyChangeEvent evt)
+        private void OnModeChange()
         {
             SetDrawerVisibility();
             if (IsPreset)
