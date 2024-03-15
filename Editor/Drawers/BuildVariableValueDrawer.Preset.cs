@@ -16,16 +16,14 @@ namespace Deploy.Editor.Drawers
 {
     public class PresetValueElement : VisualElement
     {
-        private CustomPresetField _presetField;
-        private InspectorElement _valueField;
-        private Foldout _editFoldout;
         private SerializedProperty _property;
         private SerializedProperty _variableProperty;
         private SerializedProperty _presetProperty;
+        
         private VisualElement _presetContainer;
+        private CustomPresetField _presetSelector;
         private Button _createPresetButton;
-        private VisualElement _foldoutHeader;
-
+        
         public PresetValueElement(SerializedProperty property, SerializedProperty variableProperty)
         {
             _property = property;
@@ -48,27 +46,58 @@ namespace Deploy.Editor.Drawers
             Add(_presetContainer);
             
             // preset selector
-            _presetField = new CustomPresetField("Preset", variable, preset);
-            _presetField.BindProperty(_presetProperty);
-            _presetField.style.flexGrow = 1;
-            _presetContainer.Add(_presetField);
+            _presetSelector = new CustomPresetField("Preset", variable, preset);
+            _presetSelector.BindProperty(_presetProperty);
+            _presetSelector.style.flexGrow = 1;
+            _presetContainer.Add(_presetSelector);
             
             // create button
-            _createPresetButton = new Button(CreatePreset)
+            _createPresetButton = new Button(CreatePresetAsset)
             {
                 text = "Create preset"
             };
             _presetContainer.Add(_createPresetButton);
             
-            // editing foldout
-            _editFoldout = new Foldout();
-            _editFoldout.style.flexGrow = 1;
-            _foldoutHeader = _editFoldout.Q(className: Foldout.inputUssClassName);
-            Add(_editFoldout);
-            _valueField = new InspectorElement(preset);
-            _editFoldout.contentContainer.Add(_valueField);
+            _presetSelector.RegisterValueChangedCallback(OnPresetChanged);
+        }
+
+        private void UpdateUI(Preset selected)
+        {
+            if (selected == null)
+            {
+                _createPresetButton.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _createPresetButton.style.display = DisplayStyle.None;
+            }
+        }
+
+        private void CreatePresetAsset()
+        {
+            var parentDeployContext = EditorWindow.GetWindow<DeployEditorWindow>().CurrentContext;
             
-            _presetField.RegisterValueChangedCallback(OnPresetChanged);
+            var variable = GetVariableObject();
+            var path = AssetDatabase.GetAssetPath(variable);
+            var directory = Path.GetDirectoryName(path);
+            var newPresetPath = Path.Combine(directory, $"{variable.name}.{parentDeployContext.name}.asset");
+            var preset = new Preset(variable);
+            AssetDatabase.CreateAsset(preset, newPresetPath);
+
+            _presetSelector.value = preset;
+            EditorUtility.SetDirty(parentDeployContext);
+        }
+
+        private ScriptableObject GetVariableObject()
+        {
+            var variableObject = PropertiesUtils.GetTargetObjectOfProperty(_variableProperty) as ScriptableObject;
+            return variableObject;
+        }
+
+        private Preset GetPreset()
+        {
+            var valueObject = PropertiesUtils.GetTargetObjectOfProperty(_presetProperty) as Preset;
+            return valueObject;
         }
 
         private void OnPresetChanged(ChangeEvent<Object> evt)
@@ -84,65 +113,6 @@ namespace Deploy.Editor.Drawers
             }
         }
 
-        private void OnPresetSelectedInSearchWindow(Preset selected)
-        {
-            _presetField.value = selected;
-        }
-
-        private void CreatePreset()
-        {
-            var parentDeployContext = EditorWindow.GetWindow<DeployEditorWindow>().CurrentContext;
-            
-            var variable = GetVariableObject();
-            var path = AssetDatabase.GetAssetPath(variable);
-            var directory = Path.GetDirectoryName(path);
-            var newPresetPath = Path.Combine(directory, $"{variable.name}.{parentDeployContext.name}.asset");
-            var preset = new Preset(variable);
-            AssetDatabase.CreateAsset(preset, newPresetPath);
-
-            _presetField.value = preset;
-            EditorUtility.SetDirty(parentDeployContext);
-        }
-
-        private void UpdateUI(Preset selected)
-        {
-            if (_editFoldout.contentContainer.Contains(_valueField))
-            {
-                _editFoldout.contentContainer.Remove(_valueField);
-                _valueField = null;
-            }
-            
-            if (selected == null)
-            {
-                _createPresetButton.style.display = DisplayStyle.Flex;
-                _editFoldout.style.display = DisplayStyle.None;
-                
-                Add(_presetContainer);
-            }
-            else
-            {
-                _createPresetButton.style.display = DisplayStyle.None;
-                _editFoldout.style.display = DisplayStyle.Flex;
-                
-                _foldoutHeader.Add(_presetContainer);
-                
-                _valueField = new InspectorElement(selected);
-                _editFoldout.contentContainer.Add(_valueField);
-            }
-        }
-
-        private ScriptableObject GetVariableObject()
-        {
-            var variableObject = PropertiesUtils.GetTargetObjectOfProperty(_variableProperty) as ScriptableObject;
-            return variableObject;
-        }
-
-        private Preset GetPreset()
-        {
-            var valueObject = PropertiesUtils.GetTargetObjectOfProperty(_presetProperty) as Preset;
-            return valueObject;
-        }
-
         public void OnVariableChange()
         {
             var variable = GetVariableObject();
@@ -152,19 +122,19 @@ namespace Deploy.Editor.Drawers
             {
                 if (preset != null)  // remove preset because variable is null
                 {
-                    _presetField.value = null;
+                    _presetSelector.value = null;
                 }
             }
             else
             {
                 if (preset != null)
                 {
-                    var variableType = variable.GetType();
-                    var valueType = preset.GetType();
-                    bool sameType = variableType == valueType;
+                    var variableTypeName = variable.GetType().FullName;
+                    var valueTypeName = preset.GetPresetType().GetManagedTypeName();
+                    bool sameType = variableTypeName == valueTypeName;
                     if (!sameType)  // draw a new preset with the new type
                     {
-                        _presetField.value = null;
+                        _presetSelector.value = null;
                     }
                 }
             }
