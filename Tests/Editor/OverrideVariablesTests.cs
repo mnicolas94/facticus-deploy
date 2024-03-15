@@ -2,39 +2,49 @@
 using Deploy.Editor.Data;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.Presets;
 using UnityEngine;
 
 namespace Deploy.Tests.Editor
 {
     public class OverrideVariablesTests
     {
-        [Test]
-        public void OverrideVariablesTestsSimplePasses()
+        private static List<BuildVariableValue> _overrides = new ()
+        {
+            new BuildVariableValue(
+                TestScriptableObject.Get(1, 2, "qwe"),
+                TestScriptableObject.Get(4, 5, "asd")),
+            new BuildVariableValue(
+                TestScriptableObject.Get(1, 2, "qwe"),
+                new Preset(TestScriptableObject.Get(4, 5, "asd"))),
+        };
+
+        [TestCaseSource(nameof(_overrides))]
+        public void When_ApplyOverrideWithBuildVariableValue_OverridesAreAppliedCorrectly(BuildVariableValue overrideVariable)
         {
             // arrange
-            var variable = TestScriptableObject.Get(1, 2, "qwe");
-            var overrideValue = TestScriptableObject.Get(4, 5, "asd");
-            
             // create asset file for it to have guid
             var assetPath = "Assets/Deploy/Tests/Editor/test.asset";
-            AssetDatabase.CreateAsset(variable, assetPath);
+            AssetDatabase.CreateAsset(overrideVariable.Variable, assetPath);
             AssetDatabase.Refresh();
-            
-            var tuple = new BuildVariableValue()
-            {
-                Variable = variable,
-                Value = overrideValue,
-            };
+
             var variables = new List<BuildVariableValue>()
             {
-                tuple
+                overrideVariable
             };
 
+            // false-positive assert
+            var variable = overrideVariable.Variable as TestScriptableObject;
+            var overrideValue = overrideVariable.OverrideVariable as TestScriptableObject;
+            Assert.IsFalse(variable.IsEqualTo(overrideValue));
+            
             // act
             var base64 = variables.OverrideVariablesToBase64();
             OverrideVariablesListExtensions.ApplyOverrideVariablesValues(base64);
             
             // assert
+            variable = overrideVariable.Variable as TestScriptableObject;
+            overrideValue = overrideVariable.OverrideVariable as TestScriptableObject;
             Assert.IsTrue(variable.IsEqualTo(overrideValue));
             
             // teardown

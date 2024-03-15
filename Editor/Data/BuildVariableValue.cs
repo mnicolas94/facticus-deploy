@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Deploy.Runtime;
+using System.IO;
 using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Deploy.Editor.Data
 {
@@ -17,21 +18,91 @@ namespace Deploy.Editor.Data
     public class BuildVariableValue
     {
         [SerializeField] private ScriptableObject _variable;
+        public ScriptableObject Variable => _variable;
+
         [SerializeField] private ScriptableObject _value;
+        public ScriptableObject Value => _value;
+
         [SerializeField] private Preset _preset;
+
         [SerializeField] private ValueMode _valueMode;
 
-        public ScriptableObject Variable
+        public ScriptableObject OverrideVariable
         {
-            get => _variable;
-            set => _variable = value;
+            get
+            {
+                ScriptableObject overrideValue = _value;
+                if (_valueMode == ValueMode.Preset)
+                {
+                    overrideValue = Object.Instantiate(_variable);
+                    _preset.ApplyTo(overrideValue);
+                }
+
+                return overrideValue;
+            }
         }
 
-        public ScriptableObject Value
+        public BuildVariableValue(ScriptableObject variable, ScriptableObject value)
         {
-            get => _value;
-            set => _value = value;
+            _variable = variable;
+            _value = value;
+            _valueMode = ValueMode.ScriptableObject_Deprecated;
         }
+
+        public BuildVariableValue(ScriptableObject variable, Preset preset)
+        {
+            _variable = variable;
+            _preset = preset;
+            _valueMode = ValueMode.Preset;
+        }
+
+        public BuildVariableValueJsonSerializable ToJsonSerializable()
+        {
+            var overrideValue = OverrideVariable;
+
+            return ToJsonSerializable(overrideValue);
+        }
+
+        public BuildVariableValueJsonSerializable ToJsonSerializableBackup()
+        {
+            return ToJsonSerializable(overrideValue: _variable);
+        }
+
+        private BuildVariableValueJsonSerializable ToJsonSerializable(ScriptableObject overrideValue)
+        {
+            var path = AssetDatabase.GetAssetPath(_variable);
+            var guid = AssetDatabase.AssetPathToGUID(path);
+            var valueJson = JsonUtility.ToJson(overrideValue);
+            var serializable = new BuildVariableValueJsonSerializable(guid, valueJson);
+            return serializable;
+        }
+
+        public void Clear()
+        {
+            _variable = null;
+            _value = null;
+            _preset = null;
+            _valueMode = ValueMode.Preset;
+        }
+
+#if UNITY_EDITOR
+        public void Editor_ChangeToPresetMode(DeployContext parentDeployContext)
+        {
+            if (_valueMode == ValueMode.Preset)
+                return;
+            
+            var path = AssetDatabase.GetAssetPath(_variable);
+            var directory = Path.GetDirectoryName(path);
+            var newPresetPath = Path.Combine(directory, $"{_variable.name}.{parentDeployContext.name}.asset");
+            var preset = new Preset(_variable);
+            AssetDatabase.CreateAsset(preset, newPresetPath);
+
+            _preset = preset;
+            _valueMode = ValueMode.Preset;
+            
+            EditorUtility.SetDirty(parentDeployContext);
+        }
+#endif
     }
     
     [Serializable]
@@ -94,16 +165,23 @@ namespace Deploy.Editor.Data
         
         public static string OverrideVariablesToBase64(this List<BuildVariableValue> variables)
         {
-            var serializableVariables = variables.ConvertAll(variableValue =>
-            {
-                var variable = variableValue.Variable;
-                var value = variableValue.Value;
-                var path = AssetDatabase.GetAssetPath(variable);
-                var guid = AssetDatabase.AssetPathToGUID(path);
-                var valueJson = JsonUtility.ToJson(value);
-                var serializable = new BuildVariableValueJsonSerializable(guid, valueJson);
-                return serializable;
-            });
+            var serializableVariables = variables.ConvertAll(
+                variableValue => variableValue.ToJsonSerializable());   
+            var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
+            
+            var json = JsonUtility.ToJson(serializableList);
+            
+            // encode with base64
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var base64 = Convert.ToBase64String(plainTextBytes);
+            
+            return base64;
+        }
+        
+        public static string OriginalVariablesToBase64(this List<BuildVariableValue> variables)
+        {
+            var serializableVariables = variables.ConvertAll(
+                variableValue => variableValue.ToJsonSerializableBackup());
             var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
             
             var json = JsonUtility.ToJson(serializableList);
@@ -122,29 +200,6 @@ namespace Deploy.Editor.Data
             var serializableVariables = JsonUtility.FromJson<BuildVariableValueJsonSerializableList>(buildVariables);
 
             return serializableVariables.SerializedVariables;
-        }
-        
-        public static string OriginalVariablesToBase64(this List<BuildVariableValue> variables)
-        {
-            var serializableVariables = variables.ConvertAll(variableValue =>
-            {
-                var variable = variableValue.Variable;
-                var value = variableValue.Variable;
-                var path = AssetDatabase.GetAssetPath(variable);
-                var guid = AssetDatabase.AssetPathToGUID(path);
-                var valueJson = JsonUtility.ToJson(value);
-                var serializable = new BuildVariableValueJsonSerializable(guid, valueJson);
-                return serializable;
-            });
-            var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
-            
-            var json = JsonUtility.ToJson(serializableList);
-            
-            // encode with base64
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
-            var base64 = Convert.ToBase64String(plainTextBytes);
-            
-            return base64;
         }
     }
 }

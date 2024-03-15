@@ -122,8 +122,7 @@ namespace Deploy.Editor.Drawers
             var context = (DeployContext) target;
             foreach (var i in newIndices)
             {
-                context.OverrideVariables[i].Value = null;
-                context.OverrideVariables[i].Variable = null;
+                context.OverrideVariables[i].Clear();
                 EditorUtility.SetDirty(context);
             }
         }
