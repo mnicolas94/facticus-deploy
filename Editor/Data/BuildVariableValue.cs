@@ -88,13 +88,10 @@ namespace Deploy.Editor.Data
 #if UNITY_EDITOR
         public void Editor_ChangeToPresetMode(DeployContext parentDeployContext)
         {
-            if (_valueMode == ValueMode.Preset)
-                return;
-            
             var path = AssetDatabase.GetAssetPath(_variable);
             var directory = Path.GetDirectoryName(path);
             var newPresetPath = Path.Combine(directory, $"{_variable.name}.{parentDeployContext.name}.asset");
-            var preset = new Preset(_variable);
+            var preset = new Preset(_value);
             AssetDatabase.CreateAsset(preset, newPresetPath);
 
             _preset = preset;
