@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Utils.Editor;
 
 namespace Deploy.Editor.Drawers
 {
@@ -16,148 +17,110 @@ namespace Deploy.Editor.Drawers
             return new BuildVariableValueElement(property);
         }
     }
+    
     public class BuildVariableValueElement : VisualElement
     {
-        private InspectorElement _valueField;
+        private static List<ValueMode> Choices = Enum.GetNames(typeof(ValueMode))
+            .Select(enumString => Enum.Parse<ValueMode>(enumString)).ToList();
+        
+        private SerializedProperty _property;
+        private SerializedProperty _variableProperty;
+        private SerializedProperty _modeProperty;
+
+        
+        private ScriptableObjectValueElement _soDrawer;
+        private PresetValueElement _presetDrawer;
+        private ToolbarMenu _modeMenu;
+
+        private bool IsPreset => GetMode() == ValueMode.Preset;
 
         public BuildVariableValueElement(SerializedProperty property)
         {
+            _property = property;
+            _variableProperty = property.FindPropertyRelative("_variable");
+            _modeProperty = property.FindPropertyRelative("_valueMode");
+
+            var variableContainer = new VisualElement();
+            variableContainer.style.flexDirection = FlexDirection.Row;
+            Add(variableContainer);
+            
             // variable
-            var variableField = new PropertyField(property.FindPropertyRelative("_variable"));
+            var variableField = new PropertyField(_variableProperty);
+            variableField.style.flexGrow = 1;
             variableField.RegisterValueChangeCallback(OnVariableChange);
-            Add(variableField);
+            variableContainer.Add(variableField);
+            
+            // mode
+            _modeMenu = new ToolbarMenu();
+            ConstructModesMenu();
+            variableContainer.Add(_modeMenu);
 
             // value
-            var valueObject = GetOrCreateValueObject(property);
-            DrawValue(valueObject);
+            _soDrawer = new ScriptableObjectValueElement(_property, _variableProperty);
+            _presetDrawer = new PresetValueElement(_property, _variableProperty);
+            Add(_soDrawer);
+            Add(_presetDrawer);
+            SetDrawerVisibility();
         }
 
-        private void DrawValue(ScriptableObject valueObject)
+        private void ConstructModesMenu()
         {
-            if (valueObject != null)
+            var modes = Enum.GetValues(typeof(ValueMode)).Cast<ValueMode>();
+            foreach (var mode in modes)
             {
-                if (_valueField == null)
-                {
-                    _valueField = new InspectorElement(valueObject);
-                    Add(_valueField);
-                }
-                else
-                {
-                    _valueField.Bind(new SerializedObject(valueObject));
-                }
-            }
-            else
-            {
-                if (_valueField != null)
-                {
-                    if (Contains(_valueField))
+                _modeMenu.menu.AppendAction(
+                    mode.ToString(),
+                    menuItem =>
                     {
-                        Remove(_valueField);
-                    }
-                    _valueField = null;
-                }
+                        var newMode = ((ValueMode)menuItem.userData);
+                        _modeProperty.enumValueIndex = (int)newMode;
+                        _modeProperty.serializedObject.ApplyModifiedProperties();
+                        OnModeChange();
+                    },
+                    menuItem =>
+                    {
+                        var currentMode = GetMode();
+                        var mode = ((ValueMode)menuItem.userData);
+                        return mode == currentMode ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
+                    },
+                    mode
+                );
             }
         }
 
-        private ScriptableObject GetVariableObject(SerializedProperty property)
+        private ValueMode GetMode()
         {
-            var variableProperty = property.FindPropertyRelative("_variable");
-            var variableObject = PropertiesUtils.GetTargetObjectOfProperty(variableProperty) as ScriptableObject;
-            return variableObject;
+            return (ValueMode)_modeProperty.enumValueIndex;
         }
 
-        private ScriptableObject GetValueObject(SerializedProperty property)
+        private void SetDrawerVisibility()
         {
-            var valueProperty = property.FindPropertyRelative("_value");
-            var valueObject = PropertiesUtils.GetTargetObjectOfProperty(valueProperty) as ScriptableObject;
-            return valueObject;
-        }
-        
-        private ScriptableObject GetOrCreateValueObject(SerializedProperty property)
-        {
-            var valueObject = GetValueObject(property);
-
-            if (valueObject == null)
-            {
-                if (!TryCreateNewValue(property, out valueObject))
-                {
-                    return null;
-                }
-            }
-            
-            return valueObject;
-        }
-
-        private bool TryCreateNewValue(SerializedProperty property, out ScriptableObject valueObject)
-        {
-            var variable = GetVariableObject(property);
-            if (variable == null)
-            {
-                valueObject = null;
-                return false;
-            }
-
-            valueObject = Object.Instantiate(variable);
-            var valueProperty = property.FindPropertyRelative("_value");
-            AddAsSubAsset(property, valueObject);
-            valueProperty.objectReferenceValue = valueObject;
-            valueProperty.serializedObject.ApplyModifiedProperties();
-
-            return true;
-        }
-
-        private static void AddAsSubAsset(SerializedProperty property, ScriptableObject valueObject)
-        {
-            var parentAsset = property.serializedObject.targetObject;
-            AssetDatabase.AddObjectToAsset(valueObject, parentAsset);
-            EditorUtility.SetDirty(parentAsset);
-            EditorUtility.SetDirty(valueObject);
-            AssetDatabase.SaveAssets();
-        }
-        
-        private static void RemoveFromSubAssets(SerializedProperty property, ScriptableObject valueObject)
-        {
-            var parentAsset = property.serializedObject.targetObject;
-            AssetDatabase.RemoveObjectFromAsset(valueObject);
-            EditorUtility.SetDirty(parentAsset);
-            AssetDatabase.SaveAssets();
+            _soDrawer.style.display = IsPreset ? DisplayStyle.None : DisplayStyle.Flex;
+            _presetDrawer.style.display = IsPreset ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void OnVariableChange(SerializedPropertyChangeEvent evt)
         {
-            var parentProperty = evt.changedProperty.FindParentProperty();
-            var variable = GetVariableObject(parentProperty);
-            var value = GetValueObject(parentProperty);
-
-            if (variable == null)
+            if (IsPreset)
             {
-                if (value != null)  // remove value because variable is null
-                {
-                    RemoveFromSubAssets(parentProperty, value);
-                    parentProperty.FindPropertyRelative("_value").objectReferenceValue = null;
-                    parentProperty.serializedObject.ApplyModifiedProperties();
-                    DrawValue(null);
-                }
+                _presetDrawer.OnVariableChange();
             }
             else
             {
-                if (value == null)  // create a value for the variable
-                {
-                    TryCreateNewValue(parentProperty, out value);
-                    DrawValue(value);
-                }
-                else
-                {
-                    var variableType = variable.GetType();
-                    var valueType = value.GetType();
-                    bool sameType = variableType == valueType;
-                    if (!sameType)  // draw a new value with the new type
-                    {
-                        RemoveFromSubAssets(parentProperty, value);
-                        TryCreateNewValue(parentProperty, out value);
-                        DrawValue(value);
-                    }
-                }
+                _soDrawer.OnVariableChange();
+            }
+        }
+        
+        private void OnModeChange()
+        {
+            SetDrawerVisibility();
+            if (IsPreset)
+            {
+                _presetDrawer.OnVariableChange();
+            }
+            else
+            {
+                _soDrawer.OnVariableChange();
             }
         }
     }

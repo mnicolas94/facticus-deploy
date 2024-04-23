@@ -1,11 +1,25 @@
 {
-  "name": "com.facticus.deploy.Editor.Tests",
-  "references": [
-    "com.facticus.deploy"
-  ],
-  "optionalUnityReferences": [
-    "TestAssemblies"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": []
+    "name": "com.facticus.deploy.Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "com.facticus.deploy",
+        "com.facticus.deploy.editor",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

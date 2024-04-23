@@ -26,5 +26,16 @@ namespace Deploy.Editor.Data
         public string RepositoryBranchOrTag => _repositoryBranchOrTag;
 
         public bool AllDisabled => _platforms.TrueForAll(element => !element.Enabled);
+        
+#if UNITY_EDITOR
+        [ContextMenu(nameof(ChangeToPresetMode))]
+        private void ChangeToPresetMode()
+        {
+            foreach (var variableValue in _overrideVariables)
+            {
+                variableValue.Editor_ChangeToPresetMode(this);
+            }
+        }
+#endif
     }
 }
