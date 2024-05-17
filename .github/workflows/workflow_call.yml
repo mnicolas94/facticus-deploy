@@ -61,11 +61,11 @@ jobs:
       - name: Decode input
         id: decode
         run: |
-          echo "${{ github.event.inputs.json_parameters }}"
-          echo "${{ inputs.json_parameters }}"
           input=$(echo "${{ inputs.json_parameters }}" | base64 --decode)
           echo "$input"
-          echo "input=$input" >> $GITHUB_OUTPUT
+          echo "input<<_EOF_" >> $GITHUB_OUTPUT
+          echo "$input" >> $GITHUB_OUTPUT
+          echo "_EOF_" >> $GITHUB_OUTPUT
           
   build:
     name: Build for ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
