@@ -192,6 +192,11 @@ namespace Deploy.Editor.Data
         
         public static List<BuildVariableValueJsonSerializable> OverrideVariablesFromBase64(string base64Encoded)
         {
+            if (string.IsNullOrEmpty(base64Encoded))
+            {
+                return new List<BuildVariableValueJsonSerializable>();
+            }
+            
             var base64EncodedBytes = Convert.FromBase64String(base64Encoded);
             var buildVariables = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
             var serializableVariables = JsonUtility.FromJson<BuildVariableValueJsonSerializableList>(buildVariables);
