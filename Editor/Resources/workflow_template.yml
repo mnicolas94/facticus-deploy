@@ -3,13 +3,29 @@
 on:
   workflow_dispatch:
     inputs:
-      json_parameters:
+      json_parameters:  # TODO change name to indicate is base64
         type: string
         required: true
 
 jobs:
+  decode_input:
+    name: Parse base64 input
+    runs-on: ubuntu-latest
+    outputs:
+      input: ${{ steps.decode.outputs.input }}
+    steps:
+      - name: Decode input
+        id: decode
+        run: |
+          input=$(echo "${{ inputs.json_parameters }}" | base64 --decode)
+          echo "$input"
+          echo "input<<_EOF_" >> $GITHUB_OUTPUT
+          echo "$input" >> $GITHUB_OUTPUT
+          echo "_EOF_" >> $GITHUB_OUTPUT
+    
   run:
+    needs: [ decode_input ]
     uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.1
     with:
-      json_parameters: ${{ inputs.json_parameters }}
+      json_input: ${{ needs.decode_input.outputs.input }}
     secrets: inherit

@@ -4,32 +4,14 @@ name: Build and Deploy
 on:
   workflow_call:
     inputs:
-      json_parameters:
+      json_input:
         type: string
         required: true
 
 jobs:
-  parse_input:
-    name: Parse base64 input
-    runs-on: ubuntu-latest
-    outputs:
-      input: ${{ steps.decode.outputs.input }}
-    steps:
-      - name: Decode input
-        id: decode
-        run: |
-          input=$(echo "${{ inputs.json_parameters }}" | base64 --decode)
-          echo "$input"
-          echo "input<<_EOF_" >> $GITHUB_OUTPUT
-          echo "$input" >> $GITHUB_OUTPUT
-          echo "_EOF_" >> $GITHUB_OUTPUT
-          
   build:
-    name: Build for ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
-    needs: parse_input
+    name: Build for ${{ fromJson(inputs.json_input).buildPlatform }}
     runs-on: ubuntu-latest
-    env:
-      json: ${{ needs.parse_input.outputs.input }}
     outputs:
       artifact: ${{ steps.uuid.outputs.uuid }}
       build_path: ${{ steps.build.outputs.buildPath }}
@@ -45,7 +27,7 @@ jobs:
 
       # --- Free disk space if requested
       - name: Free CI system disk space
-        if: ${{ fromJson(env.json).freeDiskSpace == true }}
+        if: ${{ fromJson(inputs.json_input).freeDiskSpace == true }}
         uses: kfir4444/free-disk-space@main
         with:
           tool-cache: false
@@ -65,14 +47,14 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          targetPlatform: ${{ fromJson(env.json).buildPlatform }}
-          developmentBuild: ${{ fromJson(env.json).developmentBuild }}
-          versioningStrategy: ${{ fromJson(env.json).versioningStrategy }}
-          buildVariables: ${{ fromJson(env.json).buildVariables }}
+          targetPlatform: ${{ fromJson(inputs.json_input).buildPlatform }}
+          developmentBuild: ${{ fromJson(inputs.json_input).developmentBuild }}
+          versioningStrategy: ${{ fromJson(inputs.json_input).versioningStrategy }}
+          buildVariables: ${{ fromJson(inputs.json_input).buildVariables }}
           # Dummy specific
-          dummyDirectory: ${{ fromJson(env.json).buildParams.dummyDirectory }}
+          dummyDirectory: ${{ fromJson(inputs.json_input).buildParams.dummyDirectory }}
           # Android specific
-          androidAppBundle: ${{ fromJson(env.json).buildParams.appBundle }}
+          androidAppBundle: ${{ fromJson(inputs.json_input).buildParams.appBundle }}
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_NAME }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
@@ -100,13 +82,13 @@ jobs:
   # --- Deploy ---
   deploy:
     name: Deploy to ${{ matrix.deployPlatform }}
-    needs: [parse_input, build]
+    needs: [build]
     if: always()
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.parse_input.outputs.input).deployPlatforms }}
+        include: ${{ fromJson(inputs.json_input).deployPlatforms }}
     steps:
       - name: Download artifact build
         id: download
@@ -152,7 +134,7 @@ jobs:
         id: display_name
         uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.6.1
         with:
-          platform: ${{ fromJson(needs.parse_input.outputs.input).buildPlatform }}
+          platform: ${{ fromJson(inputs.json_input).buildPlatform }}
           
       - name: Get total elapsed time
         if: success() || failure()
@@ -206,7 +188,7 @@ jobs:
   # --- Clean artifact ---
   clean_artifact:
     name: Clean artifact
-    needs: [ parse_input, build, deploy ]
+    needs: [ build, deploy ]
     if: needs.build.result == 'success'
     runs-on: ubuntu-latest
     steps:

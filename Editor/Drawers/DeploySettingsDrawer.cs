@@ -121,7 +121,7 @@ namespace Deploy.Editor.Drawers
 
             if (!File.Exists(filePath))
             {
-                // this means this project is my development project, should not happen for package's users
+                // this means this project is my development project, should not happen for Deploy's users
                 packageDir = "Assets/Deploy/Editor/Resources";
                 filePath = Path.Combine(packageDir, templateFileName);
             }
