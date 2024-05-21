@@ -23,7 +23,7 @@ runs:
         echo "lasttag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.0
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.1
     - uses: appleboy/telegram-action@master
       env:
         message_verb: ${{ fromJSON('["release", "devbuild"]')[inputs.development_build == 'true'] }}
