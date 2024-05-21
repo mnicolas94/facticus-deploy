@@ -48,24 +48,22 @@ namespace Deploy.Editor.BackEnds
             var elements = context.Platforms;
             var overrideVariables = context.OverrideVariables.ToList();
             
-            var inputs = GithubActionsBackend.GetGroupedWorkflowsInputs(elements, overrideVariables);
-            foreach (var input in inputs)
-            {
-                var secretsPath = _secretsDir;
-                secretsPath = Path.GetFullPath(secretsPath);
-                var deploySettings = DeploySettings.GetOrCreate();
-                var workflowName = $"{deploySettings.WorkflowId}.yml";
-                var workflowPath = Path.Combine(".github", "workflows", workflowName);
-            
-                var command =
-                    $"workflow_dispatch -W {workflowPath}" +
-                    $" --input \"json_parameters={input}\"" +
-                    $" --secret-file {secretsPath}";
+            var inputs = GithubActionsBackend.GetWorkflowInputAsJson(elements, overrideVariables);
+            var base64Input = GithubActionsBackend.ConvertJsonObjectToBase64(inputs);
+            var secretsPath = _secretsDir;
+            secretsPath = Path.GetFullPath(secretsPath);
+            var deploySettings = DeploySettings.GetOrCreate();
+            var workflowName = $"{deploySettings.WorkflowId}.yml";
+            var workflowPath = Path.Combine(".github", "workflows", workflowName);
+        
+            var command =
+                $"workflow_dispatch -W {workflowPath}" +
+                $" --input \"base64_json={base64Input}\"" +
+                $" --secret-file {secretsPath}";
 
-                command = AddExtraArgumentsToActCommand(command);
+            command = AddExtraArgumentsToActCommand(command);
 
-                TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
-            }
+            TerminalUtils.RunCommandMergeOutputs("act", command, deploySettings.GitDirectory, true);
             Debug.Log("Act started building. See outputs in terminal");
         }
 

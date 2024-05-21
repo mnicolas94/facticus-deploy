@@ -23,9 +23,12 @@ jobs:
           echo "$input" >> $GITHUB_OUTPUT
           echo "_EOF_" >> $GITHUB_OUTPUT
     
-  run:
+  build_and_deploy:
     needs: [ decode_input ]
+    strategy:
+      matrix:
+        json_input: ${{ fromJson(needs.decode_input.outputs.input) }}
     uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@feat/several_builds_one_workflow
     with:
-      json_input: ${{ needs.decode_input.outputs.input }}
+      json_input: ${{ matrix.json_input }}
     secrets: inherit

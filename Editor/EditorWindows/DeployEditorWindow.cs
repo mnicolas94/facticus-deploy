@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Deploy.Editor.BackEnds;
 using Deploy.Editor.Data;
 using Deploy.Editor.Settings;
 using Deploy.Editor.Utility;
+using Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -124,6 +126,14 @@ namespace Deploy.Editor.EditorWindows
                 "Duplicate",
                 action => DuplicateContext(action, (VisualElement) label),
                 DropdownMenuAction.Status.Normal);
+            ctx.menu.AppendAction(
+                "Copy json",
+                action => CopyJson(action, (VisualElement) label),
+                DropdownMenuAction.Status.Normal);
+            ctx.menu.AppendAction(
+                "Copy json as base64",
+                action => CopyJsonAsBase64(action, (VisualElement) label),
+                DropdownMenuAction.Status.Normal);
         }
 
         private void DuplicateContext(DropdownMenuAction action, VisualElement label)
@@ -131,6 +141,26 @@ namespace Deploy.Editor.EditorWindows
             var context = label.userData as DeployContext;
             var copy = context.DuplicateScriptableObjectWithSubAssets();
             RefreshList();
+        }
+        
+        private void CopyJson(DropdownMenuAction action, VisualElement label)
+        {
+            var context = label.userData as DeployContext;
+            var json = GithubActionsBackend.GetWorkflowInputAsJson(
+                context.Platforms, context.OverrideVariables.ToList());
+            var jsonString = json.ToString(Formatting.Indented);
+
+            EditorGUIUtility.systemCopyBuffer = jsonString;
+        }
+        
+        private void CopyJsonAsBase64(DropdownMenuAction action, VisualElement label)
+        {
+            var context = label.userData as DeployContext;
+            var json = GithubActionsBackend.GetWorkflowInputAsJson(
+                context.Platforms, context.OverrideVariables.ToList());
+            var base64Input = GithubActionsBackend.ConvertJsonObjectToBase64(json);
+
+            EditorGUIUtility.systemCopyBuffer = base64Input;
         }
 
         private void RefreshList()

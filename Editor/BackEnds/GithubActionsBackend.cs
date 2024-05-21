@@ -61,44 +61,42 @@ namespace Deploy.Editor.BackEnds
                 var requestUri = $"https://api.github.com/repos/{owner}/{repo}/actions/workflows/{workflowId}/dispatches";
                 var userAgent = GetGitUser();
                 
-                var inputs = GetGroupedWorkflowsInputs(context.Platforms, context.OverrideVariables.ToList());
+                var inputs = GetWorkflowInputAsJson(context.Platforms, context.OverrideVariables.ToList());
+                var base64Input = ConvertJsonObjectToBase64(inputs);
                 
-                foreach (var input in inputs)
+                var inputsString = $"{{\"base64_json\":\"{base64Input}\"}}";
+                var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
+                    
+                var requestContent = new StringContent(stringContent);
+                using var httpClient = new HttpClient();
+                using var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri);
+                request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
+                request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
+                request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
+                request.Content = requestContent;
+                request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+
+                var response = await httpClient.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+                var responseCode = (int)response.StatusCode;
+
+                // Bad credentials
+                if (responseCode == 401)  // request token and try again
                 {
-                    var inputsString = $"{{\"base64_json\":\"{input}\"}}";
-                    var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
-                        
-                    var requestContent = new StringContent(stringContent);
-                    using var httpClient = new HttpClient();
-                    using var request = new HttpRequestMessage(new HttpMethod("POST"), requestUri);
-                    request.Headers.TryAddWithoutValidation("User-Agent", $"{userAgent}");
-                    request.Headers.TryAddWithoutValidation("Accept", "application/vnd.github+json");
-                    request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
-                    request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
-                    request.Content = requestContent;
-                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
-
-                    var response = await httpClient.SendAsync(request);
-                    var content = await response.Content.ReadAsStringAsync();
-                    var responseCode = (int)response.StatusCode;
-
-                    // Bad credentials
-                    if (responseCode == 401)  // request token and try again
+                    var message = "Your Github authentication token is no longer valid, please enter a new valid one.";
+                    entered = TryAskForTokenDialog(message, out var _);
+                    success = false;
+                    if (entered)
                     {
-                        var message = "Your Github authentication token is no longer valid, please enter a new valid one.";
-                        entered = TryAskForTokenDialog(message, out var _);
-                        success = false;
-                        if (entered)
-                        {
-                            tokenIsNotValid = true;  // try again
-                        }
+                        tokenIsNotValid = true;  // try again
+                    }
 
-                        break;
-                    }
-                    else if (responseCode >= 300)
-                    {
-                        throw new HttpRequestException($"Error {responseCode}\n{content}");
-                    }
+                    break;
+                }
+                else if (responseCode >= 300)
+                {
+                    throw new HttpRequestException($"Error {responseCode}\n{content}");
                 }
             } while (tokenIsNotValid);
             
@@ -112,10 +110,10 @@ namespace Deploy.Editor.BackEnds
         /// <param name="elements"></param>
         /// <param name="variables"></param>
         /// <returns></returns>
-        public static List<string> GetGroupedWorkflowsInputs(ReadOnlyCollection<BuildDeployElement> elements,
+        public static JArray GetWorkflowInputAsJson(ReadOnlyCollection<BuildDeployElement> elements,
             List<BuildVariableValue> variables)
         {
-            var inputStrings = elements
+            var groupedObjectsJson = elements
                 .Where(element => element.Enabled)  // only build enabled elements
                 .GroupBy(element =>  // group by build platforms with same parameters to only build once
                 {
@@ -125,27 +123,14 @@ namespace Deploy.Editor.BackEnds
                 })
                 .Select(group =>
                 {
-                    var inputString = GetWorkflowInputAsBase64(group.ToList(), variables);
-                    return inputString;
+                    var json = GetBuildGroupAsJsonObject(group.ToList(), variables);
+                    return json;
                 });
 
-            return inputStrings.ToList();
-        }
-
-        public static string GetWorkflowInputAsBase64(List<BuildDeployElement> elements,
-            List<BuildVariableValue> variables)
-        {
-            var inputObject = GetWorkflowInputAsJsonObject(elements, variables);
-            var json = inputObject.ToString(Formatting.None);
-            
-            // encode with base64
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
-            var inputBase64 = Convert.ToBase64String(plainTextBytes);
-            
-            return inputBase64;
+            return new JArray(groupedObjectsJson);
         }
         
-        public static JObject GetWorkflowInputAsJsonObject(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
+        public static JObject GetBuildGroupAsJsonObject(List<BuildDeployElement> elements, List<BuildVariableValue> variables)
         {
             var first = elements[0];
             var buildPlatform = first.BuildPlatform.GetGameCiName();
@@ -179,6 +164,17 @@ namespace Deploy.Editor.BackEnds
                 { "deployPlatforms", deployPlatforms },
             };
             return jsonObject;
+        }
+
+        public static string ConvertJsonObjectToBase64(JContainer jsonObject)
+        {
+            var json = jsonObject.ToString(Formatting.None);
+            
+            // encode with base64
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var inputBase64 = Convert.ToBase64String(plainTextBytes);
+            
+            return inputBase64;
         }
 
         private static JObject ToJObject(object obj)
