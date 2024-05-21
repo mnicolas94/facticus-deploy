@@ -13,4 +13,11 @@ namespace Deploy.Editor.NotifyPlatforms
     {
         public string GetPlatformName() => "Telegram";
     }
+    
+    [Serializable]
+    [AddTypeMenu("Discord")]
+    public class DiscordNotifyPlatform : INotifyPlatform
+    {
+        public string GetPlatformName() => "Discord";
+    }
 }

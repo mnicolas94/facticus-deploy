@@ -16,6 +16,15 @@ inputs:
     required: false
     default: ''
     description: 'TODO'
+  # Discord
+  DISCORD_WEBHOOK_ID:
+    required: false
+    default: ''
+    description: 'TODO'
+  DISCORD_WEBHOOK_TOKEN:
+    required: false
+    default: ''
+    description: 'TODO'
 
 runs:
   using: "composite"
@@ -27,4 +36,13 @@ runs:
       with:
         to: ${{ inputs.TELEGRAM_CHAT_ID }}
         token: ${{ inputs.TELEGRAM_TOKEN }}
+        message: ${{ inputs.message }}
+        
+    # Discord
+    - name: Send notification to Discord
+      if: ${{ inputs.notifyPlatform == 'Discord'}}
+      uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ inputs.DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ inputs.DISCORD_WEBHOOK_TOKEN }}
         message: ${{ inputs.message }}
