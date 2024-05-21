@@ -3,7 +3,7 @@
 on:
   workflow_dispatch:
     inputs:
-      json_parameters:  # TODO change name to indicate is base64
+      base64_json:
         type: string
         required: true
 
@@ -17,7 +17,7 @@ jobs:
       - name: Decode input
         id: decode
         run: |
-          input=$(echo "${{ inputs.json_parameters }}" | base64 --decode)
+          input=$(echo "${{ inputs.base64_json }}" | base64 --decode)
           echo "$input"
           echo "input<<_EOF_" >> $GITHUB_OUTPUT
           echo "$input" >> $GITHUB_OUTPUT

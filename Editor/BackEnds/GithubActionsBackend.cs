@@ -65,7 +65,7 @@ namespace Deploy.Editor.BackEnds
                 
                 foreach (var input in inputs)
                 {
-                    var inputsString = $"{{\"json_parameters\":\"{input}\"}}";
+                    var inputsString = $"{{\"base64_json\":\"{input}\"}}";
                     var stringContent = $"{{\"ref\":\"{branch}\",\"inputs\":{inputsString}}}";
                         
                     var requestContent = new StringContent(stringContent);
