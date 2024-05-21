@@ -25,7 +25,7 @@ jobs:
     
   run:
     needs: [ decode_input ]
-    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.1
+    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@feat/several_builds_one_workflow
     with:
       json_input: ${{ needs.decode_input.outputs.input }}
     secrets: inherit
