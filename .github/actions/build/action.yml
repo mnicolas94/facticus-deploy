@@ -138,8 +138,7 @@ runs:
         cd "renamed"
         tar -czf "$tar_path" "${{ steps.project_name.outputs.projectName }}" --preserve-permissions
         cd ..
-        mv "renamed/$tar_path" $tar_path
-        echo "path=$tar_path" >> $GITHUB_OUTPUT
+        echo "path=renamed/$tar_path" >> $GITHUB_OUTPUT
     # WebGL
     - uses: vimtor/action-zip@v1
       if: ${{ inputs.targetPlatform == 'WebGL' }}
