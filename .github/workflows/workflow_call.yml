@@ -7,53 +7,53 @@ on:
       json_input:
         type: string
         required: true
-  secrets:
-    # Build secrets
-    UNITY_LICENSE:
-      required: true
-    UNITY_EMAIL:
-      required: true
-    UNITY_PASSWORD:
-      required: true
-    # Build for Android
-    ANDROID_KEYSTORE_NAME:
-      required: true
-    ANDROID_KEYSTORE_BASE64:
-      required: true
-    ANDROID_KEYSTORE_PASS:
-      required: true
-    ANDROID_KEYALIAS_NAME:
-      required: true
-    ANDROID_KEYALIAS_PASS:
-      required: true
-    # Discord
-    DISCORD_WEBHOOK_ID:
-      required: true
-    DISCORD_WEBHOOK_TOKEN:
-      required: true
-    # Itch.io
-    ITCH_BUTLER_CREDENTIALS:
-      required: true
-    ITCH_GAME:
-      required: true
-    ITCH_USER:
-      required: true
-    # Telegram
-    TELEGRAM_SESSION:
-      required: true
-    TELEGRAM_API_ID:
-      required: true
-    TELEGRAM_API_HASH:
-      required: true
-    TELEGRAM_TOKEN:
-      required: true
-    TELEGRAM_CHAT_ID:
-      required: true
-    # Play Store
-    PLAY_STORE_SERVICE_ACCOUNT_JSON:
-      required: true
-    PLAY_STORE_PACKAGE_NAME:
-      required: true
+    secrets:
+      # Build secrets
+      UNITY_LICENSE:
+        required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
+      # Build for Android
+      ANDROID_KEYSTORE_NAME:
+        required: true
+      ANDROID_KEYSTORE_BASE64:
+        required: true
+      ANDROID_KEYSTORE_PASS:
+        required: true
+      ANDROID_KEYALIAS_NAME:
+        required: true
+      ANDROID_KEYALIAS_PASS:
+        required: true
+      # Discord
+      DISCORD_WEBHOOK_ID:
+        required: true
+      DISCORD_WEBHOOK_TOKEN:
+        required: true
+      # Itch.io
+      ITCH_BUTLER_CREDENTIALS:
+        required: true
+      ITCH_GAME:
+        required: true
+      ITCH_USER:
+        required: true
+      # Telegram
+      TELEGRAM_SESSION:
+        required: true
+      TELEGRAM_API_ID:
+        required: true
+      TELEGRAM_API_HASH:
+        required: true
+      TELEGRAM_TOKEN:
+        required: true
+      TELEGRAM_CHAT_ID:
+        required: true
+      # Play Store
+      PLAY_STORE_SERVICE_ACCOUNT_JSON:
+        required: true
+      PLAY_STORE_PACKAGE_NAME:
+        required: true
     
 
 jobs:
