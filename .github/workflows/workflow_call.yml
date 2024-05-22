@@ -89,7 +89,7 @@ jobs:
       # --- Build ---
       - name: Build
         id: build
-        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/build@v0.6.8
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -110,7 +110,7 @@ jobs:
       - name: Get project name variable
         if: success() || failure()
         id: project_name
-        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.8
       
       - name: Generate unique id for artifact
         id: uuid
@@ -148,7 +148,7 @@ jobs:
           echo "path=$filepath" >> $GITHUB_OUTPUT
           
       - name: Deploy
-        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/deploy@v0.6.8
         env:
           TELEGRAM_SESSION: ${{ secrets.TELEGRAM_SESSION }}
           TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
@@ -170,7 +170,7 @@ jobs:
       - name: Get platform display name
         if: success() || failure()
         id: display_name
-        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.6.8
         with:
           platform: ${{ fromJson(inputs.json_input).buildPlatform }}
           
@@ -202,7 +202,7 @@ jobs:
       # Success message
       - name: Send success message if not failed
         if: ${{ success() && needs.build.result == 'success' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.6.8
         env:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -215,7 +215,7 @@ jobs:
       # Error message
       - name: Send error message if failed
         if: ${{ failure() || needs.build.result == 'failure' }}
-        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.6.7
+        uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.6.8
         env:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
