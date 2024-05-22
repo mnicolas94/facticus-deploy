@@ -51,28 +51,28 @@ runs:
           Library-${{ steps.project_name.outputs.projectNameNoSpaces }}-
           Library-
           
-#    - name: Build step
-#      if: ${{ inputs.targetPlatform != 'Dummy' }}
-#      uses: game-ci/unity-builder@v4
-#      id: build
-#      env:
-#        UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
-#        UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
-#        UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
-#        dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
-#        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[fromJson(inputs.buildParameters).androidAppBundle == 'true'] }}
-#      with:
-#        buildName: ${{ steps.project_name.outputs.projectName }}
-#        buildMethod: UnityBuilderAction.BuildScript.Build
-#        targetPlatform: ${{ inputs.targetPlatform }}
-#        versioning: ${{ inputs.versioningStrategy }}
-#        androidExportType: ${{ env.androidExportType }}
-#        androidKeystoreName: ${{ env.ANDROID_KEYSTORE_NAME }}
-#        androidKeystoreBase64: ${{ env.ANDROID_KEYSTORE_BASE64 }}
-#        androidKeystorePass: ${{ env.ANDROID_KEYSTORE_PASS }}
-#        androidKeyaliasName: ${{ env.ANDROID_KEYALIAS_NAME }}
-#        androidKeyaliasPass: ${{ env.ANDROID_KEYALIAS_PASS }}
-#        customParameters: ${{ env.dev_build_parameter }} -buildVariables ${{ inputs.buildVariables }}
+    - name: Build step
+      if: ${{ inputs.targetPlatform != 'Dummy' }}
+      uses: game-ci/unity-builder@v4
+      id: build
+      env:
+        UNITY_LICENSE: ${{ env.UNITY_LICENSE }}
+        UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
+        UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
+        dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
+        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[fromJson(inputs.buildParameters).androidAppBundle == 'true'] }}
+      with:
+        buildName: ${{ steps.project_name.outputs.projectName }}
+        buildMethod: UnityBuilderAction.BuildScript.Build
+        targetPlatform: ${{ inputs.targetPlatform }}
+        versioning: ${{ inputs.versioningStrategy }}
+        androidExportType: ${{ env.androidExportType }}
+        androidKeystoreName: ${{ env.ANDROID_KEYSTORE_NAME }}
+        androidKeystoreBase64: ${{ env.ANDROID_KEYSTORE_BASE64 }}
+        androidKeystorePass: ${{ env.ANDROID_KEYSTORE_PASS }}
+        androidKeyaliasName: ${{ env.ANDROID_KEYALIAS_NAME }}
+        androidKeyaliasPass: ${{ env.ANDROID_KEYALIAS_PASS }}
+        customParameters: ${{ env.dev_build_parameter }} -buildVariables ${{ inputs.buildVariables }}
     
     # --- Get build path ---    
     - name: Get platform display name
@@ -122,24 +122,19 @@ runs:
       id: osx
       shell: bash
       run: |
-        mkdir build
-        mkdir build/StandaloneOSX
-        touch build/StandaloneOSX/app
-        
         mkdir renamed
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
         
         if [ ${{ fromJson(inputs.buildParameters).macAddPermissions }} == 'true' ]; then
           app_name="${{ steps.project_name.outputs.projectName }}"
-          #app_path="renamed/$app_name/$app_name.app/Contents/MacOS/$app_name"
-          #echo $app_name
-          #echo $app_path
+          app_path="renamed/$app_name/$app_name.app/Contents/MacOS/$app_name"
+          echo $app_name
+          echo $app_path
           
-          #chmod +x "$app_path"
+          chmod +x "$app_path"
           #xattr -d com.apple.quarantine "$app_path"
-          #tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.platform_display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.${{ fromJson(inputs.buildParameters).macZipExtension }}"
-          tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.platform_display_name.outputs.display_name_lower }}-v1.2.3.${{ fromJson(inputs.buildParameters).macZipExtension }}"
+          tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.platform_display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.tar.gz"
           echo $tar_path
           
           cd "renamed"
