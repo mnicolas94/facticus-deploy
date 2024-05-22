@@ -41,19 +41,19 @@ runs:
     # testing
     - shell: bash
       run: |
-        echo fromJson(inputs.buildParameters).macAddPermissions
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == 'true'  }}
+        echo "macAddPermissions ${{ fromJson(inputs.buildParameters).macAddPermissions }}"
+    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == 'true' }}
       shell: bash
       run: |
-        echo fromJson(inputs.buildParameters).macAddPermissions == 'true'
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == true  }}
+        echo "fromJson(inputs.buildParameters).macAddPermissions == 'true'"
+    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == true }}
       shell: bash
       run: |
-        echo fromJson(inputs.buildParameters).macAddPermissions == true
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions  }}
+        echo "fromJson(inputs.buildParameters).macAddPermissions == true"
+    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions }}
       shell: bash
       run: |
-        echo fromJson(inputs.buildParameters).macAddPermissions
+        echo "fromJson(inputs.buildParameters).macAddPermissions"
         
     - name: Get project name variable
       id: project_name
