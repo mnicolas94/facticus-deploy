@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJson(needs.decode_input.outputs.input) }}
-    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.14
+    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.15
     with:
       json_input: ${{ toJson(matrix) }}
     secrets:
