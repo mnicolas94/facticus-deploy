@@ -143,13 +143,13 @@ runs:
           echo $tar_path
           
           cd "renamed"
-          ls
           tar -czf "$tar_path" "${{ steps.project_name.outputs.projectName }}" --preserve-permissions
           cd ..
           echo "path=renamed/$tar_path" >> $GITHUB_OUTPUT
         else
-          zip -r "${{ steps.zipName.outputs.zipName }}" renamed/
-          echo "path=${{ steps.zipName.outputs.zipName }}" >> $GITHUB_OUTPUT
+          cd "renamed"
+          zip -r "${{ steps.zipName.outputs.zipName }}" "${{ steps.project_name.outputs.projectName }}"
+          echo "path=renamed/${{ steps.zipName.outputs.zipName }}" >> $GITHUB_OUTPUT
         fi
         
     # WebGL
