@@ -15,6 +15,10 @@ inputs:
   buildVariables:
     required: true
     description: 'Base64 encoded build variables'
+  buildPatameters:
+    required: false
+    default: ''
+    description: 'Platform specific parameters in json format'
   dummyDirectory:
     required: false
     default: ''
@@ -23,26 +27,6 @@ inputs:
     required: false
     default: 'false'
     description: 'Whether to build .aab instead of .apk'
-  androidKeystoreBase64:
-    required: false
-    default: ''
-    description: 'The base64 contents of the android keystore file'
-  androidKeystoreName:
-    required: false
-    default: ''
-    description: 'The android keystoreName'
-  androidKeystorePass:
-    required: false
-    default: ''
-    description: 'The android keystorePass'
-  androidKeyaliasName:
-    required: false
-    default: ''
-    description: 'The android keyaliasName'
-  androidKeyaliasPass:
-    required: false
-    default: ''
-    description: 'The android keyaliasPass'
 outputs:
   buildPath:
     value: ${{ steps.output_path.outputs.path }}
@@ -91,11 +75,11 @@ runs:
         targetPlatform: ${{ inputs.targetPlatform }}
         versioning: ${{ inputs.versioningStrategy }}
         androidExportType: ${{ env.androidExportType }}
-        androidKeystoreName: ${{ inputs.androidKeystoreName }}
-        androidKeystoreBase64: ${{ inputs.androidKeystoreBase64 }}
-        androidKeystorePass: ${{ inputs.androidKeystorePass }}
-        androidKeyaliasName: ${{ inputs.androidKeyaliasName }}
-        androidKeyaliasPass: ${{ inputs.androidKeyaliasPass }}
+        androidKeystoreName: ${{ env.ANDROID_KEYSTORE_NAME }}
+        androidKeystoreBase64: ${{ env.ANDROID_KEYSTORE_BASE64 }}
+        androidKeystorePass: ${{ env.ANDROID_KEYSTORE_PASS }}
+        androidKeyaliasName: ${{ env.ANDROID_KEYALIAS_NAME }}
+        androidKeyaliasPass: ${{ env.ANDROID_KEYALIAS_PASS }}
         customParameters: ${{ env.dev_build_parameter }} -buildVariables ${{ inputs.buildVariables }}
     
     # --- Get build path ---    

@@ -15,40 +15,8 @@ inputs:
     required: false
     default: ''
     description: 'TODO'
-  TELEGRAM_SESSION:
-    required: false
-    default: ''
-    description: 'TODO'
-  TELEGRAM_API_ID:
-    required: false
-    default: ''
-    description: 'TODO'
-  TELEGRAM_API_HASH:
-    required: false
-    default: ''
-    description: 'TODO'
-  TELEGRAM_TOKEN:
-    required: false
-    default: ''
-    description: 'TODO'
-  TELEGRAM_CHAT_ID:
-    required: false
-    default: ''
-    description: 'TODO'
 # Itch.io
   itch_channel:
-    required: false
-    default: ''
-    description: 'TODO'
-  ITCH_BUTLER_CREDENTIALS:
-    required: false
-    default: ''
-    description: 'TODO'
-  ITCH_GAME:
-    required: false
-    default: ''
-    description: 'TODO'
-  ITCH_USER:
     required: false
     default: ''
     description: 'TODO'
@@ -69,14 +37,6 @@ inputs:
     required: false
     default: ''
     description: 'TODO'
-  PLAY_STORE_SERVICE_ACCOUNT_JSON:
-    required: false
-    default: ''
-    description: 'TODO'
-  PLAY_STORE_PACKAGE_NAME:
-    required: false
-    default: ''
-    description: 'TODO'
 
 runs:
   using: "composite"
@@ -88,21 +48,21 @@ runs:
       with:
         buildPath: ${{ inputs.buildPath }}
         message: ${{ inputs.telegram_message }}
-        TELEGRAM_SESSION: ${{ inputs.TELEGRAM_SESSION }}
-        TELEGRAM_API_ID: ${{ inputs.TELEGRAM_API_ID }}
-        TELEGRAM_API_HASH: ${{ inputs.TELEGRAM_API_HASH }}
-        TELEGRAM_TOKEN: ${{ inputs.TELEGRAM_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ inputs.TELEGRAM_CHAT_ID }}
+        TELEGRAM_SESSION: ${{ env.TELEGRAM_SESSION }}
+        TELEGRAM_API_ID: ${{ env.TELEGRAM_API_ID }}
+        TELEGRAM_API_HASH: ${{ env.TELEGRAM_API_HASH }}
+        TELEGRAM_TOKEN: ${{ env.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ env.TELEGRAM_CHAT_ID }}
         
     # Itchio
     - name: Deploy to Itch.io
       if: ${{ inputs.deployPlatform == 'Itch'}}
       uses: yeslayla/butler-publish-itchio-action@master
       env:
-        BUTLER_CREDENTIALS: ${{ inputs.ITCH_BUTLER_CREDENTIALS }}
+        BUTLER_CREDENTIALS: ${{ env.ITCH_BUTLER_CREDENTIALS }}
         CHANNEL: ${{ inputs.itch_channel }}
-        ITCH_GAME: ${{ inputs.ITCH_GAME }}
-        ITCH_USER: ${{ inputs.ITCH_USER }}
+        ITCH_GAME: ${{ env.ITCH_GAME }}
+        ITCH_USER: ${{ env.ITCH_USER }}
         PACKAGE: ${{ inputs.buildPath }}
         VERSION: ${{ inputs.version }}
         
@@ -111,8 +71,8 @@ runs:
       if: ${{ inputs.deployPlatform == 'PlayStore'}}
       uses: r0adkll/upload-google-play@v1
       with:
-        serviceAccountJsonPlainText: ${{ inputs.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
-        packageName: ${{ inputs.PLAY_STORE_PACKAGE_NAME }}
+        serviceAccountJsonPlainText: ${{ env.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        packageName: ${{ env.PLAY_STORE_PACKAGE_NAME }}
         releaseFiles: ${{ inputs.buildPath }}
 #        releaseName: ${{ inputs.version }}
         track: ${{ inputs.playstore_track }}

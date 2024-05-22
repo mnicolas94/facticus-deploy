@@ -7,24 +7,6 @@ inputs:
   message:
     required: true
     description: 'Message to send'
-  # Telegram
-  TELEGRAM_TOKEN:
-    required: false
-    default: ''
-    description: 'TODO'
-  TELEGRAM_CHAT_ID:
-    required: false
-    default: ''
-    description: 'TODO'
-  # Discord
-  DISCORD_WEBHOOK_ID:
-    required: false
-    default: ''
-    description: 'TODO'
-  DISCORD_WEBHOOK_TOKEN:
-    required: false
-    default: ''
-    description: 'TODO'
 
 runs:
   using: "composite"
@@ -34,8 +16,8 @@ runs:
       if: ${{ inputs.notifyPlatform == 'Telegram'}}
       uses: appleboy/telegram-action@master
       with:
-        to: ${{ inputs.TELEGRAM_CHAT_ID }}
-        token: ${{ inputs.TELEGRAM_TOKEN }}
+        to: ${{ env.TELEGRAM_CHAT_ID }}
+        token: ${{ env.TELEGRAM_TOKEN }}
         message: ${{ inputs.message }}
         
     # Discord
@@ -43,6 +25,6 @@ runs:
       if: ${{ inputs.notifyPlatform == 'Discord'}}
       uses: appleboy/discord-action@master
       with:
-        webhook_id: ${{ inputs.DISCORD_WEBHOOK_ID }}
-        webhook_token: ${{ inputs.DISCORD_WEBHOOK_TOKEN }}
+        webhook_id: ${{ env.DISCORD_WEBHOOK_ID }}
+        webhook_token: ${{ env.DISCORD_WEBHOOK_TOKEN }}
         message: ${{ inputs.message }}
