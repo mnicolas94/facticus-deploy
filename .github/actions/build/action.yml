@@ -104,7 +104,7 @@ runs:
         echo "path=$path" >> $GITHUB_OUTPUT
     # Standalone (not OSX)
     - name: Rename build folder
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions == 'false') }}
       id: renaming
       shell: bash
       run: |
@@ -112,13 +112,13 @@ runs:
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - uses: vimtor/action-zip@v1
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions == 'false') }}
       with:
         files: renamed
         dest: ${{ steps.zipName.outputs.zipName }}
     # Standalone OSX
     - name: Give permissions and tar
-      if: ${{ inputs.targetPlatform == 'StandaloneOSX' }}
+      if: ${{ inputs.targetPlatform == 'StandaloneOSX' && fromJson(inputs.buildParameters).macAddPermissions == 'true') }}
       id: osx
       shell: bash
       run: |
@@ -132,10 +132,13 @@ runs:
         
         chmod +x "$app_path"
         #xattr -d com.apple.quarantine "$app_path"
-        tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.tar.gz"
+        tar_path="${{ steps.project_name.outputs.projectName }}-${{ steps.display_name.outputs.display_name_lower }}-${{ steps.build.outputs.buildVersion }}.${{ fromJson(inputs.buildParameters).macZipExtension }}"
         echo $tar_path
         
-        tar -czf "$tar_path" "renamed/${{ steps.project_name.outputs.projectName }}" --preserve-permissions
+        cd "renamed"
+        tar -czf "$tar_path" "${{ steps.project_name.outputs.projectName }}" --preserve-permissions
+        cd ..
+        mv "renamed/$tar_path" $tar_path
         echo "path=$tar_path" >> $GITHUB_OUTPUT
     # WebGL
     - uses: vimtor/action-zip@v1

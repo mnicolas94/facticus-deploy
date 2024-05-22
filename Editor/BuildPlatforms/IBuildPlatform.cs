@@ -33,6 +33,12 @@ namespace Deploy.Editor.BuildPlatforms
     public class Mac : IBuildPlatform
     {
         public string GetGameCiName() => "StandaloneOSX";
+        
+        [SerializeField, Tooltip("Whether to add executable permissions to the app")]
+        private bool macAddPermissions = true;
+        
+        [SerializeField, Tooltip("Zip extension used when the app has executable permissions")]
+        private string macZipExtension = "tar.gz";
     }
     
     [Serializable]
