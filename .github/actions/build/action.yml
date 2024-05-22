@@ -148,7 +148,7 @@ runs:
           cd ..
           echo "path=renamed/$tar_path" >> $GITHUB_OUTPUT
         else
-          zip -r ${{ steps.zipName.outputs.zipName }} renamed/
+          zip -r "${{ steps.zipName.outputs.zipName }}" renamed/
           echo "path=${{ steps.zipName.outputs.zipName }}" >> $GITHUB_OUTPUT
         fi
         
