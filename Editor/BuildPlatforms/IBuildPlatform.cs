@@ -36,9 +36,6 @@ namespace Deploy.Editor.BuildPlatforms
         
         [SerializeField, Tooltip("Whether to add executable permissions to the app")]
         private bool macAddPermissions = true;
-        
-        [SerializeField, Tooltip("Zip extension used when the app has executable permissions")]
-        private string macZipExtension = "tar.gz";
     }
     
     [Serializable]
