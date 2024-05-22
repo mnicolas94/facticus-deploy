@@ -60,7 +60,7 @@ runs:
         UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
         dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
-        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[${{ fromJson(inputs.buildParameters).androidAppBundle }} == 'true'] }}
+        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[fromJson(inputs.buildParameters).androidAppBundle == 'true'] }}
       with:
         buildName: ${{ steps.project_name.outputs.projectName }}
         buildMethod: UnityBuilderAction.BuildScript.Build
@@ -148,7 +148,7 @@ runs:
       if: ${{ inputs.targetPlatform == 'Android' }}
       id: android_path
       env:
-        ext: ${{ fromJSON('[".apk", ".aab"]')[${{ fromJson(inputs.buildParameters).androidAppBundle }} == 'true'] }}
+        ext: ${{ fromJSON('[".apk", ".aab"]')[fromJson(inputs.buildParameters).androidAppBundle == 'true'] }}
       shell: bash
       run: |
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"
