@@ -164,15 +164,7 @@ jobs:
           deployPlatform: ${{ matrix.deployPlatform }}
           buildPath: ${{ steps.path.outputs.path }}
           version: ${{ needs.build.outputs.version }}
-          # Telegram
-          telegram_message: ${{ matrix.deployParams.tg_message }}
-          # Itch
-          itch_channel: ${{ matrix.deployParams.itch_channel }}
-          # PlayStore
-          playstore_track: ${{ matrix.deployParams.ps_track }}
-          playstore_status: ${{ matrix.deployParams.ps_status }}
-          playstore_inAppUpdatePriority: ${{ matrix.deployParams.ps_inAppUpdatePriority }}
-          playstore_userFraction: ${{ matrix.deployParams.ps_userFraction }}
+          deployParameters: ${{ toJson(matrix.deployParams) }}
 
       # --- Notify ---
       - name: Get platform display name
