@@ -118,7 +118,7 @@ runs:
         dest: ${{ steps.zipName.outputs.zipName }}
     # Standalone OSX
     - name: Give permissions and tar
-      if: ${{ inputs.targetPlatform == 'StandaloneOSX' && fromJson(inputs.buildParameters).macAddPermissions == 'true') }}
+      if: ${{ inputs.targetPlatform == 'StandaloneOSX' && fromJson(inputs.buildParameters).macAddPermissions == 'true' }}
       id: osx
       shell: bash
       run: |
