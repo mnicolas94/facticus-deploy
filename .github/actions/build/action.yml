@@ -139,7 +139,6 @@ runs:
           
           cd "renamed"
           tar -czf "$tar_path" "${{ steps.project_name.outputs.projectName }}" --preserve-permissions
-          cd ..
           echo "path=renamed/$tar_path" >> $GITHUB_OUTPUT
         else
           cd "renamed"
