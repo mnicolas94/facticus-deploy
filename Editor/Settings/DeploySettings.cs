@@ -8,7 +8,7 @@ using Deploy.Editor.NotifyPlatforms;
 using Deploy.Editor.Versioning;
 using UnityEditor;
 using UnityEngine;
-using Utils;
+using Utils.Editor;
 
 namespace Deploy.Editor.Settings
 {
