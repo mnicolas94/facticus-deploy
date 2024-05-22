@@ -19,14 +19,6 @@ inputs:
     required: false
     default: ''
     description: 'Platform specific parameters in json format'
-  dummyDirectory:
-    required: false
-    default: ''
-    description: 'Test purposes only. Directory to save the dummy file.'
-  androidAppBundle:
-    required: false
-    default: 'false'
-    description: 'Whether to build .aab instead of .apk'
 outputs:
   buildPath:
     value: ${{ steps.output_path.outputs.path }}
@@ -68,7 +60,7 @@ runs:
         UNITY_EMAIL: ${{ env.UNITY_EMAIL }}
         UNITY_PASSWORD: ${{ env.UNITY_PASSWORD }}
         dev_build_parameter: ${{ fromJSON('["", "-developmentBuild"]')[inputs.developmentBuild == 'true'] }}
-        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[inputs.androidAppBundle == 'true'] }}
+        androidExportType: ${{ fromJSON('["androidPackage", "androidAppBundle"]')[${{ fromJson(inputs.buildParameters).androidAppBundle }} == 'true'] }}
       with:
         buildName: ${{ steps.project_name.outputs.projectName }}
         buildMethod: UnityBuilderAction.BuildScript.Build
@@ -101,7 +93,7 @@ runs:
       id: dummy
       shell: bash
       run: |
-        dir=${{ inputs.dummyDirectory }}
+        dir=${{ fromJson(inputs.buildParameters).dummyDirectory }}
         if [ ! -z "$dir" -a "$dir" != " " ]; then
           mkdir -p $dir
           path="$dir/dummy.txt"
@@ -156,7 +148,7 @@ runs:
       if: ${{ inputs.targetPlatform == 'Android' }}
       id: android_path
       env:
-        ext: ${{ fromJSON('[".apk", ".aab"]')[inputs.androidAppBundle == 'true'] }}
+        ext: ${{ fromJSON('[".apk", ".aab"]')[${{ fromJson(inputs.buildParameters).androidAppBundle }} == 'true'] }}
       shell: bash
       run: |
         oldfilename="build/Android/${{ steps.project_name.outputs.projectName }}${{ env.ext }}"

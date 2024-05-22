@@ -105,10 +105,6 @@ jobs:
           versioningStrategy: ${{ fromJson(inputs.json_input).versioningStrategy }}
           buildVariables: ${{ fromJson(inputs.json_input).buildVariables }}
           buildParameters: ${{ toJson(fromJson(inputs.json_input).buildParams) }}
-          # Dummy specific
-          dummyDirectory: ${{ fromJson(inputs.json_input).buildParams.dummyDirectory }}
-          # Android specific
-          androidAppBundle: ${{ fromJson(inputs.json_input).buildParams.appBundle }}
       
       # get project name in this job as it is the one checkouts the repository during the build step
       - name: Get project name variable
@@ -228,13 +224,14 @@ jobs:
       - name: Send error message if failed
         if: ${{ failure() || needs.build.result == 'failure' }}
         uses: mnicolas94/facticus-deploy/.github/actions/notify@v0.6.3
-        with:
-          notifyPlatform: ${{ matrix.notifyPlatform }}
-          message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
+        env:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
           DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+        with:
+          notifyPlatform: ${{ matrix.notifyPlatform }}
+          message: "⚠️ Error ${{ steps.messageInfo.outputs.info }}"
           
   # --- Clean artifact ---
   clean_artifact:

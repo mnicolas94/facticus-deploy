@@ -10,33 +10,10 @@ inputs:
   version:
     required: true
     description: 'build version'
-# Telegram
-  telegram_message:
+  deployParameters:
     required: false
     default: ''
-    description: 'TODO'
-# Itch.io
-  itch_channel:
-    required: false
-    default: ''
-    description: 'TODO'
-  # Play Store
-  playstore_track:
-    required: false
-    default: ''
-    description: 'TODO'
-  playstore_status:
-    required: false
-    default: ''
-    description: 'TODO'
-  playstore_inAppUpdatePriority:
-    required: false
-    default: ''
-    description: 'TODO'
-  playstore_userFraction:
-    required: false
-    default: ''
-    description: 'TODO'
+    description: 'Platform specific parameters in json format'
 
 runs:
   using: "composite"
@@ -47,7 +24,7 @@ runs:
       uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@v0.6.3
       with:
         buildPath: ${{ inputs.buildPath }}
-        message: ${{ inputs.telegram_message }}
+        message: ${{ fromJson(inputs.deployParameters).telegram_message }}
         TELEGRAM_SESSION: ${{ env.TELEGRAM_SESSION }}
         TELEGRAM_API_ID: ${{ env.TELEGRAM_API_ID }}
         TELEGRAM_API_HASH: ${{ env.TELEGRAM_API_HASH }}
@@ -60,7 +37,7 @@ runs:
       uses: yeslayla/butler-publish-itchio-action@master
       env:
         BUTLER_CREDENTIALS: ${{ env.ITCH_BUTLER_CREDENTIALS }}
-        CHANNEL: ${{ inputs.itch_channel }}
+        CHANNEL: ${{ fromJson(inputs.deployParameters).itch_channel }}
         ITCH_GAME: ${{ env.ITCH_GAME }}
         ITCH_USER: ${{ env.ITCH_USER }}
         PACKAGE: ${{ inputs.buildPath }}
@@ -75,10 +52,10 @@ runs:
         packageName: ${{ env.PLAY_STORE_PACKAGE_NAME }}
         releaseFiles: ${{ inputs.buildPath }}
 #        releaseName: ${{ inputs.version }}
-        track: ${{ inputs.playstore_track }}
-        status: ${{ inputs.playstore_status }}
-        inAppUpdatePriority: ${{ inputs.playstore_inAppUpdatePriority }}
-        userFraction: ${{ inputs.playstore_userFraction }}
+        track: ${{ fromJson(inputs.deployParameters).playstore_track }}
+        status: ${{ fromJson(inputs.deployParameters).playstore_status }}
+        inAppUpdatePriority: ${{ fromJson(inputs.deployParameters).playstore_inAppUpdatePriority }}
+        userFraction: ${{ fromJson(inputs.deployParameters).playstore_userFraction }}
 #        whatsNewDirectory: ${{ inputs. }}
 #        mappingFile: ${{ inputs. }}
 #        debugSymbols: ${{ inputs. }}
