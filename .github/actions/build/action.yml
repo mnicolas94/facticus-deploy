@@ -38,23 +38,6 @@ runs:
       with:
         fetch-depth: 0
         lfs: true
-    # testing
-    - shell: bash
-      run: |
-        echo "macAddPermissions ${{ fromJson(inputs.buildParameters).macAddPermissions }}"
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == 'true' }}
-      shell: bash
-      run: |
-        echo "fromJson(inputs.buildParameters).macAddPermissions == 'true'"
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions == true }}
-      shell: bash
-      run: |
-        echo "fromJson(inputs.buildParameters).macAddPermissions == true"
-    - if: ${{ fromJson(inputs.buildParameters).macAddPermissions }}
-      shell: bash
-      run: |
-        echo "fromJson(inputs.buildParameters).macAddPermissions"
-        
     - name: Get project name variable
       id: project_name
       uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@fix/mac_installable
@@ -121,7 +104,7 @@ runs:
         echo "path=$path" >> $GITHUB_OUTPUT
     # Standalone (not OSX)
     - name: Rename build folder
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions == 'false') }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions != true) }}
       id: renaming
       shell: bash
       run: |
@@ -129,13 +112,13 @@ runs:
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - uses: vimtor/action-zip@v1
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions == 'false') }}
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && (inputs.targetPlatform != 'StandaloneOSX' || fromJson(inputs.buildParameters).macAddPermissions != true) }}
       with:
         files: renamed
         dest: ${{ steps.zipName.outputs.zipName }}
     # Standalone OSX
     - name: Give permissions and tar
-      if: ${{ inputs.targetPlatform == 'StandaloneOSX' && fromJson(inputs.buildParameters).macAddPermissions == 'true' }}
+      if: ${{ inputs.targetPlatform == 'StandaloneOSX' && fromJson(inputs.buildParameters).macAddPermissions }}
       id: osx
       shell: bash
       run: |
