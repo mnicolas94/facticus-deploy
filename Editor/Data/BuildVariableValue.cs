@@ -162,6 +162,11 @@ namespace Deploy.Editor.Data
         
         public static string OverrideVariablesToBase64(this List<BuildVariableValue> variables)
         {
+            if (variables == null || variables.Count == 0)
+            {
+                return "";
+            }
+            
             var serializableVariables = variables.ConvertAll(
                 variableValue => variableValue.ToJsonSerializable());   
             var serializableList = new BuildVariableValueJsonSerializableList(serializableVariables);
