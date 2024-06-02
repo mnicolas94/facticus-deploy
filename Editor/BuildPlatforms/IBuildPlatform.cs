@@ -54,4 +54,10 @@ namespace Deploy.Editor.BuildPlatforms
     {
         public string GetGameCiName() => "WebGL";
     }
+    
+    [Serializable]
+    public class IOS : IBuildPlatform
+    {
+        public string GetGameCiName() => "iOS";
+    }
 }
