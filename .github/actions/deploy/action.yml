@@ -21,7 +21,7 @@ runs:
     # Telegram
     - name: Deploy to Telegram
       if: ${{ inputs.deployPlatform == 'Telegram'}}
-      uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@v0.6.24
+      uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@feat/ios_support
       with:
         buildPath: ${{ inputs.buildPath }}
         message: ${{ fromJson(inputs.deployParameters).telegram_message }}
@@ -63,9 +63,10 @@ runs:
     # Github Release
     - name: Checkout
       if: ${{ inputs.deployPlatform == 'GithubRelease'}}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        lfs: true
     - name: Create tag if it doesn't exist
       if: ${{ inputs.deployPlatform == 'GithubRelease'}}
       id: tag
