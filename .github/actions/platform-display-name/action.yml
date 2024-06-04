@@ -19,11 +19,13 @@ runs:
         StandaloneLinux64: "Linux"
         StandaloneOSX: "Mac"
         Android: "Android"
+        iOS: "iOS"
         WebGL: "WebGL"
         StandaloneWindows64_lower: "windows"
         StandaloneLinux64_lower: "linux"
         StandaloneOSX_lower: "mac"
         Android_lower: "android"
+        iOS_lower: "ios"
         WebGL_lower: "webgl"
       shell: bash
       run: |
