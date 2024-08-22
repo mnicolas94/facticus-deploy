@@ -37,6 +37,8 @@ runs:
     - name: Checkout code
       if: steps.lfs_check.outputs.lfs == 'true'
       uses: nschloe/action-cached-lfs-checkout@v1
+      with:
+        fetch-depth: 0
         
     - name: Get project name variable
       id: project_name
