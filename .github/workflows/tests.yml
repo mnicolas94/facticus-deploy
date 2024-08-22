@@ -1,0 +1,29 @@
+name: Tests
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      bool:
+        type: boolean
+        required: true
+        description: ""
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: run if boolean
+        if: ${{ inputs.bool }}
+        run: |
+          echo bool is true
+          
+      - name: run if boolean
+        if: ${{ !inputs.bool }}
+        run: |
+          echo bool is false
