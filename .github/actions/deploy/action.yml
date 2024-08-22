@@ -21,7 +21,7 @@ runs:
     # Telegram
     - name: Deploy to Telegram
       if: ${{ inputs.deployPlatform == 'Telegram'}}
-      uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@v0.6.21
+      uses: mnicolas94/facticus-deploy/.github/actions/deploy/telegram@v0.6.22
       with:
         buildPath: ${{ inputs.buildPath }}
         message: ${{ fromJson(inputs.deployParameters).telegram_message }}
