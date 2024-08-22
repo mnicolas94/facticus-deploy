@@ -1,0 +1,19 @@
+name: Test
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nschloe/action-cached-lfs-checkout@v1
+        with:
+          fetch-depth: 0
+      - name: echo things
+        run: |
+          echo -----
+          ls
+
+      
