@@ -33,11 +33,29 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    # checkout repository caching LFS files in case the project is using its
+    - name: Check for Git LFS
+      shell: bash
+      id: lfs_check
+      run: |
+        if git grep -q filter=lfs -- .gitattributes '**/.gitattributes'; then
+          echo "Using Git LFS"
+          echo "lfs=true" >> $GITHUB_OUTPUT
+        else
+          echo "Not using Git LFS"
+          echo "lfs=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Checkout code
+      if: steps.lfs_check.outputs.lfs == 'true'
+      uses: nschloe/action-cached-lfs-checkout@v1
+
+    - name: Checkout code
+      if: steps.lfs_check.outputs.lfs == 'false'
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        lfs: true
+        
     - name: Get project name variable
       id: project_name
       uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.17
