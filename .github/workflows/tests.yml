@@ -1,0 +1,35 @@
+name: Tests
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      bool:
+        type: boolean
+        required: true
+        description: ""
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    if: ${{ inputs.bool }}
+    steps:
+      - name: run if boolean
+        if: ${{ inputs.bool }}
+        run: |
+          echo bool is true
+          
+      - name: run if boolean
+        if: ${{ !inputs.bool }}
+        run: |
+          echo bool is false
+          
+  depends:
+    name: depends
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: echo
+        run: |
+          echo depends ran

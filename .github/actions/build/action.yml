@@ -33,14 +33,15 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    # checkout repository caching LFS files if it uses them
+    - name: Checkout code
+      uses: nschloe/action-cached-lfs-checkout@v1
       with:
         fetch-depth: 0
-        lfs: true
+        
     - name: Get project name variable
       id: project_name
-      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@feat/ios_support
+      uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.16
     - name: Cache
       if: ${{ inputs.targetPlatform != 'Dummy' }}
       uses: actions/cache@v3
@@ -77,7 +78,7 @@ runs:
     # --- Get build path ---    
     - name: Get platform display name
       id: platform_display_name
-      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@feat/ios_support
+      uses: mnicolas94/facticus-deploy/.github/actions/platform-display-name@v0.6.16
       with:
         platform: ${{ inputs.targetPlatform }}
         
