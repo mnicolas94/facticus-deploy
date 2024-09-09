@@ -51,7 +51,10 @@ namespace UnityBuilderAction
                     EditorUserBuildSettings.buildAppBundle = options["customBuildPath"].EndsWith(".aab");
                     if (options.TryGetValue("androidKeystoreName", out string keystoreName) &&
                         !string.IsNullOrEmpty(keystoreName))
+                    {
+                        PlayerSettings.Android.useCustomKeystore = true;
                         PlayerSettings.Android.keystoreName = keystoreName;
+                    }
                     if (options.TryGetValue("androidKeystorePass", out string keystorePass) &&
                         !string.IsNullOrEmpty(keystorePass))
                         PlayerSettings.Android.keystorePass = keystorePass;
@@ -61,6 +64,22 @@ namespace UnityBuilderAction
                     if (options.TryGetValue("androidKeyaliasPass", out string keyaliasPass) &&
                         !string.IsNullOrEmpty(keyaliasPass))
                         PlayerSettings.Android.keyaliasPass = keyaliasPass;
+                    if (options.TryGetValue("androidTargetSdkVersion", out string androidTargetSdkVersion) &&
+                        !string.IsNullOrEmpty(androidTargetSdkVersion))
+                    {
+                        var targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
+                        try
+                        {
+                            targetSdkVersion =
+                                (AndroidSdkVersions) Enum.Parse(typeof(AndroidSdkVersions), androidTargetSdkVersion);
+                        }
+                        catch
+                        {
+                            UnityEngine.Debug.Log("Failed to parse androidTargetSdkVersion! Fallback to AndroidApiLevelAuto");
+                        }
+
+                        PlayerSettings.Android.targetSdkVersion = targetSdkVersion;
+                    }
                     break;
                 }
                 case BuildTarget.StandaloneOSX:
@@ -68,6 +87,7 @@ namespace UnityBuilderAction
                     break;
             }
 
+            // Overrides
             var buildVariablesEncoded = options["buildVariables"];
             OverrideVariablesListExtensions.ApplyOverrideVariablesValues(buildVariablesEncoded);
             
@@ -76,8 +96,17 @@ namespace UnityBuilderAction
 
             bool devBuild = options.ContainsKey("developmentBuild");
             
+            // Determine subtarget
+            int buildSubtarget = 0;
+#if UNITY_2021_2_OR_NEWER
+            if (!options.TryGetValue("standaloneBuildSubtarget", out var subtargetValue) || !Enum.TryParse(subtargetValue, out StandaloneBuildSubtarget buildSubtargetValue)) {
+                buildSubtargetValue = default;
+            }
+            buildSubtarget = (int) buildSubtargetValue;
+#endif
+            
             // Custom build
-            Build(buildTarget, options["customBuildPath"], devBuild, exit);
+            Build(buildTarget, buildSubtarget, options["customBuildPath"], devBuild, exit);
         }
 
         private static void BuildAddressables()
@@ -117,6 +146,7 @@ namespace UnityBuilderAction
 
             if (!Enum.IsDefined(typeof(BuildTarget), buildTarget ?? string.Empty))
             {
+                Console.WriteLine($"{buildTarget} is not a defined {nameof(BuildTarget)}");
                 EditorApplication.Exit(121);
             }
 
@@ -174,7 +204,7 @@ namespace UnityBuilderAction
             }
         }
 
-        private static void Build(BuildTarget buildTarget, string filePath, bool developmentBuild, bool exit = true)
+        private static void Build(BuildTarget buildTarget, int buildSubtarget, string filePath, bool developmentBuild, bool exit = true)
         {
             string[] scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(s => s.path).ToArray();
             var buildPlayerOptions = new BuildPlayerOptions
@@ -183,6 +213,9 @@ namespace UnityBuilderAction
                 target = buildTarget,
 //                targetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget),
                 locationPathName = filePath,
+#if UNITY_2021_2_OR_NEWER
+                subtarget = buildSubtarget
+#endif
             };
 
             if (developmentBuild)
