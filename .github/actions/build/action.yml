@@ -165,7 +165,50 @@ runs:
         newfilename="build/Android/${{ steps.project_name.outputs.projectName }} ${{ steps.build.outputs.buildVersion }}${{ env.ext }}"
         sudo mv "$oldfilename" "$newfilename"
         echo "path=$newfilename" >> $GITHUB_OUTPUT
-    
+    # iOS
+    - name: Fix File Permissions and Run fastlane
+      if: ${{ inputs.targetPlatform == 'iOS' }}
+      env:
+        APPLE_CONNECT_EMAIL: ${{ env.APPLE_CONNECT_EMAIL }}
+        APPLE_DEVELOPER_EMAIL: ${{ env.APPLE_DEVELOPER_EMAIL }}
+        APPLE_TEAM_ID: ${{ env.APPLE_TEAM_ID }}
+        
+        MATCH_REPOSITORY: ${{ env.MATCH_REPOSITORY }}
+        MATCH_DEPLOY_KEY: ${{ env.MATCH_DEPLOY_KEY }}
+        MATCH_PASSWORD: ${{ env.MATCH_PASSWORD }}
+        
+        APPSTORE_ISSUER_ID: ${{ env.APPSTORE_ISSUER_ID }}
+        APPSTORE_KEY_ID: ${{ env.APPSTORE_KEY_ID }}
+        APPSTORE_P8: ${{ env.APPSTORE_P8 }}
+        
+        IOS_BUILD_PATH: ${{ format('{0}/build/iOS', github.workspace) }}
+        IOS_BUNDLE_ID: ${{ env.IOS_BUNDLE_ID }}
+        PROJECT_NAME: ${{ steps.project_name.outputs.projectName }}
+      shell: bash
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add - <<< "${MATCH_DEPLOY_KEY}"
+        find $IOS_BUILD_PATH -type f -name "**.sh" -exec chmod +x {} \;
+        find $IOS_BUILD_PATH -type f -iname "usymtool" -exec chmod +x {} \;
+        bundle install
+        bundle exec fastlane ios ${{ fromJson(inputs.buildParameters).iosLane }}
+    - name: debug
+      if: ${{ inputs.targetPlatform == 'iOS' }}
+      shell: bash
+      run: |
+        ls
+        echo ---
+        cd build
+        ls
+        echo ---
+        cd iOS
+        ls
+    - name: Set iOS output path
+      if: ${{ inputs.targetPlatform == 'iOS' }}
+      id: ios_path
+      shell: bash
+      run: |
+        echo "path=build/iOS/${{ steps.project_name.outputs.projectName }}.ipa" >> $GITHUB_OUTPUT
     # Output
     - name: Set the action's output
       id: output_path
@@ -179,6 +222,8 @@ runs:
           echo 'path=${{ steps.zipName.outputs.zipName }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'StandaloneOSX' }} == 'true' ]; then
           echo 'path=${{ steps.osx.outputs.path }}' >> $GITHUB_OUTPUT
+        elif [ ${{ inputs.targetPlatform == 'iOS' }} == 'true' ]; then
+          echo 'path=${{ steps.ios_path.outputs.path }}' >> $GITHUB_OUTPUT
         elif [ ${{ inputs.targetPlatform == 'Dummy' }} == 'true' ]; then
           echo 'path=${{ steps.dummy.outputs.path }}' >> $GITHUB_OUTPUT
         else
