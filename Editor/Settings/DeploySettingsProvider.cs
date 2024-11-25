@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace Deploy.Editor.Settings
 {
@@ -17,7 +18,9 @@ namespace Deploy.Editor.Settings
                 activateHandler = (searchContext, root) =>
                 {
                     var inspector = new InspectorElement(settings);
-                    root.Add(inspector);
+                    var scroll = new ScrollView(ScrollViewMode.Vertical);
+                    scroll.Add(inspector);
+                    root.Add(scroll);
                 },
                 keywords = keywords
             };

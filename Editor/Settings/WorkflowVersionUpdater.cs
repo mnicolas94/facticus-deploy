@@ -27,7 +27,7 @@ namespace Deploy.Editor.Settings
 
         public void OnPackageAddedOrUpdated(PackageInfo packageInfo)
         {
-            if (UpdatedSelf(packageInfo))
+            if (IsSelf(packageInfo))
             {
                 if (DeploySettings.GetOrCreate().UpdateWorkflowAutomatically)
                 {
@@ -43,7 +43,7 @@ namespace Deploy.Editor.Settings
         {
         }
 
-        private bool UpdatedSelf(PackageInfo packageInfo)
+        private bool IsSelf(PackageInfo packageInfo)
         {
             return packageInfo.name == "com.facticus.deploy";
         }
