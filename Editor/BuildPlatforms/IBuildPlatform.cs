@@ -59,5 +59,13 @@ namespace Deploy.Editor.BuildPlatforms
     public class IOS : IBuildPlatform
     {
         public string GetGameCiName() => "iOS";
+
+        [SerializeField] private IOSLane iosLane;
+        public enum IOSLane
+        {
+            release,
+            beta,
+            build
+        }
     }
 }
