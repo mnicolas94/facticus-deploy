@@ -229,7 +229,7 @@ jobs:
   clean_artifact:
     name: Clean artifact
     needs: [ build, deploy ]
-    if: needs.build.result == 'success'
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Delete artifact
