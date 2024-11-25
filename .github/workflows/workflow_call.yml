@@ -59,7 +59,7 @@ on:
 jobs:
   build:
     name: Build for ${{ fromJson(inputs.json_input).buildPlatform }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON('["ubuntu-latest", "macos-latest"]')[fromJson(inputs.json_input).buildPlatform == 'iOS'] }}
     outputs:
       artifact: ${{ steps.uuid.outputs.uuid }}
       build_path: ${{ steps.build.outputs.buildPath }}
