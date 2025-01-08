@@ -17,7 +17,7 @@ namespace Deploy.Editor.DeployPlatforms
     public class Telegram : IDeployPlatform
     {
         public string GetPlatformName() => "Telegram";
-        public string GetFieldsPrefix() => "tg";
+        public string GetFieldsPrefix() => "telegram";
 
         [SerializeField] private string message;
 
@@ -48,7 +48,7 @@ namespace Deploy.Editor.DeployPlatforms
     public class PlayStore : IDeployPlatform, IJsonSerializable
     {
         public string GetPlatformName() => "PlayStore";
-        public string GetFieldsPrefix() => "ps";
+        public string GetFieldsPrefix() => "playstore";
 
         [SerializeField, Dropdown(nameof(GetTrackValues))]
         private string track;
