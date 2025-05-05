@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace Deploy.Editor.Drawers
 {
-    public class PresetValueElement : VisualElement
+    public class PresetValueElement : VisualElement, IBuildVariableDrawer
     {
         private SerializedProperty _property;
         private SerializedProperty _variableProperty;

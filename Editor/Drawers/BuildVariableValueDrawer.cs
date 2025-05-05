@@ -4,7 +4,6 @@ using System.Linq;
 using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Deploy.Editor.Drawers
@@ -20,16 +19,11 @@ namespace Deploy.Editor.Drawers
     
     public class BuildVariableValueElement : VisualElement
     {
-        private static List<ValueMode> Choices = Enum.GetNames(typeof(ValueMode))
-            .Select(enumString => Enum.Parse<ValueMode>(enumString)).ToList();
-        
         private SerializedProperty _property;
         private SerializedProperty _variableProperty;
         private SerializedProperty _modeProperty;
 
-        
-        private ScriptableObjectValueElement _soDrawer;
-        private PresetValueElement _presetDrawer;
+        private Dictionary<ValueMode, IBuildVariableDrawer> _modeDrawers;
         private ToolbarMenu _modeMenu;
 
         private bool IsPreset => GetMode() == ValueMode.Preset;
@@ -56,31 +50,41 @@ namespace Deploy.Editor.Drawers
             variableContainer.Add(_modeMenu);
 
             // value
-            _soDrawer = new ScriptableObjectValueElement(_property, _variableProperty);
-            _presetDrawer = new PresetValueElement(_property, _variableProperty);
-            Add(_soDrawer);
-            Add(_presetDrawer);
+            _modeDrawers = new Dictionary<ValueMode, IBuildVariableDrawer>()
+            {
+                { ValueMode.Preset, new PresetValueElement(_property, _variableProperty) },
+                // { ValueMode.ScriptableObject_Deprecated, new ScriptableObjectValueElement(_property, _variableProperty) },
+            };
+
+            foreach (var drawer in _modeDrawers.Values)
+            {
+                Add(drawer as VisualElement);
+            }
+            
             SetDrawerVisibility();
         }
 
         private void ConstructModesMenu()
         {
-            var modes = Enum.GetValues(typeof(ValueMode)).Cast<ValueMode>();
+            var modes = Enum.GetValues(typeof(ValueMode)).Cast<ValueMode>().ToList();
+            // remove deprecated mode
+            modes.Remove(ValueMode.ScriptableObject_Deprecated);
+            
             foreach (var mode in modes)
             {
                 _modeMenu.menu.AppendAction(
                     mode.ToString(),
                     menuItem =>
                     {
-                        var newMode = ((ValueMode)menuItem.userData);
-                        _modeProperty.enumValueIndex = (int)newMode;
+                        var newMode = (ValueMode) menuItem.userData;
+                        _modeProperty.enumValueIndex = (int) newMode;
                         _modeProperty.serializedObject.ApplyModifiedProperties();
                         OnModeChange();
                     },
                     menuItem =>
                     {
                         var currentMode = GetMode();
-                        var mode = ((ValueMode)menuItem.userData);
+                        var mode = (ValueMode) menuItem.userData;
                         return mode == currentMode ? DropdownMenuAction.Status.Checked : DropdownMenuAction.Status.Normal;
                     },
                     mode
@@ -95,33 +99,36 @@ namespace Deploy.Editor.Drawers
 
         private void SetDrawerVisibility()
         {
-            _soDrawer.style.display = IsPreset ? DisplayStyle.None : DisplayStyle.Flex;
-            _presetDrawer.style.display = IsPreset ? DisplayStyle.Flex : DisplayStyle.None;
+            var currentMode = GetMode();
+            foreach (var (mode, drawer) in _modeDrawers)
+            {
+                var visualElement = drawer as VisualElement;
+                visualElement.style.display = mode == currentMode ? DisplayStyle.Flex : DisplayStyle.None;
+            }
         }
 
         private void OnVariableChange(SerializedPropertyChangeEvent evt)
         {
-            if (IsPreset)
+            var mode = GetMode();
+            if (_modeDrawers.TryGetValue(mode, out var drawer))
             {
-                _presetDrawer.OnVariableChange();
-            }
-            else
-            {
-                _soDrawer.OnVariableChange();
+                drawer.OnVariableChange();
             }
         }
         
         private void OnModeChange()
         {
             SetDrawerVisibility();
-            if (IsPreset)
+            var mode = GetMode();
+            if (_modeDrawers.TryGetValue(mode, out var drawer))
             {
-                _presetDrawer.OnVariableChange();
-            }
-            else
-            {
-                _soDrawer.OnVariableChange();
+                drawer.OnVariableChange();
             }
         }
+    }
+
+    public interface IBuildVariableDrawer
+    {
+        void OnVariableChange();
     }
 }

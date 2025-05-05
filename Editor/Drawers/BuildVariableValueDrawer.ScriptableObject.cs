@@ -6,7 +6,7 @@ using Utils.Editor;
 
 namespace Deploy.Editor.Drawers
 {
-    public class ScriptableObjectValueElement : VisualElement
+    public class ScriptableObjectValueElement : VisualElement, IBuildVariableDrawer
     {
         private InspectorElement _valueField;
         private SerializedProperty _property;
