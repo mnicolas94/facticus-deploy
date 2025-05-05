@@ -1,29 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Deploy.Editor.Data;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.Presets;
-using UnityEngine;
 
 namespace Deploy.Tests.Editor
 {
     public class OverrideVariablesTests
     {
-        private static List<BuildVariableValue> _overrides = new ()
+        private static List<Func<BuildVariableValue>> _overrides = new ()
         {
-            new BuildVariableValue(
+            () => new BuildVariableValue(
                 TestScriptableObject.Get(1, 2, "qwe"),
                 TestScriptableObject.Get(4, 5, "asd")),
-            new BuildVariableValue(
+            () => new BuildVariableValue(
                 TestScriptableObject.Get(1, 2, "qwe"),
                 new Preset(TestScriptableObject.Get(4, 5, "asd"))),
         };
 
         [TestCaseSource(nameof(_overrides))]
-        public void When_ApplyOverrideWithBuildVariableValue_OverridesAreAppliedCorrectly(BuildVariableValue overrideVariable)
+        public void When_ApplyOverrideWithBuildVariableValue_OverridesAreAppliedCorrectly(Func<BuildVariableValue> factory)
         {
             // arrange
             // create asset file for it to have guid
+            var overrideVariable = factory();
             var assetPath = "Assets/Deploy/Tests/Editor/test.asset";
             AssetDatabase.CreateAsset(overrideVariable.Variable, assetPath);
             AssetDatabase.Refresh();
@@ -50,31 +51,6 @@ namespace Deploy.Tests.Editor
             // teardown
             AssetDatabase.DeleteAsset(assetPath);
             AssetDatabase.Refresh();
-        }
-    }
-
-    public class TestScriptableObject : ScriptableObject
-    {
-        public int Int;
-        public float Float;
-        public string String;
-
-        public static TestScriptableObject Get(int i = 0, float f = 0f, string s = "")
-        {
-            var tso = CreateInstance<TestScriptableObject>();
-            tso.Int = i;
-            tso.Float = f;
-            tso.String = s;
-            return tso;
-        }
-
-        public bool IsEqualTo(TestScriptableObject other)
-        {
-            if (Int != other.Int) return false;
-            if (!Mathf.Approximately(Float, other.Float)) return false;
-            if (String != other.String) return false;
-
-            return true;
         }
     }
 }
