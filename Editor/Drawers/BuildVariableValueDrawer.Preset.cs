@@ -126,15 +126,12 @@ namespace Deploy.Editor.Drawers
             }
             else
             {
-                if (preset != null)
+                var newPresetType = new PresetType(variable);
+                bool sameType = _presetSelector.PresetType == newPresetType;
+                if (!sameType)  // draw a new preset with the new type
                 {
-                    var variableTypeName = variable.GetType().FullName;
-                    var valueTypeName = preset.GetPresetType().GetManagedTypeName();
-                    bool sameType = variableTypeName == valueTypeName;
-                    if (!sameType)  // draw a new preset with the new type
-                    {
-                        _presetSelector.value = null;
-                    }
+                    _presetSelector.value = null;
+                    _presetSelector.PresetType = newPresetType;
                 }
             }
         }
@@ -144,7 +141,12 @@ namespace Deploy.Editor.Drawers
     {
         private static readonly Texture PresetsIcon = EditorGUIUtility.IconContent("Preset.Context").image;
 
-        private readonly PresetType _presetType;
+        private PresetType _presetType;
+        public PresetType PresetType
+        {
+            get => _presetType;
+            set => _presetType = value;
+        }
 
         public CustomPresetField(string label, Object target, Preset initialValue) : base(label)
         {
