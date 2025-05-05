@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Deploy.Editor.EditorWindows;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -143,13 +142,14 @@ namespace Deploy.Editor.Drawers
     
     public class CustomPresetField : ObjectField
     {
-        private static Texture PresetsIcon = EditorGUIUtility.IconContent("Preset.Context").image;
+        private static readonly Texture PresetsIcon = EditorGUIUtility.IconContent("Preset.Context").image;
 
-        private Object _target;
-        
+        private readonly PresetType _presetType;
+
         public CustomPresetField(string label, Object target, Preset initialValue) : base(label)
         {
-            _target = target;
+            _presetType = new PresetType(target);
+            
             // Set the type of the objects that can be assigned
             objectType = typeof(Preset);
             value = initialValue;
@@ -172,16 +172,22 @@ namespace Deploy.Editor.Drawers
             {
                 new ("None", null)
             };
-            var presetsEntries = AssetDatabase.FindAssets("t:Preset")
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .SelectMany(AssetDatabase.LoadAllAssetsAtPath)
-                .Where(asset => asset is Preset)
-                .Cast<Preset>()
-                .Where(p => p.GetPresetType() == new PresetType(_target))
-                .Select(preset => new SearchEntry<Preset>(preset.name, preset, PresetsIcon))
-                .ToList();
             
-            searchEntries.AddRange(presetsEntries);
+            // find preset and add as entries
+            var presetsGuids = AssetDatabase.FindAssets("t:Preset");
+            foreach (var presetGuid in presetsGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(presetGuid);
+                var assets = AssetDatabase.LoadAllAssetsAtPath(path);
+                foreach (var asset in assets)
+                {
+                    if (asset is Preset preset && preset.GetPresetType() == _presetType)
+                    {
+                        searchEntries.Add(new SearchEntry<Preset>(preset.name, preset, PresetsIcon));
+                    }
+                }
+            }
+            
             var position = EditorWindow.mouseOverWindow.position.min + (Vector2) evt.position;
             GenericSearchWindow<Preset>.Create(position, "Presets", searchEntries, OnSelected);
         }
