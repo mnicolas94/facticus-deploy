@@ -1,6 +1,5 @@
 name: Build and Deploy
 
-
 on:
   workflow_call:
     inputs:
@@ -55,7 +54,6 @@ on:
       PLAY_STORE_PACKAGE_NAME:
         required: false
     
-
 jobs:
   build:
     name: Build for ${{ fromJson(inputs.json_input).buildPlatform }}

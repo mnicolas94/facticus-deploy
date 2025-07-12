@@ -1,4 +1,4 @@
-name: Build and deploy with json file as input
+name: Build and Deploy with json file as input
 
 on:
   workflow_call:
@@ -6,7 +6,53 @@ on:
       json_file:
         type: string
         required: true
-      
+    secrets:
+      # Build secrets
+      UNITY_LICENSE:
+        required: true
+      UNITY_EMAIL:
+        required: true
+      UNITY_PASSWORD:
+        required: true
+      # Build for Android
+      ANDROID_KEYSTORE_NAME:
+        required: false
+      ANDROID_KEYSTORE_BASE64:
+        required: false
+      ANDROID_KEYSTORE_PASS:
+        required: false
+      ANDROID_KEYALIAS_NAME:
+        required: false
+      ANDROID_KEYALIAS_PASS:
+        required: false
+      # Discord
+      DISCORD_WEBHOOK_ID:
+        required: false
+      DISCORD_WEBHOOK_TOKEN:
+        required: false
+      # Itch.io
+      ITCH_BUTLER_CREDENTIALS:
+        required: false
+      ITCH_GAME:
+        required: false
+      ITCH_USER:
+        required: false
+      # Telegram
+      TELEGRAM_SESSION:
+        required: false
+      TELEGRAM_API_ID:
+        required: false
+      TELEGRAM_API_HASH:
+        required: false
+      TELEGRAM_TOKEN:
+        required: false
+      TELEGRAM_CHAT_ID:
+        required: false
+      # Play Store
+      PLAY_STORE_SERVICE_ACCOUNT_JSON:
+        required: false
+      PLAY_STORE_PACKAGE_NAME:
+        required: false
 
 jobs:
   read_input:
