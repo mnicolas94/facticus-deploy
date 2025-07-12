@@ -30,7 +30,7 @@ jobs:
           echo "_EOF_" >> $GITHUB_OUTPUT
           
   build_deploy:
-    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.33
+    uses: mnicolas94/facticus-deploy/.github/workflows/workflow_call.yml@v0.6.34
     needs: [ read_input ]
     strategy:
       fail-fast: false
