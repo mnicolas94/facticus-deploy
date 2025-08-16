@@ -53,6 +53,13 @@ on:
         required: false
       PLAY_STORE_PACKAGE_NAME:
         required: false
+      # Steam
+      STEAM_USERNAME:
+        required: false
+      STEAM_CONFIG_VDF:
+        required: false
+      STEAM_APP_ID:
+        required: false
 
 jobs:
   read_input:
@@ -105,3 +112,6 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
       PLAY_STORE_PACKAGE_NAME: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
+      STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
+      STEAM_CONFIG_VDF: ${{ secrets.STEAM_CONFIG_VDF }}
+      STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}

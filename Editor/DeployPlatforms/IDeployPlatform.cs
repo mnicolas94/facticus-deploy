@@ -29,6 +29,15 @@ namespace Deploy.Editor.DeployPlatforms
     }
     
     [Serializable]
+    public class Steam : IDeployPlatform
+    {
+        public string GetPlatformName() => "Steam";
+        public string GetFieldsPrefix() => "steam";
+
+        [SerializeField] private string releaseBranch;
+    }
+    
+    [Serializable]
     public class Itch : IDeployPlatform
     {
         public string GetPlatformName() => "Itch";

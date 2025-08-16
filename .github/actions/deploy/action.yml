@@ -43,6 +43,19 @@ runs:
         PACKAGE: ${{ inputs.buildPath }}
         VERSION: ${{ inputs.version }}
         
+    # Steam
+    - name: Deploy to Steam
+      if: ${{ inputs.deployPlatform == 'Steam'}}
+      uses: game-ci/steam-deploy@v3
+      with:
+        username: ${{ env.STEAM_USERNAME }}
+        configVdf: ${{ env.STEAM_CONFIG_VDF }}
+        appId: ${{ env.STEAM_APP_ID }}
+        buildDescription: ${{ inputs.version }}
+        rootPath: ''
+        depot1Path: ${{ inputs.buildPath }}
+        releaseBranch: ${{ fromJson(inputs.deployParameters).steam_releaseBranch }}
+        
     # Play Store
     - name: Deploy to Play Store
       if: ${{ inputs.deployPlatform == 'PlayStore'}}
