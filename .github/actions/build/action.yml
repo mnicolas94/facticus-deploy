@@ -39,6 +39,18 @@ runs:
       with:
         fetch-depth: 0
         
+    # sync submodules
+    - name: Setup SSH
+      if: ${{ secrets.SUBMODULES_SSH_KEY != '' }}
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+    - name: Init and update submodules
+      if: ${{ secrets.SUBMODULES_SSH_KEY != '' }}
+      run: |
+        git submodule sync
+        git submodule update --init --recursive
+        
     - name: Get project name variable
       id: project_name
       uses: mnicolas94/facticus-deploy/.github/actions/get-project-name@v0.6.36
