@@ -41,12 +41,13 @@ runs:
         
     # sync submodules
     - name: Setup SSH
-      if: ${{ secrets.SUBMODULES_SSH_KEY != '' }}
+      if: ${{ env.SUBMODULES_SSH_KEY != '' }}
       uses: webfactory/ssh-agent@v0.9.0
       with:
-        ssh-private-key: ${{ secrets.SUBMODULES_SSH_KEY }}
+        ssh-private-key: ${{ env.SUBMODULES_SSH_KEY }}
     - name: Init and update submodules
-      if: ${{ secrets.SUBMODULES_SSH_KEY != '' }}
+      if: ${{ env.SUBMODULES_SSH_KEY != '' }}
+      shell: bash
       run: |
         git submodule sync
         git submodule update --init --recursive
