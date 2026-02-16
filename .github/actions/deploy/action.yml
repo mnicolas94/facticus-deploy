@@ -34,7 +34,7 @@ runs:
     # Itchio
     - name: Deploy to Itch.io
       if: ${{ inputs.deployPlatform == 'Itch'}}
-      uses: yeslayla/butler-publish-itchio-action@master
+      uses: XanatosX/butler-publish-itchio-action@master
       env:
         BUTLER_CREDENTIALS: ${{ env.ITCH_BUTLER_CREDENTIALS }}
         CHANNEL: ${{ fromJson(inputs.deployParameters).itch_channel }}
