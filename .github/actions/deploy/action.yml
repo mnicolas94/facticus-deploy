@@ -44,6 +44,11 @@ runs:
         VERSION: ${{ inputs.version }}
         
     # Steam
+    - name: Decompress zip for Steam
+      if: ${{ inputs.deployPlatform == 'Steam'}}
+      shell: bash
+      run: unzip "${{ inputs.buildPath }}" -d buildSteam
+        
     - name: Deploy to Steam
       if: ${{ inputs.deployPlatform == 'Steam'}}
       uses: game-ci/steam-deploy@v3
@@ -53,7 +58,7 @@ runs:
         appId: ${{ env.STEAM_APP_ID }}
         buildDescription: ${{ inputs.version }}
         rootPath: ''
-        depot1Path: ${{ inputs.buildPath }}
+        depot1Path: buildSteam
         releaseBranch: ${{ fromJson(inputs.deployParameters).steam_releaseBranch }}
         
     # Play Store
