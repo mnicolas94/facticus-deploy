@@ -47,7 +47,15 @@ runs:
     - name: Decompress zip for Steam
       if: ${{ inputs.deployPlatform == 'Steam'}}
       shell: bash
-      run: unzip "${{ inputs.buildPath }}" -d buildSteam
+      run: |
+        unzip "${{ inputs.buildPath }}" -d buildSteam
+        
+        # Inside the zip there is another folder with the actual game files inside.
+        # We find that directory inside buildSteam and save it to $GITHUB_ENV
+        # So, we can send the root game folder a not another parent folder, in this case "buildSteam"
+        SUBFOLDER=$(find buildSteam -maxdepth 1 -mindepth 1 -type d | head -n 1)
+        
+        echo "STEAM_DEPOT_PATH=$SUBFOLDER" >> $GITHUB_ENV
         
     - name: Deploy to Steam
       if: ${{ inputs.deployPlatform == 'Steam'}}
@@ -58,7 +66,7 @@ runs:
         appId: ${{ env.STEAM_APP_ID }}
         buildDescription: ${{ inputs.version }}
         rootPath: ''
-        depot1Path: buildSteam
+        depot1Path: ${{ env.STEAM_DEPOT_PATH }}
         releaseBranch: ${{ fromJson(inputs.deployParameters).steam_releaseBranch }}
         
     # Play Store
