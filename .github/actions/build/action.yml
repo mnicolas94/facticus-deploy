@@ -125,11 +125,14 @@ runs:
         mkdir renamed
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
-    - uses: vimtor/action-zip@v1.3
-      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
-      with:
-        files: renamed
-        dest: ${{ steps.zipName.outputs.zipName }}
+    - name: Zip build folder using 7z
+      shell: bash
+      run: 7z a ${{ steps.zipName.outputs.zipName }} renamed
+    # - uses: vimtor/action-zip@v1.3
+    #   if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
+    #   with:
+    #     files: renamed
+    #     dest: ${{ steps.zipName.outputs.zipName }}
     # Standalone OSX
     - name: Give permissions and tar
       if: ${{ inputs.targetPlatform == 'StandaloneOSX' }}
