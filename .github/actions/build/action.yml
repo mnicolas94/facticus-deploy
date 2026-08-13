@@ -125,7 +125,7 @@ runs:
         mkdir renamed
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
-    - uses: vimtor/action-zip@v1
+    - uses: vimtor/action-zip@v1.3
       if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
       with:
         files: renamed
