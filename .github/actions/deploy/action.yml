@@ -82,6 +82,7 @@ runs:
         status: ${{ fromJson(inputs.deployParameters).playstore_status }}
         inAppUpdatePriority: ${{ fromJson(inputs.deployParameters).playstore_inAppUpdatePriority }}
         userFraction: ${{ fromJson(inputs.deployParameters).playstore_userFraction }}
+        changesNotSentForReview: ${{ fromJson(inputs.deployParameters).playstore_changesNotSentForReview }}
 #        whatsNewDirectory: ${{ inputs. }}
 #        mappingFile: ${{ inputs. }}
 #        debugSymbols: ${{ inputs. }}

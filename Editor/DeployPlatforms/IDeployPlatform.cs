@@ -65,6 +65,7 @@ namespace Deploy.Editor.DeployPlatforms
         private string status;
         [SerializeField, Range(0, 5)] private int inAppUpdatePriority;
         [SerializeField, Range(0.0001f, 0.9999f)] private float userFraction = 0.5f;
+        [SerializeField] private bool changesNotSentForReview = false;
 
         public string ToJson()
         {
@@ -74,6 +75,7 @@ namespace Deploy.Editor.DeployPlatforms
                 {"status", $"\"{status}\""},
                 {"inAppUpdatePriority", inAppUpdatePriority.ToString()},
                 {"userFraction", userFraction.ToString()},
+                {"changesNotSentForReview", changesNotSentForReview.ToString()},
             };
             
             if (status is not "inProgress" and not "halted" )
