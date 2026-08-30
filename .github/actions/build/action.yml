@@ -126,6 +126,7 @@ runs:
         cp -r "build/${{ inputs.targetPlatform }}" renamed
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - name: Zip build folder using 7z
+      if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
       shell: bash
       run: 7z a "${{ steps.zipName.outputs.zipName }}" renamed
     # - uses: vimtor/action-zip@v1.3
