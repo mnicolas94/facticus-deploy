@@ -127,7 +127,7 @@ runs:
         mv "renamed/${{ inputs.targetPlatform }}" "renamed/${{ steps.project_name.outputs.projectName }}"
     - name: Zip build folder using 7z
       shell: bash
-      run: 7z a ${{ steps.zipName.outputs.zipName }} renamed
+      run: 7z a "${{ steps.zipName.outputs.zipName }}" renamed
     # - uses: vimtor/action-zip@v1.3
     #   if: ${{ startsWith(inputs.targetPlatform, 'Standalone') && inputs.targetPlatform != 'StandaloneOSX' }}
     #   with:
