@@ -75,7 +75,7 @@ namespace Deploy.Editor.DeployPlatforms
                 {"status", $"\"{status}\""},
                 {"inAppUpdatePriority", inAppUpdatePriority.ToString()},
                 {"userFraction", userFraction.ToString()},
-                {"changesNotSentForReview", changesNotSentForReview.ToString()},
+                {"changesNotSentForReview", $"\"{changesNotSentForReview}\""},
             };
             
             if (status is not "inProgress" and not "halted" )
