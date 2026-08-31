@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Deploy.Editor.Utility;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
 using Utils.Attributes;
 
@@ -69,22 +70,15 @@ namespace Deploy.Editor.DeployPlatforms
 
         public string ToJson()
         {
-            var dict = new Dictionary<string, string>
-            {
-                {"track", $"\"{track}\""},
-                {"status", $"\"{status}\""},
-                {"inAppUpdatePriority", inAppUpdatePriority.ToString()},
-                {"userFraction", userFraction.ToString()},
-                {"changesNotSentForReview", $"\"{changesNotSentForReview}\""},
-            };
+            var js = JsonUtility.ToJson(this);
+            var jObject = JObject.Parse(js);
             
             if (status is not "inProgress" and not "halted" )
             {
-                dict.Remove("userFraction");
+                jObject.Remove("userFraction");
             }
-            
-            var json = DictToJson(dict);
-            return json;
+
+            return jObject.ToString();
         }
 
         private string DictToJson(Dictionary<string, string> dict)
