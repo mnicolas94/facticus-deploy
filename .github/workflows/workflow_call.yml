@@ -92,6 +92,16 @@ jobs:
           large-packages: true
           docker-images: false
           swap-storage: false
+          
+      # --- Create swap file to increse virtual memory if requested
+      - name: Create swap file
+        if: ${{ fromJson(inputs.json_input).createSwapFile == true }}
+        run: |
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
 
       # --- Build ---
       - name: Build
