@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using Deploy.Editor.Data;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 using Utils.Editor;
+using Utils.Editor.EditorGUIUtils;
 
 namespace Deploy.Editor.Drawers
 {
@@ -26,6 +26,8 @@ namespace Deploy.Editor.Drawers
         private Label _foldoutLabel;
         private VisualElement _propertiesContainer;
 
+        private IntegerField _fileSizeField;
+        
         private readonly string[] _propertiesToUpdateLabel = new[]
         {
             "_buildPlatform",
@@ -35,6 +37,14 @@ namespace Deploy.Editor.Drawers
         public BuildDeployElementField(SerializedProperty property)
         {
             _property = property;
+            
+            var propertyToVisualElementMap = new Dictionary<string, Func<SerializedProperty, VisualElement>>
+            {
+                {"_buildPlatform", GetPlatformsVisualElements},
+                {"_deployPlatform", GetPlatformsVisualElements},
+                {"_createSwapFile", GetSwapFileVisualElement},
+                {"_swapFileSizeGb", GetSwapFileSizeVisualElement},
+            };
             
             var labelString = GetLabel(property);
 
@@ -60,20 +70,44 @@ namespace Deploy.Editor.Drawers
 
             _propertiesContainer = new VisualElement();
             _propertiesContainer.style.marginLeft = 30;
-            foreach (var sp in PropertiesUtils.GetSerializedProperties(property))
-            {
-                var propertyField = new PropertyField(sp);
-                _propertiesContainer.Add(propertyField);
-
-                // update label when platform values change
-                if (_propertiesToUpdateLabel.Contains(sp.name))
-                {
-                    propertyField.RegisterValueChangeCallback(OnAnyPlatformChanged);
-                }
-            }
+            var serializedProperties = PropertiesUtils.GetSerializedProperties(property);
+            GUIUtils.DrawSerializedProperties(_propertiesContainer, serializedProperties, propertyToVisualElementMap);
             
             Add(labelContainer);
             Add(_propertiesContainer);
+        }
+
+        private VisualElement GetPlatformsVisualElements(SerializedProperty sp)
+        {
+            var propertyField = new PropertyField(sp);
+
+            // update label when platform values change
+            propertyField.RegisterValueChangeCallback(OnAnyPlatformChanged);
+
+            return propertyField;
+        }
+
+        private VisualElement GetSwapFileSizeVisualElement(SerializedProperty property)
+        {
+            _fileSizeField = new IntegerField();
+            _fileSizeField.label = property.displayName;
+            _fileSizeField.BindProperty(property);
+            return _fileSizeField;
+        }
+
+        private VisualElement GetSwapFileVisualElement(SerializedProperty property)
+        {
+            var propertyField = new Toggle();
+            propertyField.label = property.displayName;
+            propertyField.BindProperty(property);
+            propertyField.RegisterValueChangedCallback(OnSwapFileToggleChanged);
+            return propertyField;
+        }
+
+        private void OnSwapFileToggleChanged(ChangeEvent<bool> changeEvent)
+        {
+            if (_fileSizeField == null) return;
+            _fileSizeField.style.display = changeEvent.newValue ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void OnAnyPlatformChanged(SerializedPropertyChangeEvent evt)
