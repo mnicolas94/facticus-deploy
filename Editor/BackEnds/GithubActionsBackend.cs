@@ -139,6 +139,7 @@ namespace Deploy.Editor.BackEnds
             var developmentBuild = first.DevelopmentBuild;
             var freeDiskSpace = first.FreeDiskSpaceBeforeBuild;
             var createSwapFile = first.CreateSwapFile;
+            var swapFileSize = first.SwapFileSizeGb;
             
             var deploySettings = DeploySettings.GetOrCreate();
             var versioningStrategy = deploySettings.VersioningStrategy;
@@ -162,6 +163,7 @@ namespace Deploy.Editor.BackEnds
                 { "developmentBuild", developmentBuild },
                 { "freeDiskSpace", freeDiskSpace },
                 { "createSwapFile", createSwapFile },
+                { "swapFileSize", swapFileSize },
                 { "versioningStrategy", versioningStrategy.ToString() },
                 { "deployPlatforms", deployPlatforms },
             };

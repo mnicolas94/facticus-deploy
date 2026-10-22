@@ -21,6 +21,10 @@ namespace Deploy.Editor.Data
                  "is being killed with an error code 137, which means out of memory in Unix runners.")]
         private bool _createSwapFile;
         
+        [Tooltip("Gb size of virtual memory allocated with swap file. GitHub Actions' free runners usually have 3GB," +
+                 " use a greater value here (e.g. 8) to increase the available memory.")]
+        [SerializeField] private int _swapFileSizeGb = 8;
+        
         [SerializeReference, SubclassSelector] private IBuildPlatform _buildPlatform;
         [SerializeReference, SubclassSelector] private IDeployPlatform _deployPlatform;
         // [SerializeField] private SubclassSelector<IDeployPlatform> _deployPlatformCustom;
@@ -32,6 +36,8 @@ namespace Deploy.Editor.Data
         public bool FreeDiskSpaceBeforeBuild => _freeDiskSpaceBeforeBuild;
 
         public bool CreateSwapFile => _createSwapFile;
+        
+        public int SwapFileSizeGb => _swapFileSizeGb;
 
         public IBuildPlatform BuildPlatform
         {
