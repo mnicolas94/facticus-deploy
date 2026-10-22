@@ -97,10 +97,18 @@ jobs:
       - name: Create swap file
         if: ${{ fromJson(inputs.json_input).createSwapFile == true }}
         run: |
+          echo "=== Default Memory and Swap (Before) ==="
+          free -h
+          
+          echo "=== Replacing Default Swap with 8G ==="
+          sudo swapoff /swapfile || true
+          sudo rm /swapfile
           sudo fallocate -l 8G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
+          
+          echo "=== Updated Memory and Swap (After) ==="
           free -h
 
       # --- Build ---
